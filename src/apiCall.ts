@@ -11,32 +11,43 @@ export const convertHtmlToPrompt = ({ contentRef }: { contentRef: RefObject<HTML
     const contentDiv = contentRef.current;
     let prompt = '';
     let isCharacterName = false;
-    
+    let isDiv = false;
+  
     Array.from(contentDiv.childNodes).forEach((child) => {
       if (child.nodeType === 3) { // Text node
-        prompt += child.textContent?.trim() ?? '';
-        if (isCharacterName) {
-          prompt += ': '; // Add colon and space after character name
-          isCharacterName = false; // Reset the flag
-        } else {
-          prompt += ' '; // Add a space between sentences/dialogues
+        const text = child.textContent?.trim() ?? '';
+        if (text.length > 0) {
+          if (isCharacterName) {
+            prompt += `: ${text}`;
+            isCharacterName = false; // Reset the flag
+            isDiv = false;
+          } else {
+            prompt += `${text} `;
+            isDiv = false; // Reset the flag
+          }
         }
       } else if (child.nodeType === 1) { // HTML element
         const element = child as HTMLElement;
         
         if (element.tagName === 'SPAN') {
-          prompt += `\n${element.textContent?.trim() ?? ''}`; // New line before character name
+          prompt += `\n${element.textContent?.trim() ?? ''}`;
           isCharacterName = true; // Flag that we're currently processing a character name
-        } else if (element.tagName === 'BR') {
-          // No new line for <br>
-        } else if (element.tagName === 'DIV') {
-          // No new line for new div
+        } else if (element.tagName === 'BR' || element.tagName === 'DIV') {
+          if (!isCharacterName && !isDiv) {
+            prompt += ' '; // Add a space if it's within a character's line
+          }
+          if (element.tagName === 'DIV') {
+            isDiv = true; // Flag that a new div started
+          }
         }
       }
     });
-    
+  
     return prompt.trim(); // Remove any extra spaces at the beginning or the end
   };
+  
+  
+  
 
   export const generateText = async ({ inputPrompt, max_length } : {inputPrompt: string, max_length?: number}) => {
     const apiUrl = "https://api.novelai.net/ai/generate";
@@ -81,21 +92,29 @@ export const convertHtmlToPrompt = ({ contentRef }: { contentRef: RefObject<HTML
     }
   };
   
-  export const convertTextToHtml = ({generatedText}: {generatedText: string}) => {
+  export const convertTextToHtml = ({ generatedText }: { generatedText: string }) => {
     const lines = generatedText.split('\n');
     let html = '';
     const parser = new DOMParser();
-    
+  
     lines.forEach((line) => {
-      // Identify a line description if it exists (format: [character] (description): dialogue)
-      const match = line.match(/\[(.*?)\](?:\s?\((.*?)\))?/);
-  
+      const match = line.match(/^([^:]+): (.*)$/);
       if (match) {
-        const characterName = match[1];
-        const lineDescription = match[2] ? ` (${match[2]})` : '';
-        const dialogue = line.replace(match[0], '').split(': ')[1];
+        const preDialogue = match[1].trim();
+        const dialogue = match[2].trim();
   
-        html += `<div><span>${characterName.trim()}</span>${lineDescription.trim()}: ${dialogue.trim()}</div>`;
+        let characterName = "";
+        let lineDescription = "";
+  
+        const descriptionMatch = preDialogue.match(/(.*) \((.*)\)/);
+        if (descriptionMatch) {
+          characterName = descriptionMatch[1];
+          lineDescription = `(${descriptionMatch[2]})`;
+        } else {
+          characterName = preDialogue;
+        }
+  
+        html += `<div><span>${characterName}</span>${lineDescription}<br/> ${dialogue}</div>`;
       } else {
         // For lines without a character name or description (could be stage directions or actions)
         html += `<div>${line.trim()}</div>`;
@@ -113,3 +132,4 @@ export const convertHtmlToPrompt = ({ contentRef }: { contentRef: RefObject<HTML
     // Convert the DOM fragment back to an HTML string
     return doc.body.innerHTML;
   };
+  
