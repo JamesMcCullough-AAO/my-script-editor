@@ -1,6 +1,8 @@
 import { Box, VStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, Button, Textarea, IconButton } from '@chakra-ui/react';
-import { DownloadIcon } from '@chakra-ui/icons';
+import { DownloadIcon, EditIcon } from '@chakra-ui/icons';
 import { useRef, useState } from 'react';
+import { convertHtmlToPrompt, convertTextToHtml, generateText } from './apiCall';
+import { applySpanStyles } from './styling';
 
 
 function App() {
@@ -10,14 +12,20 @@ function App() {
   const [importText, setImportText] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const applySpanStyles = (span: HTMLSpanElement) => {
-    span.style.backgroundColor = "lightblue";
-    span.style.borderRadius = "12px";
-    span.style.color = "black";
-    span.style.padding = "2px 5px";
-    span.style.marginLeft = "30px";
-    span.style.marginRight = "5px";
+  const handleGenerateText = async () => {
+    const prompt = convertHtmlToPrompt({contentRef});
+    console.log('Prompt: ' + prompt);
+    const generatedText = await generateText({inputPrompt: prompt});
+    console.log('Generated Text: ' + generatedText);
+    const html = convertTextToHtml({generatedText});
+    console.log('HTML: ' + html);
+    
+    const contentDiv = contentRef.current;
+    if (contentDiv) {
+      contentDiv.innerHTML += html;
+    }
   };
+  
 
   const exportScript = () => {
     const contentDiv = contentRef.current;
@@ -162,9 +170,13 @@ function App() {
   return (
     <Box display="flex" alignItems="center" justifyContent="center" height="100vh">
       {/* Button Area */}
-      <Box position="fixed" left="1em" top="50%" transform="translateY(-50%)">
+  <Box position="fixed" left="1em" top="50%" transform="translateY(-50%)">
+      <VStack spacing={4} p={5} flex='1' height="100vh" alignItems="center" justifyContent="center">
         <IconButton aria-label="Download script" icon={<DownloadIcon />} onClick={onOpen} />
+        <IconButton aria-label="Generate text" icon={<EditIcon />} onClick={handleGenerateText} />
+</VStack>
       </Box>
+  {/* ... rest of your JSX ... */}
       <VStack spacing={4} p={5} flex='1' height="100vh" alignItems="center" justifyContent="center">
         <Box flex='1' width='100%' height='100%' display="flex" alignItems="center" justifyContent="center">
           <div
