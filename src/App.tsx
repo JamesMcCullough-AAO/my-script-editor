@@ -16,12 +16,11 @@ import {
   Input,
   List,
   ListItem,
-  Flex,
   HStack,
 } from "@chakra-ui/react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
-import IosShareIcon from "@mui/icons-material/IosShare";
+import DownloadIcon from "@mui/icons-material/Download";
 import CreateIcon from "@mui/icons-material/Create";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import EditNoteIcon from "@mui/icons-material/EditNote";
@@ -39,6 +38,8 @@ function App() {
   const [title, setTitle] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [newScriptTitle, setNewScriptTitle] = useState("");
+  const [oldScriptTitle, setOldScriptTitle] = useState("");
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
@@ -54,6 +55,11 @@ function App() {
     isOpen: isDeleteModalOpen,
     onOpen: onDeleteModalOpen,
     onClose: onDeleteModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isRenameModalOpen,
+    onOpen: onRenameModalOpen,
+    onClose: onRenameModalClose,
   } = useDisclosure();
 
   const handleOpenMenu = () => {
@@ -107,6 +113,46 @@ function App() {
       .filter(({ title }) => title.toLowerCase().includes(searchTerm));
   };
 
+  const getAllSavedScripts = () => {
+    const savedScripts = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("script_")) {
+        const data = JSON.parse(localStorage.getItem(key) || "{}");
+        savedScripts.push({
+          title: key.substring(7),
+          content: data.content,
+          timestamp: data.timestamp,
+        });
+      }
+    }
+    // Sort by most recently edited and filter based on search term
+    return savedScripts.sort((a, b) => b.timestamp - a.timestamp);
+  };
+
+  const handleOpenRenameModal = (scriptTitle: string) => {
+    setOldScriptTitle(scriptTitle);
+    onRenameModalOpen();
+  };
+
+  const handleRenameScript = () => {
+    if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
+      if (
+        getAllSavedScripts().some((script) => script.title === newScriptTitle)
+      ) {
+        alert("This title already exists!");
+        return;
+      }
+      const scriptJSON = localStorage.getItem(`script_${oldScriptTitle}`);
+      localStorage.removeItem(`script_${oldScriptTitle}`);
+      localStorage.setItem(`script_${newScriptTitle}`, scriptJSON || "");
+      setTitle(newScriptTitle);
+    }
+    setOldScriptTitle("");
+    setNewScriptTitle("");
+    onRenameModalClose();
+  };
+
   const deleteScript = () => {
     // Remove script from local storage
     localStorage.removeItem(`script_${title}`);
@@ -136,10 +182,17 @@ function App() {
   };
 
   const newScript = () => {
-    if (contentRef.current) {
-      contentRef.current.innerHTML = "";
+    const newTitle = prompt("Enter a new script title:", "");
+    if (newTitle) {
+      if (getAllSavedScripts().some((script) => script.title === newTitle)) {
+        alert("This title already exists!");
+        return;
+      }
+      if (contentRef.current) {
+        contentRef.current.innerHTML = "";
+      }
+      setTitle(newTitle);
     }
-    setTitle("");
   };
 
   useEffect(() => {
@@ -282,7 +335,7 @@ function App() {
             <HStack justifyContent="center" mb={4} spacing="2">
               <IconButton
                 aria-label="Download script"
-                icon={<IosShareIcon />}
+                icon={<DownloadIcon />}
                 onClick={onOpen}
                 isDisabled={isGenerating}
               />
@@ -291,6 +344,11 @@ function App() {
                 icon={<NoteAddIcon />}
                 onClick={newScript}
                 isDisabled={isGenerating}
+              />
+              <IconButton
+                aria-label="Rename script"
+                icon={<EditNoteIcon />}
+                onClick={() => handleOpenRenameModal(title)}
               />
               <IconButton
                 aria-label="Delete script"
@@ -337,6 +395,28 @@ function App() {
               Delete
             </Button>
             <Button variant="ghost" onClick={onDeleteModalClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isRenameModalOpen} onClose={onRenameModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Rename Script</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              value={newScriptTitle}
+              onChange={(e) => setNewScriptTitle(e.target.value)}
+              placeholder="New Script Title"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleRenameScript}>
+              Rename
+            </Button>
+            <Button variant="ghost" onClick={onRenameModalClose}>
               Cancel
             </Button>
           </ModalFooter>
