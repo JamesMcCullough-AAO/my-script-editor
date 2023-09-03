@@ -1,221 +1,349 @@
-import { Box, VStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, Button, Textarea, IconButton } from '@chakra-ui/react';
-import { DownloadIcon, EditIcon } from '@chakra-ui/icons';
-import { useRef, useState } from 'react';
-import { convertHtmlToPrompt, convertTextToHtml, generateText } from './apiCall';
-import { applySpanStyles } from './styling';
-
+import {
+  Box,
+  VStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  Text,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Button,
+  Textarea,
+  IconButton,
+  Input,
+  List,
+  ListItem,
+  Flex,
+  HStack,
+} from "@chakra-ui/react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MenuIcon from "@mui/icons-material/Menu";
+import IosShareIcon from "@mui/icons-material/IosShare";
+import CreateIcon from "@mui/icons-material/Create";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import { useEffect, useRef, useState } from "react";
+import { exportScript, importScript } from "./utils";
+import { handleGenerateText, handleKeyDown } from "./handlers";
+import PendingIcon from "@mui/icons-material/Pending";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [isCharacterName, setIsCharacterName] = useState(false);
   const [isLineDescription, setIsLineDescription] = useState(false);
-  const [importText, setImportText] = useState('');
+  const [importText, setImportText] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [title, setTitle] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [savedScriptTitles, setSavedScriptTitles] = useState([
+    {
+      title: "",
+      timestamp: 0,
+    },
+  ]); // New state to hold saved script titles
+  const {
+    isOpen: isMenuOpen,
+    onOpen: onMenuOpen,
+    onClose: onMenuClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onClose: onDeleteModalClose,
+  } = useDisclosure();
 
-  const handleGenerateText = async () => {
-    const prompt = convertHtmlToPrompt({contentRef});
-    console.log('Prompt: ' + prompt);
-    const generatedText = await generateText({inputPrompt: prompt});
-    console.log('Generated Text: ' + generatedText);
-    const html = convertTextToHtml({generatedText});
-    console.log('HTML: ' + html);
-    
-    const contentDiv = contentRef.current;
-    if (contentDiv) {
-      contentDiv.innerHTML += html;
+  const handleOpenMenu = () => {
+    const savedScriptTitles = getSavedScriptTitles();
+    setSavedScriptTitles(savedScriptTitles);
+    setSearchTerm("");
+    onMenuOpen();
+  };
+
+  useEffect(() => {
+    const updatedScriptTitles = getSavedScriptTitles();
+    setSavedScriptTitles(updatedScriptTitles);
+  }, [searchTerm]);
+
+  type handleSelectScriptInput = {
+    title: string;
+  };
+  const handleSelectScript = ({ title }: handleSelectScriptInput) => {
+    loadScript({ title });
+    onMenuClose();
+  };
+
+  type saveScriptInput = {
+    title: string;
+  };
+  const saveScript = ({ title }: saveScriptInput) => {
+    if (title && contentRef.current) {
+      const payload = {
+        content: contentRef.current.innerHTML,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(`script_${title}`, JSON.stringify(payload));
     }
   };
-  
 
-  const exportScript = () => {
-    const contentDiv = contentRef.current;
-    let scriptText = '';
-  
-    const traverseNode = (node: Node) => {
-      if (node.nodeType === 3) { // Text node
-        scriptText += node.textContent;
-      } else if (node.nodeType === 1) { // HTML element
-        const element = node as HTMLElement;
-  
-        if (element.tagName === 'SPAN') {
-          scriptText += `\t[${element.textContent}] `;
-        } else if (element.tagName === 'DIV') {
-          // Recurse into the div to check its children
-          Array.from(element.childNodes).forEach(traverseNode);
-          // Add a newline after exiting each div to separate lines
-          scriptText += '\n';
-        } else if (element.tagName === 'BR') {
-          // Add a newline when a br tag is encountered
-          scriptText += '\n';
-        }
+  const getSavedScriptTitles = () => {
+    const savedTitles = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("script_")) {
+        const data = JSON.parse(localStorage.getItem(key) || "{}");
+        savedTitles.push({
+          title: key.substring(7),
+          timestamp: data.timestamp,
+        });
       }
-    };
-  
-    if (contentDiv) {
-      Array.from(contentDiv.childNodes).forEach(traverseNode);
     }
-  
-    // Trigger a download of the script
-    const blob = new Blob([scriptText], {type: "text/plain"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'script.txt';
-    a.click();
-    URL.revokeObjectURL(url);
+    // Sort by most recently edited and filter based on search term
+    return savedTitles
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .filter(({ title }) => title.toLowerCase().includes(searchTerm));
   };
 
-  const importScript = (text: string) => {
-    const contentDiv = contentRef.current;
-    
-    if (contentDiv) {
-      contentDiv.innerHTML = ''; // Clear existing content
-  
-      let lines = text.split('\n');
-      
-      lines.forEach((line) => {
-        const tabIndex = line.indexOf('\t');
-        
-        if (tabIndex !== -1) {
-          const character = line.slice(tabIndex + 2, line.indexOf(']'));
-          const span = document.createElement("span");
-          span.textContent = character;
-          applySpanStyles(span);
-  
-          contentDiv.appendChild(span);
-          const remainingText = document.createTextNode(line.slice(line.indexOf(']') + 2));
-          contentDiv.appendChild(remainingText);
-        } else {
-          const textNode = document.createTextNode(line);
-          contentDiv.appendChild(textNode);
-        }
-  
-        const linebreakNode = document.createElement('br');
-        contentDiv.appendChild(linebreakNode);
-      });
-    }
-  };
-  
+  const deleteScript = () => {
+    // Remove script from local storage
+    localStorage.removeItem(`script_${title}`);
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    const contentDiv = contentRef.current;
-    if (!contentDiv) return;
-  
-    const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
-  
-    if (event.key === '[' || event.key === 'Tab') {
-      event.preventDefault();
-    
-      setIsCharacterName(true);
-    
-      const span = document.createElement("span");
-      applySpanStyles(span);
-      range?.insertNode(span);
-      range?.setStart(span, 0); // Place the cursor inside the span for typing the character name
+    // Clear the input and title
+    if (contentRef.current) {
+      contentRef.current.innerHTML = "";
     }
-    
-  
-    if (event.key === ']' && isCharacterName) {
-      event.preventDefault();
-  
-      setIsCharacterName(false);
-      setIsLineDescription(true);
-  
-      const span = range?.commonAncestorContainer?.parentNode;
-      if (span && span.nextSibling) {
-        range?.setStartBefore(span.nextSibling); // Move cursor outside the span
-      } else if (span && span.parentNode) {
-        range?.setStartAfter(span); // If no next sibling exists, place cursor at the end
+    setTitle("");
+
+    // Close the delete modal
+    onDeleteModalClose();
+  };
+
+  type loadScriptInput = {
+    title: string;
+  };
+  const loadScript = ({ title }: loadScriptInput) => {
+    const savedScriptJSON = localStorage.getItem(`script_${title}`);
+    if (savedScriptJSON) {
+      const { content } = JSON.parse(savedScriptJSON);
+      if (content && contentRef.current) {
+        contentRef.current.innerHTML = content;
+        setTitle(title);
       }
-      // add a space and open brack after the span
-      const spaceNode = document.createTextNode(' (');
-      range?.insertNode(spaceNode);
-      range?.setStartAfter(spaceNode);
-    }
-
-    if (event.key === 'Enter' && isCharacterName) {
-      event.preventDefault();
-  
-      setIsCharacterName(false);
-      setIsLineDescription(false);
-  
-      const span = range?.commonAncestorContainer?.parentNode;
-      if (span && span.nextSibling) {
-        range?.setStartBefore(span.nextSibling); // Move cursor outside the span
-      } else if (span && span.parentNode) {
-        range?.setStartAfter(span); // If no next sibling exists, place cursor at the end
-      }
-      // add a space and open brack after the span
-      const linebreakNode = document.createElement('br');
-      range?.insertNode(linebreakNode);
-      range?.setStartAfter(linebreakNode);
-    }
-
-    if (event.key === ')' && isLineDescription) {
-      event.preventDefault();
-
-      setIsLineDescription(false);
-      // Move the cursor after the closing bracket
-      const spaceNode = document.createTextNode(')');
-      range?.insertNode(spaceNode);
-      range?.setStartAfter(spaceNode);
-      const linebreakNode = document.createElement('br');
-      range?.insertNode(linebreakNode);
-      range?.setStartAfter(linebreakNode);
     }
   };
-  
+
+  const newScript = () => {
+    if (contentRef.current) {
+      contentRef.current.innerHTML = "";
+    }
+    setTitle("");
+  };
+
+  useEffect(() => {
+    if (contentRef.current) {
+      saveScript({ title });
+    }
+  }, [contentRef.current?.innerHTML]);
 
   return (
-    <Box display="flex" alignItems="center" justifyContent="center" height="100vh">
+    <Box
+      // Box should fill the entire window and expand to fit the content
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      height="100vh"
+      backgroundColor="black"
+    >
       {/* Button Area */}
-  <Box position="fixed" left="1em" top="50%" transform="translateY(-50%)">
-      <VStack spacing={4} p={5} flex='1' height="100vh" alignItems="center" justifyContent="center">
-        <IconButton aria-label="Download script" icon={<DownloadIcon />} onClick={onOpen} />
-        <IconButton aria-label="Generate text" icon={<EditIcon />} onClick={handleGenerateText} />
-</VStack>
+      <Box position="fixed" left="1" top="50%" transform="translateY(-50%)">
+        <VStack
+          spacing={2}
+          p={2}
+          flex="1"
+          height="100vh"
+          justifyContent="start"
+        >
+          <IconButton
+            aria-label="Open menu"
+            icon={<MenuIcon />}
+            onClick={handleOpenMenu}
+            isDisabled={isGenerating}
+          />
+          <IconButton
+            colorScheme="blue"
+            aria-label="Generate text"
+            icon={isGenerating ? <PendingIcon /> : <CreateIcon />}
+            onClick={() => {
+              handleGenerateText({ contentRef, setIsGenerating });
+            }}
+            isDisabled={isGenerating}
+          />
+        </VStack>
       </Box>
-  {/* ... rest of your JSX ... */}
-      <VStack spacing={4} p={5} flex='1' height="100vh" alignItems="center" justifyContent="center">
-        <Box flex='1' width='100%' height='100%' display="flex" alignItems="center" justifyContent="center">
+      <VStack
+        spacing={3}
+        p={2}
+        flex="1"
+        height="100vh"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Box width="1000px">
+          <Text
+            color="white"
+            fontWeight={600}
+            fontSize="24px"
+            textAlign="center"
+          >
+            {title}
+          </Text>
+        </Box>
+        <Box
+          flex="1"
+          width="1000px" // Set the width
+          height="calc(100vh - 100px)" // Set the height based on the viewport height and size of the other components
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
           <div
-            contentEditable
+            contentEditable={!isGenerating}
             placeholder="Type your script here..."
-            style={{ height: '100%', minHeight: '100vh', width: '1000px', overflowY: 'auto', backgroundColor: 'gray', color: 'white', padding: '1em', borderRadius: '0.25em' }}
+            style={{
+              maxHeight: "100%", // Set the maximum height
+              minHeight: "100%", // Set the minimum height
+              overflowY: "auto", // Enable vertical scrolling
+              width: "100%",
+              backgroundColor: "#424242",
+              color: "white",
+              padding: "1em",
+              borderRadius: "0.25em",
+              fontSize: "18px",
+            }}
             ref={contentRef}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(event) => {
+              handleKeyDown(event, {
+                contentRef,
+                isCharacterName,
+                setIsCharacterName,
+                isLineDescription,
+                setIsLineDescription,
+              });
+            }}
           ></div>
         </Box>
       </VStack>
       <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Import/Export Script</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Textarea placeholder="Paste your script here to import..." value={importText} onChange={(event) => setImportText(event.target.value)}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={() => {
-            importScript(importText);
-            onClose();
-          }}>
-            Import
-          </Button>
-          <Button variant="ghost" onClick={() => {
-            exportScript();
-            onClose();
-          }}>
-            Export
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Import/Export Script</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Textarea
+              placeholder="Paste your script here to import..."
+              value={importText}
+              onChange={(event) => setImportText(event.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                importScript({ text: importText, contentRef });
+                onClose();
+              }}
+            >
+              Import
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                exportScript({
+                  contentRef,
+                });
+                onClose();
+              }}
+            >
+              Export
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isMenuOpen} onClose={onMenuClose} size="2xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Menu</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <HStack justifyContent="center" mb={4} spacing="2">
+              <IconButton
+                aria-label="Download script"
+                icon={<IosShareIcon />}
+                onClick={onOpen}
+                isDisabled={isGenerating}
+              />
+              <IconButton
+                aria-label="Create Script"
+                icon={<NoteAddIcon />}
+                onClick={newScript}
+                isDisabled={isGenerating}
+              />
+              <IconButton
+                aria-label="Delete script"
+                colorScheme="red"
+                icon={<DeleteIcon />}
+                onClick={onDeleteModalOpen}
+                isDisabled={isGenerating}
+              />
+            </HStack>
+            <Text>
+              {savedScriptTitles.length === 0
+                ? "No saved scripts"
+                : "Saved Scripts"}
+            </Text>
+            <Input
+              placeholder="Search scripts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+            />
+            <List spacing={3}>
+              {savedScriptTitles.map((script) => (
+                <ListItem
+                  border="1px solid #ccc"
+                  borderRadius="0.25em"
+                  padding="0.5em"
+                  key={script.title}
+                  onClick={() => handleSelectScript({ title: script.title })}
+                >
+                  {script.title}
+                </ListItem>
+              ))}
+            </List>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Deletion</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>Are you sure you want to delete this script?</ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={deleteScript}>
+              Delete
+            </Button>
+            <Button variant="ghost" onClick={onDeleteModalClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
-  
 }
 
 export default App;
