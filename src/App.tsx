@@ -14,6 +14,7 @@ import {
   Textarea,
   IconButton,
   Input,
+  Image,
   List,
   ListItem,
   HStack,
@@ -24,8 +25,10 @@ import DownloadIcon from "@mui/icons-material/Download";
 import CreateIcon from "@mui/icons-material/Create";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import InfoIcon from "@mui/icons-material/Info";
 import { useEffect, useRef, useState } from "react";
 import {
+  deleteScript,
   exportScript,
   formatTimestamp,
   importScript,
@@ -80,25 +83,16 @@ function App() {
     onOpen: onNameModalOpen,
     onClose: onNameModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isInfoModalOpen,
+    onOpen: onInfoModalOpen,
+    onClose: onInfoModalClose,
+  } = useDisclosure();
 
   useEffect(() => {
     const updatedScriptTitles = searchSavedTitles({ title, searchTerm });
     setSavedScriptTitles(updatedScriptTitles);
   }, [searchTerm]);
-
-  const deleteScript = () => {
-    // Remove script from local storage
-    localStorage.removeItem(`script_${title}`);
-
-    // Clear the input and title
-    if (contentRef.current) {
-      contentRef.current.innerHTML = "";
-    }
-    setTitle("");
-
-    // Close the delete modal
-    onDeleteModalClose();
-  };
 
   useEffect(() => {
     if (contentRef.current) {
@@ -116,55 +110,55 @@ function App() {
   }, [title]); // This useEffect runs every time `title` changes
 
   return (
-    <Box
+    <HStack
       // Box should fill the entire window and expand to fit the content
       display="flex"
       alignItems="center"
       justifyContent="center"
-      height="100vh"
       backgroundColor="black"
+      spacing={0}
+      height="100vh"
     >
       {/* Button Area */}
-      <Box position="fixed" left="1" top="50%" transform="translateY(-50%)">
-        <VStack
-          spacing={2}
-          p={2}
-          flex="1"
-          height="100vh"
-          justifyContent="start"
-        >
-          <IconButton
-            aria-label="Open menu"
-            icon={<MenuIcon />}
-            onClick={() => {
-              handleOpenMenu({
-                title,
-                setSavedScriptTitles,
-                setSearchTerm,
-                onMenuOpen,
-              });
-            }}
-            isDisabled={isGenerating}
-          />
-          <IconButton
-            colorScheme="blue"
-            aria-label="Generate text"
-            icon={isGenerating ? <PendingIcon /> : <CreateIcon />}
-            onClick={() => {
-              handleGenerateText({ contentRef, setIsGenerating });
-            }}
-            isDisabled={isGenerating}
-            visibility={title ? "visible" : "hidden"}
-          />
-        </VStack>
-      </Box>
+      <VStack
+        spacing={2}
+        p="2"
+        backgroundColor="#1d2330"
+        width="fit-content"
+        alignItems="start"
+        height="100vh"
+      >
+        <IconButton
+          aria-label="Open menu"
+          icon={<MenuIcon />}
+          onClick={() => {
+            handleOpenMenu({
+              title,
+              setSavedScriptTitles,
+              setSearchTerm,
+              onMenuOpen,
+            });
+          }}
+          isDisabled={isGenerating}
+        />
+        <IconButton
+          colorScheme="blue"
+          aria-label="Generate text"
+          icon={isGenerating ? <PendingIcon /> : <CreateIcon />}
+          onClick={() => {
+            handleGenerateText({ contentRef, setIsGenerating });
+          }}
+          isDisabled={isGenerating}
+          visibility={title ? "visible" : "hidden"}
+        />
+      </VStack>
       <VStack
         spacing={3}
         p={2}
         flex="1"
-        height="100vh"
         alignItems="center"
         justifyContent="center"
+        height="100vh"
       >
         {!title && (
           <VStack position="absolute">
@@ -180,52 +174,55 @@ function App() {
               Click the menu button in the top left to select a script or create
               a new one.
             </Text>
+            <Image src="favicon.png" width="300px" />
           </VStack>
         )}
-        <Box width="1000px">
-          <Text
-            color="white"
-            fontWeight={600}
-            fontSize="24px"
-            textAlign="center"
+        <VStack maxWidth="1000px" width="full" alignItems="start" height="100%">
+          <HStack id="title-bar">
+            {title && (
+              <Image src="favicon.png" width="40px" marginRight="5px" />
+            )}
+            <Text color="white" fontWeight={600} fontSize="24px">
+              {title}
+            </Text>
+          </HStack>
+          <VStack
+            maxWidth="1000px"
+            width="100%"
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="row"
+            //Define height by parent, subtracting the height of the button area
+            height={`calc(100% - ${
+              (document.getElementById("title-bar")?.clientHeight || 0) + 8
+            }px)`}
           >
-            {title}
-          </Text>
-        </Box>
-        <Box
-          flex="1"
-          width="1000px" // Set the width
-          height="calc(100vh - 100px)" // Set the height based on the viewport height and size of the other components
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <div
-            contentEditable={!isGenerating && !!title}
-            placeholder="Type your script here..."
-            style={{
-              maxHeight: "100%", // Set the maximum height
-              minHeight: "100%", // Set the minimum height
-              overflowY: "auto", // Enable vertical scrolling
-              width: "100%",
-              backgroundColor: "#424242",
-              color: "white",
-              padding: "1em",
-              borderRadius: "0.25em",
-              fontSize: "18px",
-            }}
-            ref={contentRef}
-            onKeyDown={(event) => {
-              handleKeyDown(event, {
-                contentRef,
-                isCharacterName,
-                setIsCharacterName,
-                isLineDescription,
-                setIsLineDescription,
-              });
-            }}
-          ></div>
-        </Box>
+            <div
+              contentEditable={!isGenerating && !!title}
+              placeholder="Type your script here..."
+              style={{
+                overflowY: "auto", // Enable vertical scrolling
+                width: "100%",
+                height: "100%",
+                backgroundColor: "#424242",
+                color: "white",
+                padding: "1em",
+                borderRadius: "0.25em",
+                fontSize: "18px",
+              }}
+              ref={contentRef}
+              onKeyDown={(event) => {
+                handleKeyDown(event, {
+                  contentRef,
+                  isCharacterName,
+                  setIsCharacterName,
+                  isLineDescription,
+                  setIsLineDescription,
+                });
+              }}
+            ></div>
+          </VStack>
+        </VStack>
       </VStack>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -254,6 +251,7 @@ function App() {
               variant="ghost"
               onClick={() => {
                 exportScript({
+                  title,
                   contentRef,
                 });
                 onClose();
@@ -302,6 +300,7 @@ function App() {
                 }
                 isDisabled={isGenerating || !title}
               />
+
               <IconButton
                 aria-label="Delete script"
                 colorScheme="red"
@@ -311,6 +310,12 @@ function App() {
                   onMenuClose();
                 }}
                 isDisabled={isGenerating || !title}
+              />
+              <IconButton
+                aria-label="Info Box"
+                icon={<InfoIcon />}
+                colorScheme="purple"
+                onClick={onInfoModalOpen}
               />
             </HStack>
             {savedScriptTitles.length === 0 && (
@@ -362,7 +367,18 @@ function App() {
           <ModalCloseButton />
           <ModalBody>Are you sure you want to delete this script?</ModalBody>
           <ModalFooter>
-            <Button colorScheme="red" mr={3} onClick={deleteScript}>
+            <Button
+              colorScheme="red"
+              mr={3}
+              onClick={() => {
+                deleteScript({
+                  title,
+                  onDeleteModalClose,
+                  contentRef,
+                  setTitle,
+                });
+              }}
+            >
               Delete
             </Button>
             <Button variant="ghost" onClick={onDeleteModalClose}>
@@ -440,7 +456,31 @@ function App() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </Box>
+      <Modal isOpen={isInfoModalOpen} onClose={onInfoModalClose}>
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Information</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              This is a simple script editor. All scripts are stored locally on
+              your local storage.
+            </Text>
+            <Text paddingTop="4" fontWeight="bold">
+              --- Keyboard Shortcuts ---
+            </Text>
+            <Text>
+              <b>Tab or "["</b> - Begin a new character name <br />
+              <b>Enter</b> - Finish a charcter name, start line. <br />
+              <b>"]"</b> - Finish a character name, begin line description.{" "}
+              <br />
+              <b>")"</b> - Finish a line description, start line. <br />
+            </Text>
+          </ModalBody>
+          <ModalFooter></ModalFooter>
+        </ModalContent>
+      </Modal>
+    </HStack>
   );
 }
 

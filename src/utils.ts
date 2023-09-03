@@ -1,6 +1,7 @@
 import { applySpanStyles } from "./styling";
 
 type exportScriptProps = {
+  title: string;
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
@@ -28,7 +29,7 @@ export const formatTimestamp = ({ timestamp }: formatTimestampProps) => {
   }
 };
 
-export const exportScript = ({ contentRef }: exportScriptProps) => {
+export const exportScript = ({ title, contentRef }: exportScriptProps) => {
   const contentDiv = contentRef.current;
   let scriptText = "";
 
@@ -63,7 +64,7 @@ export const exportScript = ({ contentRef }: exportScriptProps) => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "script.txt";
+  a.download = title + ".txt";
   a.click();
   URL.revokeObjectURL(url);
 };
@@ -226,4 +227,30 @@ export const newScript = ({
     onNameModalClose();
     onMenuClose();
   }
+};
+
+type DeleteScriptParams = {
+  title: string;
+  contentRef: React.MutableRefObject<HTMLDivElement | null>;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  onDeleteModalClose: () => void;
+};
+
+export const deleteScript = ({
+  title,
+  contentRef,
+  setTitle,
+  onDeleteModalClose,
+}: DeleteScriptParams) => {
+  // Remove script from local storage
+  localStorage.removeItem(`script_${title}`);
+
+  // Clear the input and title
+  if (contentRef.current) {
+    contentRef.current.innerHTML = "";
+  }
+  setTitle("");
+
+  // Close the delete modal
+  onDeleteModalClose();
 };
