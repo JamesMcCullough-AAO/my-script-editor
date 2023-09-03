@@ -163,14 +163,20 @@ function App() {
         justifyContent="center"
       >
         {!title && (
-          <Text
-            color="white"
-            fontWeight={600}
-            fontSize="24px"
-            textAlign="center"
-          >
-            Click the menu button to create a new script!
-          </Text>
+          <VStack position="absolute">
+            <Text
+              color="white"
+              fontWeight={600}
+              fontSize="38px"
+              textAlign="center"
+            >
+              Welcome to the Script Editor!
+            </Text>
+            <Text color="white" fontSize="16px" textAlign="center">
+              Click the menu button in the top left to select a script or create
+              a new one.
+            </Text>
+          </VStack>
         )}
         <Box width="1000px">
           <Text
