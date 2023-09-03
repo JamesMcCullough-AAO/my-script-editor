@@ -111,6 +111,10 @@ function App() {
     onNameModalOpen();
   };
 
+  useEffect(() => {
+    document.title = title || "Script Editor"; // Set the title to the script title or some default title
+  }, [title]); // This useEffect runs every time `title` changes
+
   return (
     <Box
       // Box should fill the entire window and expand to fit the content
