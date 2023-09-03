@@ -51,6 +51,14 @@ export const exportScript = ({ title, contentRef }: exportScriptProps) => {
       } else if (element.tagName === "BR") {
         // Add a newline when a br tag is encountered
         scriptText += "\n";
+      } else if (element.tagName === "I") {
+        // Add italics markup
+        scriptText += `[i]${element.textContent}[/i]`;
+      } else if (element.tagName === "B") {
+        // Add bold markup
+        scriptText += `[b]${element.textContent}[/b]`;
+      } else if (element.tagName === "U") {
+        scriptText += `[u]${element.textContent}[/u]`;
       }
     }
   };
@@ -107,12 +115,26 @@ export const importScript = ({ contentRef, text }: importScriptProps) => {
   }
 };
 
+const removeInvisibleCharacters = (text: string) => {
+  // Returns invisible characters from the HTML
+  const invisibleCharacters = text.match(/&nbsp;|<br>|<div><br><\/div>/g);
+  if (invisibleCharacters) {
+    return invisibleCharacters.join("");
+  }
+  return "";
+};
+
 type saveScriptInput = {
   title: string;
   contentRef: React.RefObject<HTMLDivElement>;
 };
 export const saveScript = ({ title, contentRef }: saveScriptInput) => {
-  if (title && contentRef.current) {
+  if (
+    title &&
+    contentRef.current &&
+    contentRef.current.innerHTML &&
+    removeInvisibleCharacters(contentRef.current.innerHTML).length > 5
+  ) {
     const payload = {
       content: contentRef.current.innerHTML,
       timestamp: Date.now(),

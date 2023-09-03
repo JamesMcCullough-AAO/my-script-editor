@@ -329,11 +329,12 @@ function App() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
                 />
-                <List width="100%">
+                <List width="100%" spacing="1">
                   {savedScriptTitles.map((script) => (
                     <ListItem
                       border="1px solid #ccc"
                       borderRadius="0.25em"
+                      backgroundColor="#1d2330"
                       padding="0.5em"
                       key={script.title}
                       onClick={() =>
@@ -345,9 +346,17 @@ function App() {
                           setTitle,
                         })
                       }
+                      // Hilight the hovered item
+                      _hover={{
+                        backgroundColor: "#007050",
+                        cursor: "pointer",
+                      }}
                     >
                       <HStack justifyContent="space-between">
-                        <Text>{script.title}</Text>
+                        <HStack>
+                          <Image src="documentIcon.png" width="30px" />
+                          <Text>{script.title}</Text>
+                        </HStack>
                         <Text>
                           {formatTimestamp({ timestamp: script.timestamp })}
                         </Text>
