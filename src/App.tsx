@@ -23,10 +23,24 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DownloadIcon from "@mui/icons-material/Download";
 import CreateIcon from "@mui/icons-material/Create";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import EditNoteIcon from "@mui/icons-material/EditNote";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { useEffect, useRef, useState } from "react";
-import { exportScript, importScript } from "./utils";
-import { handleGenerateText, handleKeyDown } from "./handlers";
+import {
+  exportScript,
+  formatTimestamp,
+  importScript,
+  newScript,
+  saveScript,
+  searchSavedTitles,
+} from "./utils";
+import {
+  handleGenerateText,
+  handleKeyDown,
+  handleOpenMenu,
+  handleOpenRenameModal,
+  handleRenameScript,
+  handleSelectScript,
+} from "./handlers";
 import PendingIcon from "@mui/icons-material/Pending";
 
 function App() {
@@ -61,97 +75,16 @@ function App() {
     onOpen: onRenameModalOpen,
     onClose: onRenameModalClose,
   } = useDisclosure();
-
-  const handleOpenMenu = () => {
-    const savedScriptTitles = getSavedScriptTitles();
-    setSavedScriptTitles(savedScriptTitles);
-    setSearchTerm("");
-    onMenuOpen();
-  };
+  const {
+    isOpen: isNameModalOpen,
+    onOpen: onNameModalOpen,
+    onClose: onNameModalClose,
+  } = useDisclosure();
 
   useEffect(() => {
-    const updatedScriptTitles = getSavedScriptTitles();
+    const updatedScriptTitles = searchSavedTitles({ title, searchTerm });
     setSavedScriptTitles(updatedScriptTitles);
   }, [searchTerm]);
-
-  type handleSelectScriptInput = {
-    title: string;
-  };
-  const handleSelectScript = ({ title }: handleSelectScriptInput) => {
-    loadScript({ title });
-    onMenuClose();
-  };
-
-  type saveScriptInput = {
-    title: string;
-  };
-  const saveScript = ({ title }: saveScriptInput) => {
-    if (title && contentRef.current) {
-      const payload = {
-        content: contentRef.current.innerHTML,
-        timestamp: Date.now(),
-      };
-      localStorage.setItem(`script_${title}`, JSON.stringify(payload));
-    }
-  };
-
-  const getSavedScriptTitles = () => {
-    const savedTitles = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("script_")) {
-        const data = JSON.parse(localStorage.getItem(key) || "{}");
-        savedTitles.push({
-          title: key.substring(7),
-          timestamp: data.timestamp,
-        });
-      }
-    }
-    // Sort by most recently edited and filter based on search term
-    return savedTitles
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .filter(({ title }) => title.toLowerCase().includes(searchTerm));
-  };
-
-  const getAllSavedScripts = () => {
-    const savedScripts = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("script_")) {
-        const data = JSON.parse(localStorage.getItem(key) || "{}");
-        savedScripts.push({
-          title: key.substring(7),
-          content: data.content,
-          timestamp: data.timestamp,
-        });
-      }
-    }
-    // Sort by most recently edited and filter based on search term
-    return savedScripts.sort((a, b) => b.timestamp - a.timestamp);
-  };
-
-  const handleOpenRenameModal = (scriptTitle: string) => {
-    setOldScriptTitle(scriptTitle);
-    onRenameModalOpen();
-  };
-
-  const handleRenameScript = () => {
-    if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
-      if (
-        getAllSavedScripts().some((script) => script.title === newScriptTitle)
-      ) {
-        alert("This title already exists!");
-        return;
-      }
-      const scriptJSON = localStorage.getItem(`script_${oldScriptTitle}`);
-      localStorage.removeItem(`script_${oldScriptTitle}`);
-      localStorage.setItem(`script_${newScriptTitle}`, scriptJSON || "");
-      setTitle(newScriptTitle);
-    }
-    setOldScriptTitle("");
-    setNewScriptTitle("");
-    onRenameModalClose();
-  };
 
   const deleteScript = () => {
     // Remove script from local storage
@@ -167,39 +100,16 @@ function App() {
     onDeleteModalClose();
   };
 
-  type loadScriptInput = {
-    title: string;
-  };
-  const loadScript = ({ title }: loadScriptInput) => {
-    const savedScriptJSON = localStorage.getItem(`script_${title}`);
-    if (savedScriptJSON) {
-      const { content } = JSON.parse(savedScriptJSON);
-      if (content && contentRef.current) {
-        contentRef.current.innerHTML = content;
-        setTitle(title);
-      }
-    }
-  };
-
-  const newScript = () => {
-    const newTitle = prompt("Enter a new script title:", "");
-    if (newTitle) {
-      if (getAllSavedScripts().some((script) => script.title === newTitle)) {
-        alert("This title already exists!");
-        return;
-      }
-      if (contentRef.current) {
-        contentRef.current.innerHTML = "";
-      }
-      setTitle(newTitle);
-    }
-  };
-
   useEffect(() => {
     if (contentRef.current) {
-      saveScript({ title });
+      saveScript({ title, contentRef });
     }
   }, [contentRef.current?.innerHTML]);
+
+  const handleNewScript = () => {
+    setNewScriptTitle("");
+    onNameModalOpen();
+  };
 
   return (
     <Box
@@ -222,7 +132,14 @@ function App() {
           <IconButton
             aria-label="Open menu"
             icon={<MenuIcon />}
-            onClick={handleOpenMenu}
+            onClick={() => {
+              handleOpenMenu({
+                title,
+                setSavedScriptTitles,
+                setSearchTerm,
+                onMenuOpen,
+              });
+            }}
             isDisabled={isGenerating}
           />
           <IconButton
@@ -233,6 +150,7 @@ function App() {
               handleGenerateText({ contentRef, setIsGenerating });
             }}
             isDisabled={isGenerating}
+            visibility={title ? "visible" : "hidden"}
           />
         </VStack>
       </Box>
@@ -244,6 +162,16 @@ function App() {
         alignItems="center"
         justifyContent="center"
       >
+        {!title && (
+          <Text
+            color="white"
+            fontWeight={600}
+            fontSize="24px"
+            textAlign="center"
+          >
+            Click the menu button to create a new script!
+          </Text>
+        )}
         <Box width="1000px">
           <Text
             color="white"
@@ -263,7 +191,7 @@ function App() {
           justifyContent="center"
         >
           <div
-            contentEditable={!isGenerating}
+            contentEditable={!isGenerating && !!title}
             placeholder="Type your script here..."
             style={{
               maxHeight: "100%", // Set the maximum height
@@ -291,7 +219,7 @@ function App() {
       </VStack>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent backgroundColor="#424242" color="white">
           <ModalHeader>Import/Export Script</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -328,65 +256,98 @@ function App() {
       </Modal>
       <Modal isOpen={isMenuOpen} onClose={onMenuClose} size="2xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent backgroundColor="#424242" color="white">
           <ModalHeader>Menu</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <HStack justifyContent="center" mb={4} spacing="2">
               <IconButton
+                aria-label="Create Script"
+                icon={<NoteAddIcon />}
+                onClick={() => {
+                  handleNewScript();
+                }}
+                colorScheme="green"
+                isDisabled={isGenerating}
+              />
+              <IconButton
                 aria-label="Download script"
                 icon={<DownloadIcon />}
                 onClick={onOpen}
-                isDisabled={isGenerating}
-              />
-              <IconButton
-                aria-label="Create Script"
-                icon={<NoteAddIcon />}
-                onClick={newScript}
-                isDisabled={isGenerating}
+                isDisabled={isGenerating || !title}
+                colorScheme="blue"
               />
               <IconButton
                 aria-label="Rename script"
-                icon={<EditNoteIcon />}
-                onClick={() => handleOpenRenameModal(title)}
+                icon={<DriveFileRenameOutlineIcon />}
+                colorScheme="yellow"
+                onClick={() =>
+                  handleOpenRenameModal({
+                    scriptTitle: title,
+                    onMenuClose,
+                    onRenameModalOpen,
+                    setNewScriptTitle,
+                    setOldScriptTitle,
+                  })
+                }
+                isDisabled={isGenerating || !title}
               />
               <IconButton
                 aria-label="Delete script"
                 colorScheme="red"
                 icon={<DeleteIcon />}
-                onClick={onDeleteModalOpen}
-                isDisabled={isGenerating}
+                onClick={() => {
+                  onDeleteModalOpen();
+                  onMenuClose();
+                }}
+                isDisabled={isGenerating || !title}
               />
             </HStack>
-            <Text>
-              {savedScriptTitles.length === 0
-                ? "No saved scripts"
-                : "Saved Scripts"}
-            </Text>
-            <Input
-              placeholder="Search scripts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-            />
-            <List spacing={3}>
-              {savedScriptTitles.map((script) => (
-                <ListItem
-                  border="1px solid #ccc"
-                  borderRadius="0.25em"
-                  padding="0.5em"
-                  key={script.title}
-                  onClick={() => handleSelectScript({ title: script.title })}
-                >
-                  {script.title}
-                </ListItem>
-              ))}
-            </List>
+            {savedScriptTitles.length === 0 && (
+              <Text>No saved scripts yet!</Text>
+            )}
+            {savedScriptTitles.length > 0 && (
+              <VStack flex="1" width="100%">
+                <Text>Saved Scripts</Text>
+                <Input
+                  placeholder="Search scripts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+                />
+                <List width="100%">
+                  {savedScriptTitles.map((script) => (
+                    <ListItem
+                      border="1px solid #ccc"
+                      borderRadius="0.25em"
+                      padding="0.5em"
+                      key={script.title}
+                      onClick={() =>
+                        handleSelectScript({
+                          loadTitle: script.title,
+                          title,
+                          onMenuClose,
+                          contentRef,
+                          setTitle,
+                        })
+                      }
+                    >
+                      <HStack justifyContent="space-between">
+                        <Text>{script.title}</Text>
+                        <Text>
+                          {formatTimestamp({ timestamp: script.timestamp })}
+                        </Text>
+                      </HStack>
+                    </ListItem>
+                  ))}
+                </List>
+              </VStack>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent backgroundColor="#424242" color="white">
           <ModalHeader>Confirm Deletion</ModalHeader>
           <ModalCloseButton />
           <ModalBody>Are you sure you want to delete this script?</ModalBody>
@@ -413,8 +374,55 @@ function App() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleRenameScript}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                handleRenameScript({
+                  oldScriptTitle,
+                  newScriptTitle,
+                  onRenameModalClose,
+                  setOldScriptTitle,
+                  setNewScriptTitle,
+                  setTitle,
+                });
+              }}
+            >
               Rename
+            </Button>
+            <Button variant="ghost" onClick={onRenameModalClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isNameModalOpen} onClose={onNameModalClose}>
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Name New Script</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              value={newScriptTitle}
+              onChange={(e) => setNewScriptTitle(e.target.value)}
+              placeholder="New Script Title"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                newScript({
+                  newScriptTitle,
+                  contentRef,
+                  setTitle,
+                  onMenuClose,
+                  onNameModalClose,
+                });
+              }}
+            >
+              Create
             </Button>
             <Button variant="ghost" onClick={onRenameModalClose}>
               Cancel

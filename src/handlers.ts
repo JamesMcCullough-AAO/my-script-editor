@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import {
   convertHtmlToPrompt,
   convertTextToHtml,
   generateText,
 } from "./apiCall";
 import { applySpanStyles } from "./styling";
+import { getAllSavedScripts, loadScript, searchSavedTitles } from "./utils";
 
 type handleGenerateTextProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -112,4 +114,107 @@ export const handleKeyDown = (
     range?.insertNode(linebreakNode);
     range?.setStartAfter(linebreakNode);
   }
+};
+
+type handleOpenMenuInput = {
+  title: string;
+  setSavedScriptTitles: React.Dispatch<
+    React.SetStateAction<
+      {
+        title: string;
+        timestamp: number;
+      }[]
+    >
+  >;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  onMenuOpen: () => void;
+};
+
+export const handleOpenMenu = ({
+  title,
+  setSavedScriptTitles,
+  setSearchTerm,
+  onMenuOpen,
+}: handleOpenMenuInput) => {
+  const savedScriptTitles = searchSavedTitles({
+    title,
+    searchTerm: "",
+  });
+  setSavedScriptTitles(savedScriptTitles);
+  setSearchTerm("");
+  onMenuOpen();
+};
+
+type handleSelectScriptInput = {
+  title: string;
+  loadTitle: string;
+  onMenuClose: () => void;
+  contentRef: React.RefObject<HTMLDivElement>;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+};
+export const handleSelectScript = ({
+  title,
+  loadTitle,
+  onMenuClose,
+  contentRef,
+  setTitle,
+}: handleSelectScriptInput) => {
+  loadScript({ loadTitle, title, contentRef, setTitle });
+  onMenuClose();
+};
+
+type handleOpenRenameModalInput = {
+  scriptTitle: string;
+  setOldScriptTitle: React.Dispatch<React.SetStateAction<string>>;
+  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
+  onMenuClose: () => void;
+  onRenameModalOpen: () => void;
+};
+
+export const handleOpenRenameModal = ({
+  scriptTitle,
+  setOldScriptTitle,
+  setNewScriptTitle,
+  onMenuClose,
+  onRenameModalOpen,
+}: handleOpenRenameModalInput) => {
+  if (!scriptTitle) return;
+  setOldScriptTitle(scriptTitle);
+  setNewScriptTitle(scriptTitle);
+  onMenuClose();
+  onRenameModalOpen();
+};
+
+type handleRenameScriptInput = {
+  newScriptTitle: string;
+  oldScriptTitle: string;
+  setOldScriptTitle: React.Dispatch<React.SetStateAction<string>>;
+  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
+  onRenameModalClose: () => void;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export const handleRenameScript = ({
+  newScriptTitle,
+  oldScriptTitle,
+  setOldScriptTitle,
+  setNewScriptTitle,
+  onRenameModalClose,
+  setTitle,
+}: handleRenameScriptInput) => {
+  if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
+    if (
+      getAllSavedScripts().some((script) => script.title === newScriptTitle)
+    ) {
+      alert("This title already exists!");
+      return;
+    }
+    const scriptJSON = localStorage.getItem(`script_${oldScriptTitle}`);
+    localStorage.removeItem(`script_${oldScriptTitle}`);
+    localStorage.setItem(`script_${newScriptTitle}`, scriptJSON || "");
+    setTitle(newScriptTitle);
+  }
+  setOldScriptTitle("");
+  setNewScriptTitle("");
+  onRenameModalClose();
 };
