@@ -7,6 +7,7 @@ type loadScriptInput = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setIconImage: React.Dispatch<React.SetStateAction<string>>;
   iconImage?: string;
+  versionIndex?: number;
 };
 export const loadScript = ({
   loadTitle,
@@ -15,27 +16,35 @@ export const loadScript = ({
   setTitle,
   setIconImage,
   iconImage,
-}: loadScriptInput) => {
+  versionIndex = -1, // -1 will load the latest version
+}: loadScriptInput & { versionIndex?: number }) => {
   saveScript({ title, contentRef, iconImage });
-  const savedScriptJSON = localStorage.getItem(`script_${loadTitle}`);
-  console.log(savedScriptJSON);
-  if (savedScriptJSON) {
-    const { content } = JSON.parse(savedScriptJSON);
-    console.log(content);
-    console.log(contentRef);
-    setTitle(loadTitle);
-    if (content && contentRef.current) {
-      contentRef.current.innerHTML = content;
-    } else {
-      if (contentRef.current) {
-        contentRef.current.innerHTML = "";
+
+  const savedScriptsJSON = localStorage.getItem(`script_${loadTitle}`);
+  if (savedScriptsJSON) {
+    const savedScripts = JSON.parse(savedScriptsJSON);
+    const scriptToLoad =
+      versionIndex === -1
+        ? savedScripts[savedScripts.length - 1]
+        : savedScripts[versionIndex];
+
+    if (scriptToLoad) {
+      const { content, iconImage } = scriptToLoad;
+
+      setTitle(loadTitle);
+      if (content && contentRef.current) {
+        contentRef.current.innerHTML = content;
+      } else {
+        if (contentRef.current) {
+          contentRef.current.innerHTML = "";
+        }
       }
-    }
-    const { iconImage } = JSON.parse(savedScriptJSON);
-    if (iconImage) {
-      setIconImage(iconImage);
-    } else {
-      setIconImage("");
+
+      if (iconImage) {
+        setIconImage(iconImage);
+      } else {
+        setIconImage("");
+      }
     }
   }
 };

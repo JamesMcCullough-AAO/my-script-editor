@@ -28,6 +28,7 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import HistoryIcon from "@mui/icons-material/History";
 
 import { useEffect, useRef, useState } from "react";
 import { deleteScript } from "./utils/deleteScript";
@@ -46,6 +47,7 @@ import { handleKeyDown } from "./handlers/handleKeyDown";
 import { handleGenerateText } from "./handlers/handleGenerateText";
 import PendingIcon from "@mui/icons-material/Pending";
 import { throttle } from "lodash";
+import { getScriptVersions } from "./utils/getScriptVersions";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -81,6 +83,14 @@ function App() {
     maxWordCount: 0,
   });
   const [wordCount, setWordCount] = useState(0);
+  const [scriptVersions, setScriptVersions] = useState([]) as [
+    {
+      title: string;
+      timestamp: number;
+      iconImage?: string;
+    }[],
+    any
+  ];
   const {
     isOpen: isMenuOpen,
     onOpen: onMenuOpen,
@@ -115,6 +125,11 @@ function App() {
     isOpen: isSettingsModalOpen,
     onOpen: onSettingsModalOpen,
     onClose: onSettingsModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isVersionsModalOpen,
+    onOpen: onVersionsModalOpen,
+    onClose: onVersionsModalClose,
   } = useDisclosure();
 
   // A function that takes uploaded image and sets it as the icon
@@ -183,6 +198,16 @@ function App() {
   useEffect(() => {
     document.title = title || "Script Editor"; // Set the title to the script title or some default title
   }, [title]); // This useEffect runs every time `title` changes
+
+  type handleShowVersionsModalProps = {
+    title: string;
+  };
+
+  const handleShowVersionsModal = ({ title }: handleShowVersionsModalProps) => {
+    const versions = getScriptVersions(title);
+    setScriptVersions(versions);
+    onVersionsModalOpen();
+  };
 
   return (
     <HStack
@@ -424,6 +449,16 @@ function App() {
                   }}
                   isDisabled={isGenerating || !title}
                 />
+                <IconButton
+                  aria-label="Versions"
+                  colorScheme="purple"
+                  icon={<HistoryIcon />}
+                  onClick={() => {
+                    handleShowVersionsModal({ title });
+                    onMenuClose();
+                  }}
+                  isDisabled={isGenerating || !title}
+                />
               </HStack>
               <HStack justifyContent="center" spacing="2">
                 <IconButton
@@ -482,7 +517,6 @@ function App() {
                             src={script.iconImage || "documentIcon.png"}
                             width="30px"
                           />
-                          {/* <Image src="documentIcon.png" width="30px" /> */}
                           <Text>{script.title}</Text>
                         </HStack>
                         <Text>
@@ -710,6 +744,68 @@ function App() {
               Cancel
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Versions modal */}
+      <Modal isOpen={isVersionsModalOpen} onClose={onVersionsModalClose}>
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Versions</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {scriptVersions.length === 0 && <Text>No versions yet!</Text>}
+            {scriptVersions.length > 0 && (
+              <VStack flex="1" width="100%">
+                <List width="100%" spacing="1">
+                  {scriptVersions.map((script) => (
+                    <ListItem
+                      border="1px solid #ccc"
+                      borderRadius="0.25em"
+                      backgroundColor="#1d2330"
+                      padding="0.5em"
+                      key={scriptVersions.indexOf(script)}
+                      onClick={() => {
+                        handleSelectScript({
+                          loadTitle: title,
+                          title,
+                          onMenuClose,
+                          contentRef,
+                          setTitle,
+                          setIconImage,
+                          iconImage,
+                          versionIndex: scriptVersions.indexOf(script),
+                        });
+                        onVersionsModalClose();
+                      }}
+                      // Hilight the hovered item
+                      _hover={{
+                        backgroundColor: "#007050",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <HStack justifyContent="space-between">
+                        <HStack>
+                          <Image
+                            src={script.iconImage || "documentIcon.png"}
+                            width="30px"
+                          />
+                          // Reverse index version
+                          <Text>
+                            Version{" "}
+                            {scriptVersions.length -
+                              scriptVersions.indexOf(script)}
+                          </Text>
+                        </HStack>
+                        <Text>
+                          {formatTimestamp({ timestamp: script.timestamp })}
+                        </Text>
+                      </HStack>
+                    </ListItem>
+                  ))}
+                </List>
+              </VStack>
+            )}
+          </ModalBody>
         </ModalContent>
       </Modal>
     </HStack>

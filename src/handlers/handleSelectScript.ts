@@ -8,6 +8,7 @@ type handleSelectScriptInput = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setIconImage: React.Dispatch<React.SetStateAction<string>>;
   iconImage?: string;
+  versionIndex?: number;
 };
 export const handleSelectScript = ({
   title,
@@ -17,6 +18,7 @@ export const handleSelectScript = ({
   setTitle,
   setIconImage,
   iconImage,
+  versionIndex,
 }: handleSelectScriptInput) => {
   loadScript({
     loadTitle,
@@ -25,6 +27,7 @@ export const handleSelectScript = ({
     setTitle,
     setIconImage,
     iconImage,
+    versionIndex,
   });
   onMenuClose();
 };
