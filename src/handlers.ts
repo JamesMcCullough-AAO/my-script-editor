@@ -190,6 +190,7 @@ type handleOpenMenuInput = {
       {
         title: string;
         timestamp: number;
+        iconImage?: string;
       }[]
     >
   >;
@@ -218,6 +219,8 @@ type handleSelectScriptInput = {
   onMenuClose: () => void;
   contentRef: React.RefObject<HTMLDivElement>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
+  setIconImage: React.Dispatch<React.SetStateAction<string>>;
+  iconImage?: string;
 };
 export const handleSelectScript = ({
   title,
@@ -225,8 +228,17 @@ export const handleSelectScript = ({
   onMenuClose,
   contentRef,
   setTitle,
+  setIconImage,
+  iconImage,
 }: handleSelectScriptInput) => {
-  loadScript({ loadTitle, title, contentRef, setTitle });
+  loadScript({
+    loadTitle,
+    title,
+    contentRef,
+    setTitle,
+    setIconImage,
+    iconImage,
+  });
   onMenuClose();
 };
 
@@ -284,4 +296,17 @@ export const handleRenameScript = ({
   setOldScriptTitle("");
   setNewScriptTitle("");
   onRenameModalClose();
+};
+
+type handleNewScriptInput = {
+  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
+  onNameModalOpen: () => void;
+};
+
+export const handleNewScript = ({
+  setNewScriptTitle,
+  onNameModalOpen,
+}: handleNewScriptInput) => {
+  setNewScriptTitle("");
+  onNameModalOpen();
 };

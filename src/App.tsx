@@ -26,6 +26,8 @@ import CreateIcon from "@mui/icons-material/Create";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import InfoIcon from "@mui/icons-material/Info";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+
 import { useEffect, useRef, useState } from "react";
 import {
   deleteScript,
@@ -39,6 +41,7 @@ import {
 import {
   handleGenerateText,
   handleKeyDown,
+  handleNewScript,
   handleOpenMenu,
   handleOpenRenameModal,
   handleRenameScript,
@@ -57,6 +60,7 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [newScriptTitle, setNewScriptTitle] = useState("");
   const [oldScriptTitle, setOldScriptTitle] = useState("");
+  const [iconImage, setIconImage] = useState("");
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
@@ -88,6 +92,21 @@ function App() {
     onOpen: onInfoModalOpen,
     onClose: onInfoModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isIconModalOpen,
+    onOpen: onIconModalOpen,
+    onClose: onIconModalClose,
+  } = useDisclosure();
+
+  // A function that takes uploaded image and sets it as the icon
+  const handleUploadIcon = (event: any) => {
+    const uploadedImage = event.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(uploadedImage);
+    reader.onloadend = () => {
+      setIconImage(reader.result as string);
+    };
+  };
 
   useEffect(() => {
     const updatedScriptTitles = searchSavedTitles({ title, searchTerm });
@@ -99,11 +118,6 @@ function App() {
       saveScript({ title, contentRef });
     }
   }, [contentRef.current?.innerHTML]);
-
-  const handleNewScript = () => {
-    setNewScriptTitle("");
-    onNameModalOpen();
-  };
 
   useEffect(() => {
     document.title = title || "Script Editor"; // Set the title to the script title or some default title
@@ -148,6 +162,13 @@ function App() {
           onClick={() => {
             handleGenerateText({ contentRef, setIsGenerating });
           }}
+          isDisabled={isGenerating}
+          visibility={title ? "visible" : "hidden"}
+        />
+        <IconButton
+          aria-label="Upload script icon"
+          icon={<AddPhotoAlternateIcon />}
+          onClick={onIconModalOpen}
           isDisabled={isGenerating}
           visibility={title ? "visible" : "hidden"}
         />
@@ -224,6 +245,17 @@ function App() {
           </VStack>
         </VStack>
       </VStack>
+      {/* Script icon in top right corner fixed */}
+      <Box position="absolute" top="0" right="0" width="10%" zIndex="100">
+        <Image
+          src={iconImage}
+          width="100%"
+          borderBottomLeftRadius="3xl"
+          borderLeft="3px solid black"
+          borderBottom="3px solid black"
+        />
+      </Box>
+      {/* Modal Area */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent backgroundColor="#424242" color="white">
@@ -273,7 +305,10 @@ function App() {
                 aria-label="Create Script"
                 icon={<NoteAddIcon />}
                 onClick={() => {
-                  handleNewScript();
+                  handleNewScript({
+                    setNewScriptTitle,
+                    onNameModalOpen,
+                  });
                 }}
                 colorScheme="green"
                 isDisabled={isGenerating}
@@ -344,6 +379,8 @@ function App() {
                           onMenuClose,
                           contentRef,
                           setTitle,
+                          setIconImage,
+                          iconImage,
                         })
                       }
                       // Hilight the hovered item
@@ -485,8 +522,44 @@ function App() {
               <br />
               <b>")"</b> - Finish a line description, start line. <br />
             </Text>
+            <Text paddingTop="4" fontWeight="bold">
+              --- Saving ---
+            </Text>
+            <Text>
+              Scripts are only saved if they have at least 10 characters.
+            </Text>
           </ModalBody>
           <ModalFooter></ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Script icon modal - Upload the icon for the script */}
+      <Modal isOpen={isIconModalOpen} onClose={onIconModalClose}>
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Upload Script Icon</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="file"
+              onChange={(event) => {
+                handleUploadIcon(event);
+              }}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                onIconModalClose();
+              }}
+            >
+              Upload
+            </Button>
+            <Button variant="ghost" onClick={onIconModalClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </HStack>

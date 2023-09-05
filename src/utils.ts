@@ -115,29 +115,26 @@ export const importScript = ({ contentRef, text }: importScriptProps) => {
   }
 };
 
-const removeInvisibleCharacters = (text: string) => {
-  // Returns invisible characters from the HTML
-  const invisibleCharacters = text.match(/&nbsp;|<br>|<div><br><\/div>/g);
-  if (invisibleCharacters) {
-    return invisibleCharacters.join("");
-  }
-  return "";
-};
-
 type saveScriptInput = {
   title: string;
   contentRef: React.RefObject<HTMLDivElement>;
+  iconImage?: string;
 };
-export const saveScript = ({ title, contentRef }: saveScriptInput) => {
+export const saveScript = ({
+  title,
+  contentRef,
+  iconImage,
+}: saveScriptInput) => {
   if (
     title &&
     contentRef.current &&
     contentRef.current.innerHTML &&
-    removeInvisibleCharacters(contentRef.current.innerHTML).length > 5
+    contentRef.current.innerHTML.length > 10
   ) {
     const payload = {
       content: contentRef.current.innerHTML,
       timestamp: Date.now(),
+      iconImage,
     };
     localStorage.setItem(`script_${title}`, JSON.stringify(payload));
   }
@@ -160,6 +157,7 @@ export const searchSavedTitles = ({
       savedTitles.push({
         title: key.substring(7),
         timestamp: data.timestamp,
+        iconImage: data.iconImage,
       });
     }
   }
@@ -196,14 +194,18 @@ type loadScriptInput = {
   title: string;
   contentRef: React.RefObject<HTMLDivElement>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
+  setIconImage: React.Dispatch<React.SetStateAction<string>>;
+  iconImage?: string;
 };
 export const loadScript = ({
   loadTitle,
   title,
   contentRef,
   setTitle,
+  setIconImage,
+  iconImage,
 }: loadScriptInput) => {
-  saveScript({ title, contentRef });
+  saveScript({ title, contentRef, iconImage });
   const savedScriptJSON = localStorage.getItem(`script_${loadTitle}`);
   console.log(savedScriptJSON);
   if (savedScriptJSON) {
@@ -217,6 +219,12 @@ export const loadScript = ({
       if (contentRef.current) {
         contentRef.current.innerHTML = "";
       }
+    }
+    const { iconImage } = JSON.parse(savedScriptJSON);
+    if (iconImage) {
+      setIconImage(iconImage);
+    } else {
+      setIconImage("");
     }
   }
 };
