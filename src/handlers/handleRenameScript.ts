@@ -1,4 +1,4 @@
-import { getAllSavedScripts } from "../utils";
+import { getAllSavedScripts } from "../utils/getAllSavedScripts";
 
 type handleRenameScriptInput = {
   newScriptTitle: string;

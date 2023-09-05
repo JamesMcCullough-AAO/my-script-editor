@@ -1,4 +1,4 @@
-import { loadScript } from "../utils";
+import { loadScript } from "../utils/loadScript";
 
 type handleSelectScriptInput = {
   title: string;

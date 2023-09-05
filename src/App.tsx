@@ -30,15 +30,13 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  deleteScript,
-  exportScript,
-  formatTimestamp,
-  importScript,
-  newScript,
-  saveScript,
-  searchSavedTitles,
-} from "./utils";
+import { deleteScript } from "./utils/deleteScript";
+import { newScript } from "./utils/newScript";
+import { searchSavedTitles } from "./utils/searchSavedTitles";
+import { saveScript } from "./utils/saveScript";
+import { importScript } from "./utils/importScript";
+import { exportScript } from "./utils/exportScript";
+import { formatTimestamp } from "./utils/formatTimestamp";
 import { handleNewScript } from "./handlers/handleNewScript";
 import { handleRenameScript } from "./handlers/handleRenameScript";
 import { handleOpenRenameModal } from "./handlers/handleOpenRenameModal";

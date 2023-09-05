@@ -1,4 +1,4 @@
-import { searchSavedTitles } from "../utils";
+import { searchSavedTitles } from "../utils/searchSavedTitles";
 
 type handleOpenMenuInput = {
   title: string;
