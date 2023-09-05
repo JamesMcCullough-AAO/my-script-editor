@@ -18,6 +18,7 @@ import {
   List,
   ListItem,
   HStack,
+  Grid,
 } from "@chakra-ui/react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,6 +27,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import InfoIcon from "@mui/icons-material/Info";
+import SettingsIcon from "@mui/icons-material/Settings";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 import { useEffect, useRef, useState } from "react";
@@ -48,25 +50,42 @@ import {
   handleSelectScript,
 } from "./handlers";
 import PendingIcon from "@mui/icons-material/Pending";
+import { set, throttle } from "lodash";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [isCharacterName, setIsCharacterName] = useState(false);
   const [isLineDescription, setIsLineDescription] = useState(false);
   const [importText, setImportText] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [title, setTitle] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [newScriptTitle, setNewScriptTitle] = useState("");
   const [oldScriptTitle, setOldScriptTitle] = useState("");
   const [iconImage, setIconImage] = useState("");
+  const [uploadedIconImage, setUploadedIconImage] = useState("");
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
       timestamp: 0,
     },
-  ]); // New state to hold saved script titles
+  ] as {
+    title: string;
+    timestamp: number;
+    iconImage?: string;
+  }[]);
+  const {
+    isOpen: isUploadModalOpen,
+    onOpen: onUploadModalOpen,
+    onClose: onUploadModalClose,
+  } = useDisclosure();
+  const [editorSettings, setEditorSettings] = useState({
+    novelAiApiKey: "",
+    targetWordCount: 0,
+    maxWordCount: 0,
+  });
+  const [wordCount, setWordCount] = useState(0);
   const {
     isOpen: isMenuOpen,
     onOpen: onMenuOpen,
@@ -97,6 +116,11 @@ function App() {
     onOpen: onIconModalOpen,
     onClose: onIconModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isSettingsModalOpen,
+    onOpen: onSettingsModalOpen,
+    onClose: onSettingsModalClose,
+  } = useDisclosure();
 
   // A function that takes uploaded image and sets it as the icon
   const handleUploadIcon = (event: any) => {
@@ -104,9 +128,16 @@ function App() {
     const reader = new FileReader();
     reader.readAsDataURL(uploadedImage);
     reader.onloadend = () => {
-      setIconImage(reader.result as string);
+      setUploadedIconImage(reader.result as string);
     };
   };
+
+  useEffect(() => {
+    const settings = localStorage.getItem("editorSettings");
+    if (settings) {
+      setEditorSettings(JSON.parse(settings));
+    }
+  }, []);
 
   useEffect(() => {
     const updatedScriptTitles = searchSavedTitles({ title, searchTerm });
@@ -115,9 +146,44 @@ function App() {
 
   useEffect(() => {
     if (contentRef.current) {
-      saveScript({ title, contentRef });
+      saveScript({ title, contentRef, iconImage });
     }
-  }, [contentRef.current?.innerHTML]);
+  }, [contentRef.current?.innerHTML, contentRef.current?.innerText, iconImage]);
+
+  const updateWordCount = throttle(() => {
+    if (contentRef.current) {
+      const text = contentRef.current.innerText; // Split by spaces or line breaks and remove empty elements
+      const words = text
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word !== "");
+      if (words.length !== wordCount) {
+        setWordCount(words.length);
+      }
+    }
+  }, 10000);
+
+  useEffect(() => {
+    const element = contentRef.current;
+
+    if (element) {
+      // Attach the event listener to detect changes
+      element.addEventListener("input", () => {
+        updateWordCount();
+        saveScript({ title, contentRef });
+      });
+
+      // Update word count initially
+      updateWordCount();
+    }
+
+    // Cleanup
+    return () => {
+      if (element) {
+        element.removeEventListener("input", updateWordCount);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     document.title = title || "Script Editor"; // Set the title to the script title or some default title
@@ -160,15 +226,12 @@ function App() {
           aria-label="Generate text"
           icon={isGenerating ? <PendingIcon /> : <CreateIcon />}
           onClick={() => {
-            handleGenerateText({ contentRef, setIsGenerating });
+            handleGenerateText({
+              contentRef,
+              setIsGenerating,
+              apiToken: editorSettings.novelAiApiKey,
+            });
           }}
-          isDisabled={isGenerating}
-          visibility={title ? "visible" : "hidden"}
-        />
-        <IconButton
-          aria-label="Upload script icon"
-          icon={<AddPhotoAlternateIcon />}
-          onClick={onIconModalOpen}
           isDisabled={isGenerating}
           visibility={title ? "visible" : "hidden"}
         />
@@ -255,8 +318,21 @@ function App() {
           borderBottom="3px solid black"
         />
       </Box>
+      {/* Info box in the lower right corner that shows word count, updated live*/}
+      <Box
+        position="absolute"
+        bottom="0"
+        right="0"
+        width="10%"
+        zIndex="100"
+        padding="1em"
+      >
+        <Text color="white" fontWeight={600} fontSize="18px" textAlign="right">
+          {wordCount}
+        </Text>
+      </Box>
       {/* Modal Area */}
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isUploadModalOpen} onClose={onUploadModalClose}>
         <ModalOverlay />
         <ModalContent backgroundColor="#424242" color="white">
           <ModalHeader>Import/Export Script</ModalHeader>
@@ -274,7 +350,7 @@ function App() {
               mr={3}
               onClick={() => {
                 importScript({ text: importText, contentRef });
-                onClose();
+                onUploadModalClose();
               }}
             >
               Import
@@ -286,7 +362,7 @@ function App() {
                   title,
                   contentRef,
                 });
-                onClose();
+                onUploadModalClose();
               }}
             >
               Export
@@ -300,58 +376,74 @@ function App() {
           <ModalHeader>Menu</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <HStack justifyContent="center" mb={4} spacing="2">
-              <IconButton
-                aria-label="Create Script"
-                icon={<NoteAddIcon />}
-                onClick={() => {
-                  handleNewScript({
-                    setNewScriptTitle,
-                    onNameModalOpen,
-                  });
-                }}
-                colorScheme="green"
-                isDisabled={isGenerating}
-              />
-              <IconButton
-                aria-label="Download script"
-                icon={<DownloadIcon />}
-                onClick={onOpen}
-                isDisabled={isGenerating || !title}
-                colorScheme="blue"
-              />
-              <IconButton
-                aria-label="Rename script"
-                icon={<DriveFileRenameOutlineIcon />}
-                colorScheme="yellow"
-                onClick={() =>
-                  handleOpenRenameModal({
-                    scriptTitle: title,
-                    onMenuClose,
-                    onRenameModalOpen,
-                    setNewScriptTitle,
-                    setOldScriptTitle,
-                  })
-                }
-                isDisabled={isGenerating || !title}
-              />
-
-              <IconButton
-                aria-label="Delete script"
-                colorScheme="red"
-                icon={<DeleteIcon />}
-                onClick={() => {
-                  onDeleteModalOpen();
-                  onMenuClose();
-                }}
-                isDisabled={isGenerating || !title}
-              />
-              <IconButton
-                aria-label="Info Box"
-                icon={<InfoIcon />}
-                colorScheme="purple"
-                onClick={onInfoModalOpen}
-              />
+            <HStack justifyContent="space-between" mb="4">
+              <HStack justifyContent="center" spacing="2">
+                <IconButton
+                  aria-label="Create Script"
+                  icon={<NoteAddIcon />}
+                  onClick={() => {
+                    handleNewScript({
+                      setNewScriptTitle,
+                      onNameModalOpen,
+                    });
+                  }}
+                  colorScheme="green"
+                  isDisabled={isGenerating}
+                />
+                <IconButton
+                  aria-label="Download script"
+                  icon={<DownloadIcon />}
+                  onClick={onUploadModalOpen}
+                  isDisabled={isGenerating || !title}
+                  colorScheme="blue"
+                />
+                <IconButton
+                  aria-label="Rename script"
+                  icon={<DriveFileRenameOutlineIcon />}
+                  colorScheme="yellow"
+                  onClick={() =>
+                    handleOpenRenameModal({
+                      scriptTitle: title,
+                      onMenuClose,
+                      onRenameModalOpen,
+                      setNewScriptTitle,
+                      setOldScriptTitle,
+                    })
+                  }
+                  isDisabled={isGenerating || !title}
+                />
+                <IconButton
+                  aria-label="Upload Script Icon"
+                  icon={<AddPhotoAlternateIcon />}
+                  colorScheme="yellow"
+                  onClick={onIconModalOpen}
+                  isDisabled={isGenerating || !title}
+                />
+                <IconButton
+                  aria-label="Delete script"
+                  colorScheme="red"
+                  icon={<DeleteIcon />}
+                  onClick={() => {
+                    onDeleteModalOpen();
+                    onMenuClose();
+                  }}
+                  isDisabled={isGenerating || !title}
+                />
+              </HStack>
+              <HStack justifyContent="center" spacing="2">
+                <IconButton
+                  aria-label="Info Box"
+                  icon={<InfoIcon />}
+                  colorScheme="purple"
+                  onClick={onInfoModalOpen}
+                />
+                <IconButton
+                  aria-label="Settings"
+                  icon={<SettingsIcon />}
+                  colorScheme="purple"
+                  onClick={onSettingsModalOpen}
+                />
+              </HStack>
             </HStack>
             {savedScriptTitles.length === 0 && (
               <Text>No saved scripts yet!</Text>
@@ -391,7 +483,11 @@ function App() {
                     >
                       <HStack justifyContent="space-between">
                         <HStack>
-                          <Image src="documentIcon.png" width="30px" />
+                          <Image
+                            src={script.iconImage || "documentIcon.png"}
+                            width="30px"
+                          />
+                          {/* <Image src="documentIcon.png" width="30px" /> */}
                           <Text>{script.title}</Text>
                         </HStack>
                         <Text>
@@ -551,12 +647,71 @@ function App() {
               colorScheme="blue"
               mr={3}
               onClick={() => {
+                setIconImage(uploadedIconImage);
                 onIconModalClose();
               }}
             >
               Upload
             </Button>
             <Button variant="ghost" onClick={onIconModalClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Settings modal */}
+      <Modal isOpen={isSettingsModalOpen} onClose={onSettingsModalClose}>
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Editor Settings</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>NovelAI API Key</Text>
+            <Input
+              value={editorSettings.novelAiApiKey}
+              onChange={(e) =>
+                setEditorSettings({
+                  ...editorSettings,
+                  novelAiApiKey: e.target.value,
+                })
+              }
+            />
+            <Text>Target Word Count</Text>
+            <Input
+              value={editorSettings.targetWordCount}
+              onChange={(e) =>
+                setEditorSettings({
+                  ...editorSettings,
+                  targetWordCount: parseInt(e.target.value),
+                })
+              }
+            />
+            <Text>Max Word Count</Text>
+            <Input
+              value={editorSettings.maxWordCount}
+              onChange={(e) =>
+                setEditorSettings({
+                  ...editorSettings,
+                  maxWordCount: parseInt(e.target.value),
+                })
+              }
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                localStorage.setItem(
+                  "editorSettings",
+                  JSON.stringify(editorSettings)
+                );
+                onSettingsModalClose();
+              }}
+            >
+              Save
+            </Button>
+            <Button variant="ghost" onClick={onSettingsModalClose}>
               Cancel
             </Button>
           </ModalFooter>

@@ -9,6 +9,7 @@ type convertHtmlToPromptProps = {
 type generateTextProps = {
   inputPrompt: string;
   max_length?: number;
+  apiToken: string;
 };
 
 type convertTextToHtmlProps = {
@@ -64,6 +65,7 @@ export const convertHtmlToPrompt = ({
 
 export const generateText = async ({
   inputPrompt,
+  apiToken,
   max_length,
 }: generateTextProps) => {
   const apiUrl = "https://api.novelai.net/ai/generate";
@@ -91,7 +93,7 @@ export const generateText = async ({
   };
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer pst-me09LNUA4HhLJtUAHfLFio2AdYtbSSAMWBpVk1S1ZiaWSMjikGbN17ldJjlr32zG`,
+    Authorization: `Bearer ${apiToken}`,
   };
 
   try {
