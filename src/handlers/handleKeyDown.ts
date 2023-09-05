@@ -1,37 +1,4 @@
-import { useEffect } from "react";
-import {
-  convertHtmlToPrompt,
-  convertTextToHtml,
-  generateText,
-} from "./apiCall";
-import { applySpanStyles } from "./styling";
-import { getAllSavedScripts, loadScript, searchSavedTitles } from "./utils";
-
-type handleGenerateTextProps = {
-  contentRef: React.RefObject<HTMLDivElement>;
-  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
-  apiToken: string;
-};
-
-export const handleGenerateText = async ({
-  contentRef,
-  setIsGenerating,
-  apiToken,
-}: handleGenerateTextProps) => {
-  setIsGenerating(true);
-  const prompt = convertHtmlToPrompt({ contentRef });
-  console.log("Prompt: " + prompt);
-  const generatedText = await generateText({ inputPrompt: prompt, apiToken });
-  console.log("Generated Text: " + generatedText);
-  const html = convertTextToHtml({ generatedText });
-  console.log("HTML: " + html);
-
-  const contentDiv = contentRef.current;
-  if (contentDiv) {
-    contentDiv.innerHTML += html;
-  }
-  setIsGenerating(false);
-};
+import { applySpanStyles } from "../styling";
 
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -40,7 +7,6 @@ type handleKeyDownProps = {
   isLineDescription: boolean;
   setIsLineDescription: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
 const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   const range = document.createRange();
   const selection = window.getSelection();
@@ -49,7 +15,6 @@ const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   selection?.removeAllRanges();
   selection?.addRange(range);
 };
-
 const isCursorAtStart = (range: Range) => range.startOffset === 0;
 
 export const handleKeyDown = (
@@ -183,132 +148,4 @@ export const handleKeyDown = (
   ) {
     setCursorAtEnd(contentDiv);
   }
-};
-
-type handleOpenMenuInput = {
-  title: string;
-  setSavedScriptTitles: React.Dispatch<
-    React.SetStateAction<
-      {
-        title: string;
-        timestamp: number;
-        iconImage?: string;
-      }[]
-    >
-  >;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  onMenuOpen: () => void;
-};
-
-export const handleOpenMenu = ({
-  title,
-  setSavedScriptTitles,
-  setSearchTerm,
-  onMenuOpen,
-}: handleOpenMenuInput) => {
-  const savedScriptTitles = searchSavedTitles({
-    title,
-    searchTerm: "",
-  });
-  setSavedScriptTitles(savedScriptTitles);
-  setSearchTerm("");
-  onMenuOpen();
-};
-
-type handleSelectScriptInput = {
-  title: string;
-  loadTitle: string;
-  onMenuClose: () => void;
-  contentRef: React.RefObject<HTMLDivElement>;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-  setIconImage: React.Dispatch<React.SetStateAction<string>>;
-  iconImage?: string;
-};
-export const handleSelectScript = ({
-  title,
-  loadTitle,
-  onMenuClose,
-  contentRef,
-  setTitle,
-  setIconImage,
-  iconImage,
-}: handleSelectScriptInput) => {
-  loadScript({
-    loadTitle,
-    title,
-    contentRef,
-    setTitle,
-    setIconImage,
-    iconImage,
-  });
-  onMenuClose();
-};
-
-type handleOpenRenameModalInput = {
-  scriptTitle: string;
-  setOldScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  onMenuClose: () => void;
-  onRenameModalOpen: () => void;
-};
-
-export const handleOpenRenameModal = ({
-  scriptTitle,
-  setOldScriptTitle,
-  setNewScriptTitle,
-  onMenuClose,
-  onRenameModalOpen,
-}: handleOpenRenameModalInput) => {
-  if (!scriptTitle) return;
-  setOldScriptTitle(scriptTitle);
-  setNewScriptTitle(scriptTitle);
-  onMenuClose();
-  onRenameModalOpen();
-};
-
-type handleRenameScriptInput = {
-  newScriptTitle: string;
-  oldScriptTitle: string;
-  setOldScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  onRenameModalClose: () => void;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-};
-
-export const handleRenameScript = ({
-  newScriptTitle,
-  oldScriptTitle,
-  setOldScriptTitle,
-  setNewScriptTitle,
-  onRenameModalClose,
-  setTitle,
-}: handleRenameScriptInput) => {
-  if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
-    if (
-      getAllSavedScripts().some((script) => script.title === newScriptTitle)
-    ) {
-      alert("This title already exists!");
-      return;
-    }
-    const scriptJSON = localStorage.getItem(`script_${oldScriptTitle}`);
-    localStorage.removeItem(`script_${oldScriptTitle}`);
-    localStorage.setItem(`script_${newScriptTitle}`, scriptJSON || "");
-    setTitle(newScriptTitle);
-  }
-  setOldScriptTitle("");
-  setNewScriptTitle("");
-  onRenameModalClose();
-};
-
-type handleNewScriptInput = {
-  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  onNameModalOpen: () => void;
-};
-
-export const handleNewScript = ({
-  setNewScriptTitle,
-  onNameModalOpen,
-}: handleNewScriptInput) => {
-  setNewScriptTitle("");
-  onNameModalOpen();
 };

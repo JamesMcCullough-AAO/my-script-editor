@@ -18,7 +18,6 @@ import {
   List,
   ListItem,
   HStack,
-  Grid,
 } from "@chakra-ui/react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -40,17 +39,15 @@ import {
   saveScript,
   searchSavedTitles,
 } from "./utils";
-import {
-  handleGenerateText,
-  handleKeyDown,
-  handleNewScript,
-  handleOpenMenu,
-  handleOpenRenameModal,
-  handleRenameScript,
-  handleSelectScript,
-} from "./handlers";
+import { handleNewScript } from "./handlers/handleNewScript";
+import { handleRenameScript } from "./handlers/handleRenameScript";
+import { handleOpenRenameModal } from "./handlers/handleOpenRenameModal";
+import { handleSelectScript } from "./handlers/handleSelectScript";
+import { handleOpenMenu } from "./handlers/handleOpenMenu";
+import { handleKeyDown } from "./handlers/handleKeyDown";
+import { handleGenerateText } from "./handlers/handleGenerateText";
 import PendingIcon from "@mui/icons-material/Pending";
-import { set, throttle } from "lodash";
+import { throttle } from "lodash";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
