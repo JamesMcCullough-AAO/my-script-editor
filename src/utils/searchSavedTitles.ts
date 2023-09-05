@@ -1,3 +1,5 @@
+import { fileNameToScript } from "./scriptToFileName";
+
 type searchSavedTitlesInput = {
   title: string;
   searchTerm: string;
@@ -15,7 +17,7 @@ export const searchSavedTitles = ({
       if (dataArr.length > 0) {
         const mostRecentData = dataArr[dataArr.length - 1];
         savedTitles.push({
-          title: key.substring(7),
+          title: fileNameToScript(key.substring(7)),
           timestamp: mostRecentData.timestamp,
           iconImage: mostRecentData.iconImage,
         });

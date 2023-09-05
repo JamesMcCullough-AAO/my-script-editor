@@ -1,4 +1,5 @@
 import { saveScript } from "./saveScript";
+import { scriptToFileName } from "./scriptToFileName";
 
 type loadScriptInput = {
   loadTitle: string;
@@ -20,7 +21,9 @@ export const loadScript = ({
 }: loadScriptInput & { versionIndex?: number }) => {
   saveScript({ title, contentRef, iconImage });
 
-  const savedScriptsJSON = localStorage.getItem(`script_${loadTitle}`);
+  const savedScriptsJSON = localStorage.getItem(
+    `script_${scriptToFileName(loadTitle)}`
+  );
   if (savedScriptsJSON) {
     const savedScripts = JSON.parse(savedScriptsJSON);
     const scriptToLoad =

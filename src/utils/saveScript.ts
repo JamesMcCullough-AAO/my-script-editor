@@ -1,3 +1,5 @@
+import { scriptToFileName } from "./scriptToFileName";
+
 type saveScriptInput = {
   title: string;
   contentRef: React.RefObject<HTMLDivElement>;
@@ -5,10 +7,6 @@ type saveScriptInput = {
 };
 // You might want to define this outside your React component to avoid re-initializing it.
 let lastSavedTimestamp: number = 0;
-let lastSavedHash: string = "";
-
-// A simple function to create a hash of the content.
-const hashContent = (content: string) => content.length.toString();
 
 export const saveScript = ({
   title,
@@ -22,12 +20,10 @@ export const saveScript = ({
     contentRef.current.innerHTML.length > 10
   ) {
     const currentContent = contentRef.current.innerHTML;
-    const currentHash = hashContent(currentContent);
     const currentTime = Date.now();
 
     // Your condition for deciding when to version (this is just an example)
-    const shouldVersion =
-      currentHash !== lastSavedHash && currentTime - lastSavedTimestamp > 10000; // 10 seconds
+    const shouldVersion = currentTime - lastSavedTimestamp > 30000; // 30 seconds
 
     const payload = {
       content: currentContent,
@@ -35,22 +31,26 @@ export const saveScript = ({
       iconImage,
     };
 
-    const existingScriptsJSON = localStorage.getItem(`script_${title}`);
+    const existingScriptsJSON = localStorage.getItem(
+      `script_${scriptToFileName(title)}`
+    );
     const existingScripts = existingScriptsJSON
       ? JSON.parse(existingScriptsJSON)
       : [];
 
     if (shouldVersion) {
       // Save as a new version.
+      console.log("Saving new version");
       existingScripts.push(payload);
     } else {
       // Overwrite the last version.
       existingScripts[existingScripts.length - 1] = payload;
     }
 
-    localStorage.setItem(`script_${title}`, JSON.stringify(existingScripts));
-
-    lastSavedHash = currentHash;
+    localStorage.setItem(
+      `script_${scriptToFileName(title)}`,
+      JSON.stringify(existingScripts)
+    );
     lastSavedTimestamp = currentTime;
   }
 };

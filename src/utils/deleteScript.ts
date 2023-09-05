@@ -1,3 +1,5 @@
+import { scriptToFileName } from "./scriptToFileName";
+
 type DeleteScriptParams = {
   title: string;
   contentRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -12,7 +14,7 @@ export const deleteScript = ({
   onDeleteModalClose,
 }: DeleteScriptParams) => {
   // Remove script from local storage
-  localStorage.removeItem(`script_${title}`);
+  localStorage.removeItem(`script_${scriptToFileName(title)}`);
 
   // Clear the input and title
   if (contentRef.current) {
@@ -22,4 +24,12 @@ export const deleteScript = ({
 
   // Close the delete modal
   onDeleteModalClose();
+};
+
+export const deleteAllScripts = () => {
+  // Remove all scripts from local storage
+  const scripts = Object.keys(localStorage).filter((key) =>
+    key.includes("script_")
+  );
+  scripts.forEach((script) => localStorage.removeItem(script));
 };

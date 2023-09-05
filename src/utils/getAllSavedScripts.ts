@@ -1,3 +1,5 @@
+import { fileNameToScript } from "./scriptToFileName";
+
 export const getAllSavedScripts = () => {
   const savedScripts = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -7,7 +9,7 @@ export const getAllSavedScripts = () => {
       if (dataArr.length > 0) {
         const mostRecentData = dataArr[dataArr.length - 1];
         savedScripts.push({
-          title: key.substring(7),
+          title: fileNameToScript(key.substring(7)),
           content: mostRecentData.content,
           timestamp: mostRecentData.timestamp,
         });

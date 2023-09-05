@@ -1,4 +1,5 @@
 import { getAllSavedScripts } from "../utils/getAllSavedScripts";
+import { scriptToFileName } from "../utils/scriptToFileName";
 
 type handleRenameScriptInput = {
   newScriptTitle: string;
@@ -24,9 +25,14 @@ export const handleRenameScript = ({
       alert("This title already exists!");
       return;
     }
-    const scriptJSON = localStorage.getItem(`script_${oldScriptTitle}`);
-    localStorage.removeItem(`script_${oldScriptTitle}`);
-    localStorage.setItem(`script_${newScriptTitle}`, scriptJSON || "");
+    const scriptJSON = localStorage.getItem(
+      `script_${scriptToFileName(oldScriptTitle)}`
+    );
+    localStorage.removeItem(`script_${scriptToFileName(oldScriptTitle)}`);
+    localStorage.setItem(
+      `script_${scriptToFileName(newScriptTitle)}`,
+      scriptJSON || ""
+    );
     setTitle(newScriptTitle);
   }
   setOldScriptTitle("");

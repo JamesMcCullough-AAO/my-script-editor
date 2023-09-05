@@ -31,7 +31,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import HistoryIcon from "@mui/icons-material/History";
 
 import { useEffect, useRef, useState } from "react";
-import { deleteScript } from "./utils/deleteScript";
+import { deleteAllScripts, deleteScript } from "./utils/deleteScript";
 import { newScript } from "./utils/newScript";
 import { searchSavedTitles } from "./utils/searchSavedTitles";
 import { saveScript } from "./utils/saveScript";
@@ -48,6 +48,7 @@ import { handleGenerateText } from "./handlers/handleGenerateText";
 import PendingIcon from "@mui/icons-material/Pending";
 import { throttle } from "lodash";
 import { getScriptVersions } from "./utils/getScriptVersions";
+import { formatTimestampExact } from "./utils/formatTimestampExact";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -88,6 +89,7 @@ function App() {
       title: string;
       timestamp: number;
       iconImage?: string;
+      index: number;
     }[],
     any
   ];
@@ -451,7 +453,7 @@ function App() {
                 />
                 <IconButton
                   aria-label="Versions"
-                  colorScheme="purple"
+                  colorScheme="pink"
                   icon={<HistoryIcon />}
                   onClick={() => {
                     handleShowVersionsModal({ title });
@@ -725,6 +727,24 @@ function App() {
                 })
               }
             />
+            <Button
+              aria-label="Delete script"
+              colorScheme="red"
+              onClick={() => {
+                const confirmation = window.confirm(
+                  "Are you sure you want to delete all scripts?"
+                );
+                if (confirmation) {
+                  deleteAllScripts();
+                  onSettingsModalClose();
+                }
+              }}
+              isDisabled={isGenerating || !title}
+            >
+              {" "}
+              <DeleteIcon />
+              Delete All Scripts
+            </Button>
           </ModalBody>
           <ModalFooter>
             <Button
@@ -773,7 +793,7 @@ function App() {
                           setTitle,
                           setIconImage,
                           iconImage,
-                          versionIndex: scriptVersions.indexOf(script),
+                          versionIndex: script.index,
                         });
                         onVersionsModalClose();
                       }}
@@ -789,7 +809,6 @@ function App() {
                             src={script.iconImage || "documentIcon.png"}
                             width="30px"
                           />
-                          // Reverse index version
                           <Text>
                             Version{" "}
                             {scriptVersions.length -
@@ -797,7 +816,9 @@ function App() {
                           </Text>
                         </HStack>
                         <Text>
-                          {formatTimestamp({ timestamp: script.timestamp })}
+                          {formatTimestampExact({
+                            timestamp: script.timestamp,
+                          })}
                         </Text>
                       </HStack>
                     </ListItem>
