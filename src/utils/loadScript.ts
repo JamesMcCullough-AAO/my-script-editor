@@ -1,3 +1,4 @@
+import { getItem } from "./indexDB";
 import { saveScript } from "./saveScript";
 import { scriptToFileName } from "./scriptToFileName";
 
@@ -9,8 +10,11 @@ type loadScriptInput = {
   setIconImage: React.Dispatch<React.SetStateAction<string>>;
   iconImage?: string;
   versionIndex?: number;
+  notes: string;
+  setNotes: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
-export const loadScript = ({
+export const loadScript = async ({
   loadTitle,
   title,
   contentRef,
@@ -18,21 +22,28 @@ export const loadScript = ({
   setIconImage,
   iconImage,
   versionIndex = -1, // -1 will load the latest version
+  notes,
+  setNotes,
+  setIsLoading,
 }: loadScriptInput & { versionIndex?: number }) => {
-  saveScript({ title, contentRef, iconImage });
+  setIsLoading(true);
+  console.log("loadTitle", loadTitle);
+  saveScript({ title, contentRef, iconImage, notes });
 
-  const savedScriptsJSON = localStorage.getItem(
-    `script_${scriptToFileName(loadTitle)}`
-  );
-  if (savedScriptsJSON) {
-    const savedScripts = JSON.parse(savedScriptsJSON);
+  const id = `script_${scriptToFileName(loadTitle)}`;
+  const savedScripts = (await getItem(id)).existingScripts;
+
+  console.log("savedScripts", savedScripts);
+
+  if (savedScripts) {
     const scriptToLoad =
       versionIndex === -1
         ? savedScripts[savedScripts.length - 1]
         : savedScripts[versionIndex];
 
+    console.log("scriptToLoad", scriptToLoad);
     if (scriptToLoad) {
-      const { content, iconImage } = scriptToLoad;
+      const { content, iconImage, notes } = scriptToLoad;
 
       setTitle(loadTitle);
       if (content && contentRef.current) {
@@ -48,6 +59,14 @@ export const loadScript = ({
       } else {
         setIconImage("");
       }
+
+      if (notes) {
+        setNotes(notes);
+      } else {
+        setNotes("");
+      }
     }
   }
+
+  setIsLoading(false);
 };

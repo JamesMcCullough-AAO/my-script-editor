@@ -1,3 +1,4 @@
+import { getItem } from "./indexDB";
 import { scriptToFileName } from "./scriptToFileName";
 
 type ScriptVersion = {
@@ -6,15 +7,15 @@ type ScriptVersion = {
   iconImage?: string;
 };
 
-export const getScriptVersions = (
+export const getScriptVersions = async (
   scriptTitle: string
-): ScriptVersion[] | null => {
-  const scriptVersionsJSON = localStorage.getItem(
-    `script_${scriptToFileName(scriptTitle)}`
-  );
+): Promise<ScriptVersion[] | null> => {
+  const id = `script_${scriptToFileName(scriptTitle)}`;
+  const savedScripts = (await getItem(id)).existingScripts;
+
   // Parse, add their index, and sort by timestamp
-  if (scriptVersionsJSON) {
-    let versions = JSON.parse(scriptVersionsJSON);
+  if (savedScripts) {
+    let versions = savedScripts;
     versions = versions.map((version: ScriptVersion, index: number) => {
       return { ...version, index };
     });

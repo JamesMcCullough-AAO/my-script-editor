@@ -6,18 +6,19 @@ type newScriptInput = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   onMenuClose: () => void;
   onNameModalClose: () => void;
+  setNotes: React.Dispatch<React.SetStateAction<string>>;
 };
-export const newScript = ({
+export const newScript = async ({
   newScriptTitle,
   contentRef,
   setTitle,
   onMenuClose,
   onNameModalClose,
+  setNotes,
 }: newScriptInput) => {
   if (newScriptTitle) {
-    if (
-      getAllSavedScripts().some((script) => script.title === newScriptTitle)
-    ) {
+    const savedScripts = await getAllSavedScripts();
+    if (savedScripts.some((script) => script.title === newScriptTitle)) {
       alert("This title already exists!");
       return;
     }
@@ -25,6 +26,7 @@ export const newScript = ({
       contentRef.current.innerHTML = "";
     }
     setTitle(newScriptTitle);
+    setNotes("");
     onNameModalClose();
     onMenuClose();
   }

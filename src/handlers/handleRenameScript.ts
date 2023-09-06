@@ -10,7 +10,7 @@ type handleRenameScriptInput = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export const handleRenameScript = ({
+export const handleRenameScript = async ({
   newScriptTitle,
   oldScriptTitle,
   setOldScriptTitle,
@@ -19,9 +19,8 @@ export const handleRenameScript = ({
   setTitle,
 }: handleRenameScriptInput) => {
   if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
-    if (
-      getAllSavedScripts().some((script) => script.title === newScriptTitle)
-    ) {
+    const savedScripts = await getAllSavedScripts();
+    if (savedScripts.some((script) => script.title === newScriptTitle)) {
       alert("This title already exists!");
       return;
     }

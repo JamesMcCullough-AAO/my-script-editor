@@ -29,6 +29,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import HistoryIcon from "@mui/icons-material/History";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import NoteIcon from "@mui/icons-material/Note";
 
 import { useEffect, useRef, useState } from "react";
 import { deleteAllScripts, deleteScript } from "./utils/deleteScript";
@@ -41,7 +43,6 @@ import { formatTimestamp } from "./utils/formatTimestamp";
 import { handleNewScript } from "./handlers/handleNewScript";
 import { handleRenameScript } from "./handlers/handleRenameScript";
 import { handleOpenRenameModal } from "./handlers/handleOpenRenameModal";
-import { handleSelectScript } from "./handlers/handleSelectScript";
 import { handleOpenMenu } from "./handlers/handleOpenMenu";
 import { handleKeyDown } from "./handlers/handleKeyDown";
 import { handleGenerateText } from "./handlers/handleGenerateText";
@@ -49,6 +50,7 @@ import PendingIcon from "@mui/icons-material/Pending";
 import { throttle } from "lodash";
 import { getScriptVersions } from "./utils/getScriptVersions";
 import { formatTimestampExact } from "./utils/formatTimestampExact";
+import { loadScript } from "./utils/loadScript";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -63,6 +65,8 @@ function App() {
   const [oldScriptTitle, setOldScriptTitle] = useState("");
   const [iconImage, setIconImage] = useState("");
   const [uploadedIconImage, setUploadedIconImage] = useState("");
+  const [notes, setNotes] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
@@ -72,6 +76,7 @@ function App() {
     title: string;
     timestamp: number;
     iconImage?: string;
+    notes?: string;
   }[]);
   const {
     isOpen: isUploadModalOpen,
@@ -133,6 +138,11 @@ function App() {
     onOpen: onVersionsModalOpen,
     onClose: onVersionsModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isNotesModalOpen,
+    onOpen: onNotesModalOpen,
+    onClose: onNotesModalClose,
+  } = useDisclosure();
 
   // A function that takes uploaded image and sets it as the icon
   const handleUploadIcon = (event: any) => {
@@ -152,8 +162,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const updatedScriptTitles = searchSavedTitles({ title, searchTerm });
-    setSavedScriptTitles(updatedScriptTitles);
+    const fetchTitles = async () => {
+      setIsLoading(true);
+      try {
+        const updatedScriptTitles = await searchSavedTitles({
+          title,
+          searchTerm,
+        });
+        setSavedScriptTitles(updatedScriptTitles);
+      } catch (error) {
+        // Handle the error appropriately.
+        console.error("An error occurred while fetching titles:", error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchTitles();
   }, [searchTerm]);
 
   useEffect(() => {
@@ -205,8 +229,10 @@ function App() {
     title: string;
   };
 
-  const handleShowVersionsModal = ({ title }: handleShowVersionsModalProps) => {
-    const versions = getScriptVersions(title);
+  const handleShowVersionsModal = async ({
+    title,
+  }: handleShowVersionsModalProps) => {
+    const versions = await getScriptVersions(title);
     setScriptVersions(versions);
     onVersionsModalOpen();
   };
@@ -257,6 +283,17 @@ function App() {
           isDisabled={isGenerating}
           visibility={title ? "visible" : "hidden"}
         />
+        <IconButton
+          aria-label="Edit notes"
+          icon={<NoteIcon />}
+          onClick={() => {
+            onNotesModalOpen();
+          }}
+          colorScheme="yellow"
+          isDisabled={isGenerating || !title}
+          visibility={title ? "visible" : "hidden"}
+        />
+        {isLoading && <PendingIcon />}
       </VStack>
       <VStack
         spacing={3}
@@ -353,6 +390,25 @@ function App() {
           {wordCount}
         </Text>
       </Box>
+      {/* Notes modal */}
+      <Modal isOpen={isNotesModalOpen} onClose={onNotesModalClose} size="4xl">
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Notes</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Textarea
+              placeholder="Notes..."
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              height="50vh"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onNotesModalClose}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       {/* Modal Area */}
       <Modal isOpen={isUploadModalOpen} onClose={onUploadModalClose}>
         <ModalOverlay />
@@ -455,8 +511,8 @@ function App() {
                   aria-label="Versions"
                   colorScheme="pink"
                   icon={<HistoryIcon />}
-                  onClick={() => {
-                    handleShowVersionsModal({ title });
+                  onClick={async () => {
+                    await handleShowVersionsModal({ title });
                     onMenuClose();
                   }}
                   isDisabled={isGenerating || !title}
@@ -480,7 +536,7 @@ function App() {
             {savedScriptTitles.length === 0 && (
               <Text>No saved scripts yet!</Text>
             )}
-            {savedScriptTitles.length > 0 && (
+            {(savedScriptTitles.length > 0 || searchTerm.length > 0) && (
               <VStack flex="1" width="100%">
                 <Text>Saved Scripts</Text>
                 <Input
@@ -496,17 +552,20 @@ function App() {
                       backgroundColor="#1d2330"
                       padding="0.5em"
                       key={script.title}
-                      onClick={() =>
-                        handleSelectScript({
+                      onClick={async () => {
+                        await loadScript({
                           loadTitle: script.title,
                           title,
-                          onMenuClose,
                           contentRef,
                           setTitle,
                           setIconImage,
                           iconImage,
-                        })
-                      }
+                          notes,
+                          setNotes,
+                          setIsLoading,
+                        });
+                        onMenuClose();
+                      }}
                       // Hilight the hovered item
                       _hover={{
                         backgroundColor: "#007050",
@@ -618,6 +677,7 @@ function App() {
                   setTitle,
                   onMenuClose,
                   onNameModalClose,
+                  setNotes,
                 });
               }}
             >
@@ -784,16 +844,18 @@ function App() {
                       backgroundColor="#1d2330"
                       padding="0.5em"
                       key={scriptVersions.indexOf(script)}
-                      onClick={() => {
-                        handleSelectScript({
+                      onClick={async () => {
+                        loadScript({
                           loadTitle: title,
                           title,
-                          onMenuClose,
                           contentRef,
                           setTitle,
                           setIconImage,
                           iconImage,
                           versionIndex: script.index,
+                          notes,
+                          setNotes,
+                          setIsLoading,
                         });
                         onVersionsModalClose();
                       }}

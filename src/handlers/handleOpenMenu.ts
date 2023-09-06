@@ -15,13 +15,13 @@ type handleOpenMenuInput = {
   onMenuOpen: () => void;
 };
 
-export const handleOpenMenu = ({
+export const handleOpenMenu = async ({
   title,
   setSavedScriptTitles,
   setSearchTerm,
   onMenuOpen,
 }: handleOpenMenuInput) => {
-  const savedScriptTitles = searchSavedTitles({
+  const savedScriptTitles = await searchSavedTitles({
     title,
     searchTerm: "",
   });
