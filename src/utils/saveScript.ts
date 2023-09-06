@@ -31,7 +31,6 @@ export const saveScript = async ({
     const payload = {
       content: currentContent,
       timestamp: currentTime,
-      iconImage,
       notes,
     };
 
@@ -49,7 +48,7 @@ export const saveScript = async ({
 
     const id = `script_${scriptToFileName(title)}`;
 
-    await setItem(id, { existingScripts });
+    await setItem(id, { existingScripts, iconImage });
     lastSavedTimestamp = currentTime;
   }
 };

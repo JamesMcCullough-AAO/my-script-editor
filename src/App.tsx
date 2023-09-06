@@ -182,7 +182,7 @@ function App() {
 
   useEffect(() => {
     if (contentRef.current) {
-      saveScript({ title, contentRef, iconImage });
+      saveScript({ title, contentRef, iconImage, notes });
     }
   }, [contentRef.current?.innerHTML, contentRef.current?.innerText, iconImage]);
 
@@ -206,7 +206,7 @@ function App() {
       // Attach the event listener to detect changes
       element.addEventListener("input", () => {
         updateWordCount();
-        saveScript({ title, contentRef });
+        saveScript({ title, contentRef, iconImage, notes });
       });
 
       // Update word count initially
@@ -558,8 +558,8 @@ function App() {
                           title,
                           contentRef,
                           setTitle,
-                          setIconImage,
                           iconImage,
+                          setIconImage,
                           notes,
                           setNotes,
                           setIsLoading,

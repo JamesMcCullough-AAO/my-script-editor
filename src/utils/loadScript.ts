@@ -8,8 +8,8 @@ type loadScriptInput = {
   contentRef: React.RefObject<HTMLDivElement>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setIconImage: React.Dispatch<React.SetStateAction<string>>;
-  iconImage?: string;
   versionIndex?: number;
+  iconImage?: string;
   notes: string;
   setNotes: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,7 +31,9 @@ export const loadScript = async ({
   saveScript({ title, contentRef, iconImage, notes });
 
   const id = `script_${scriptToFileName(loadTitle)}`;
-  const savedScripts = (await getItem(id)).existingScripts;
+  const databaseLoad = await getItem(id);
+  const savedScripts = databaseLoad.existingScripts;
+  const { iconImage: loadIconImage } = databaseLoad;
 
   console.log("savedScripts", savedScripts);
 
@@ -43,7 +45,7 @@ export const loadScript = async ({
 
     console.log("scriptToLoad", scriptToLoad);
     if (scriptToLoad) {
-      const { content, iconImage, notes } = scriptToLoad;
+      const { content, notes } = scriptToLoad;
 
       setTitle(loadTitle);
       if (content && contentRef.current) {
@@ -54,8 +56,8 @@ export const loadScript = async ({
         }
       }
 
-      if (iconImage) {
-        setIconImage(iconImage);
+      if (loadIconImage) {
+        setIconImage(loadIconImage);
       } else {
         setIconImage("");
       }
