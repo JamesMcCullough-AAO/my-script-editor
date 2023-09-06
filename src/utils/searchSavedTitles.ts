@@ -35,6 +35,7 @@ export const searchSavedTitles = async ({
     savedTitles.splice(index, 1);
   }
 
+  console.log(savedTitles);
   // Sort by most recently edited and filter based on search term
   return savedTitles
     .sort((a, b) => b.timestamp - a.timestamp)

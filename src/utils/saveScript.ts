@@ -1,4 +1,4 @@
-import { setItem } from "./indexDB";
+import { getItem, setItem } from "./indexDB";
 import { scriptToFileName } from "./scriptToFileName";
 
 type saveScriptInput = {
@@ -35,12 +35,8 @@ export const saveScript = async ({
       notes,
     };
 
-    const existingScriptsJSON = localStorage.getItem(
-      `script_${scriptToFileName(title)}`
-    );
-    const existingScripts = existingScriptsJSON
-      ? JSON.parse(existingScriptsJSON)
-      : [];
+    const existingScripts = (await getItem(`script_${scriptToFileName(title)}`))
+      .existingScripts;
 
     if (shouldVersion) {
       // Save as a new version.
