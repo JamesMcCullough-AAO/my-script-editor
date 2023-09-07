@@ -8,6 +8,7 @@ type handleOpenMenuInput = {
         title: string;
         timestamp: number;
         iconImage?: string;
+        iconColor: string;
       }[]
     >
   >;

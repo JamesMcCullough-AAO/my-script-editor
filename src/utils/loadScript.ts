@@ -13,6 +13,8 @@ type loadScriptInput = {
   notes: string;
   setNotes: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  iconColor: string;
+  setIconColor: React.Dispatch<React.SetStateAction<string>>;
 };
 export const loadScript = async ({
   loadTitle,
@@ -25,10 +27,12 @@ export const loadScript = async ({
   notes,
   setNotes,
   setIsLoading,
+  iconColor,
+  setIconColor,
 }: loadScriptInput & { versionIndex?: number }) => {
   setIsLoading(true);
   console.log("loadTitle", loadTitle);
-  saveScript({ title, contentRef, iconImage, notes });
+  saveScript({ title, contentRef, iconImage, notes, iconColor });
 
   const id = `script_${scriptToFileName(loadTitle)}`;
   const databaseLoad = await getItem(id);

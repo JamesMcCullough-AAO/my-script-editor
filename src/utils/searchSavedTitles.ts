@@ -13,6 +13,7 @@ export const searchSavedTitles = async ({
     title: string;
     timestamp: number;
     iconImage?: string;
+    iconColor: string;
   }> = [];
 
   allItems.forEach((item) => {
@@ -24,6 +25,7 @@ export const searchSavedTitles = async ({
           title: fileNameToScript(item.id.substring(7)),
           timestamp: mostRecentData.timestamp,
           iconImage: item.iconImage,
+          iconColor: item.iconColor,
         });
       }
     }

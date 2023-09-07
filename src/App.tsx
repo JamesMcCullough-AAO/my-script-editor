@@ -52,8 +52,8 @@ import { getScriptVersions } from "./utils/getScriptVersions";
 import { formatTimestampExact } from "./utils/formatTimestampExact";
 import { loadScript } from "./utils/loadScript";
 import { compressImage } from "./utils/ImageCompressor";
-import {EditDocumentIcon} from "./icons/editDocument";
-import {DocumentIcon} from "./icons/DocumentIcon";
+import { EditDocumentIcon } from "./icons/editDocument";
+import { DocumentIcon } from "./icons/DocumentIcon";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -70,16 +70,19 @@ function App() {
   const [uploadedIconImage, setUploadedIconImage] = useState("");
   const [notes, setNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [iconColor, setIconColor] = useState("#00FFB6" as string);
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
       timestamp: 0,
+      iconColor: "#00FFB6",
     },
   ] as {
     title: string;
     timestamp: number;
     iconImage?: string;
     notes?: string;
+    iconColor: string;
   }[]);
   const {
     isOpen: isUploadModalOpen,
@@ -98,6 +101,7 @@ function App() {
       timestamp: number;
       iconImage?: string;
       index: number;
+      iconColor: string;
     }[],
     any
   ];
@@ -186,9 +190,15 @@ function App() {
 
   useEffect(() => {
     if (contentRef.current) {
-      saveScript({ title, contentRef, iconImage, notes });
+      saveScript({ title, contentRef, iconImage, notes, iconColor });
     }
-  }, [contentRef.current?.innerHTML, contentRef.current?.innerText, iconImage]);
+  }, [
+    contentRef.current?.innerHTML,
+    contentRef.current?.innerText,
+    iconImage,
+    notes,
+    iconColor,
+  ]);
 
   const updateWordCount = throttle(() => {
     if (contentRef.current) {
@@ -210,7 +220,7 @@ function App() {
       // Attach the event listener to detect changes
       element.addEventListener("input", () => {
         updateWordCount();
-        saveScript({ title, contentRef, iconImage, notes });
+        saveScript({ title, contentRef, iconImage, notes, iconColor });
       });
 
       // Update word count initially
@@ -228,6 +238,28 @@ function App() {
   useEffect(() => {
     document.title = title || "Script Editor"; // Set the title to the script title or some default title
   }, [title]); // This useEffect runs every time `title` changes
+
+  // An icon button that accepts a color prop, and displays a document icon of that color. When clicked, it sets the icon color to that color
+  const ColorIconButton = ({ color }: { color: string }) => {
+    return (
+      <IconButton
+        colorScheme="grey"
+        aria-label="Update icon"
+        icon={<EditDocumentIcon color={color} width="40px" />}
+        backgroundColor="blackAlpha.200"
+        // on hover, change the icon color to the color of the button
+        _hover={{
+          backgroundColor: "blackAlpha.600",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          setIconColor(color);
+          onIconModalClose();
+          onMenuClose();
+        }}
+      />
+    );
+  };
 
   type handleShowVersionsModalProps = {
     title: string;
@@ -329,11 +361,10 @@ function App() {
           <HStack id="title-bar">
             {title && (
               <Box marginRight="5px">
-                 { iconImage && <Image
-                            src={iconImage}
-                            width="40px"
-                          />}
-                          { !iconImage && <DocumentIcon color="#00FFB6" width="40px" />}
+                {iconImage && <Image src={iconImage} width="40px" />}
+                {!iconImage && (
+                  <EditDocumentIcon color={iconColor} width="40px" />
+                )}
                 {/* <EditDocumentIcon color="#00FFB6" width="40px" /> */}
               </Box>
             )}
@@ -576,6 +607,8 @@ function App() {
                           notes,
                           setNotes,
                           setIsLoading,
+                          iconColor,
+                          setIconColor,
                         });
                         onMenuClose();
                       }}
@@ -587,11 +620,15 @@ function App() {
                     >
                       <HStack justifyContent="space-between">
                         <HStack>
-                          { script?.iconImage && <Image
-                            src={script.iconImage}
-                            width="30px"
-                          />}
-                          { !script?.iconImage && <DocumentIcon color="#00FFB6" width="30px" />}
+                          {script?.iconImage && (
+                            <Image src={script.iconImage} width="30px" />
+                          )}
+                          {!script?.iconImage && (
+                            <DocumentIcon
+                              color={script.iconColor || "#00FFB6"}
+                              width="30px"
+                            />
+                          )}
                           {/* <Image
                             src={script.iconImage || "documentIcon.png"}
                             width="30px"
@@ -738,12 +775,40 @@ function App() {
         </ModalContent>
       </Modal>
       {/* Script icon modal - Upload the icon for the script */}
-      <Modal isOpen={isIconModalOpen} onClose={onIconModalClose}>
+      <Modal isOpen={isIconModalOpen} onClose={onIconModalClose} size="xl">
         <ModalOverlay />
         <ModalContent backgroundColor="#424242" color="white">
-          <ModalHeader>Upload Script Icon</ModalHeader>
+          <ModalHeader>Update Script Icon</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <Text>Choose a color:</Text>
+            <HStack
+              spacing="2"
+              marginBottom="2"
+              flex="1"
+              justifyContent="center"
+            >
+              <ColorIconButton color="#00FFB6" />
+              <ColorIconButton color="#00C8FF" />
+              <ColorIconButton color="#008DFF" />
+              <ColorIconButton color="#FF00F1" />
+              <ColorIconButton color="#FF004E" />
+              <ColorIconButton color="#FF0000" />
+            </HStack>
+            <HStack
+              spacing="2"
+              marginBottom="2"
+              flex="1"
+              justifyContent="center"
+            >
+              <ColorIconButton color="#FF8B00" />
+              <ColorIconButton color="#FFDC00" />
+              <ColorIconButton color="#C7FF00" />
+              <ColorIconButton color="#00FF0E" />
+              <ColorIconButton color="#FFFFFF" />
+              <ColorIconButton color="#939393" />
+            </HStack>
+            <Text marginTop="5">Or, upload your own icon:</Text>
             <Input
               type="file"
               onChange={(event) => {
@@ -863,7 +928,7 @@ function App() {
                       padding="0.5em"
                       key={scriptVersions.indexOf(script)}
                       onClick={async () => {
-                        loadScript({
+                        await loadScript({
                           loadTitle: title,
                           title,
                           contentRef,
@@ -874,6 +939,8 @@ function App() {
                           notes,
                           setNotes,
                           setIsLoading,
+                          iconColor,
+                          setIconColor,
                         });
                         onVersionsModalClose();
                       }}
@@ -885,11 +952,15 @@ function App() {
                     >
                       <HStack justifyContent="space-between">
                         <HStack>
-                        { script?.iconImage && <Image
-                            src={script.iconImage}
-                            width="30px"
-                          />}
-                          { !script?.iconImage && <DocumentIcon color="#00FFB6" width="30px" />}
+                          {script?.iconImage && (
+                            <Image src={script.iconImage} width="30px" />
+                          )}
+                          {!script?.iconImage && (
+                            <DocumentIcon
+                              color={script.iconColor || "#00FFB6"}
+                              width="30px"
+                            />
+                          )}
                           <Text>
                             Version{" "}
                             {scriptVersions.length -

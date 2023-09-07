@@ -6,6 +6,7 @@ type saveScriptInput = {
   contentRef: React.RefObject<HTMLDivElement>;
   iconImage?: string;
   notes?: string;
+  iconColor: string;
 };
 // You might want to define this outside your React component to avoid re-initializing it.
 let lastSavedTimestamp: number = 0;
@@ -15,6 +16,7 @@ export const saveScript = async ({
   contentRef,
   iconImage,
   notes,
+  iconColor,
 }: saveScriptInput) => {
   if (
     title &&
@@ -48,7 +50,7 @@ export const saveScript = async ({
 
     const id = `script_${scriptToFileName(title)}`;
 
-    await setItem(id, { existingScripts, iconImage });
+    await setItem(id, { existingScripts, iconImage, iconColor });
     lastSavedTimestamp = currentTime;
   }
 };

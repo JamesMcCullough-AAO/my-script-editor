@@ -18,7 +18,12 @@ export const getScriptVersions = async (
   if (savedScripts) {
     let versions = savedScripts;
     versions = versions.map((version: ScriptVersion, index: number) => {
-      return { ...version, iconImage: scriptFile.iconImage, index };
+      return {
+        ...version,
+        iconImage: scriptFile.iconImage,
+        iconColor: scriptFile.iconColor,
+        index,
+      };
     });
     versions.sort((a: ScriptVersion, b: ScriptVersion) => {
       return b.timestamp - a.timestamp;
