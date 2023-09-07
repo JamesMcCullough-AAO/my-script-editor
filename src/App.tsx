@@ -51,6 +51,7 @@ import { throttle } from "lodash";
 import { getScriptVersions } from "./utils/getScriptVersions";
 import { formatTimestampExact } from "./utils/formatTimestampExact";
 import { loadScript } from "./utils/loadScript";
+import { compressImage } from "./utils/ImageCompressor";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -144,11 +145,12 @@ function App() {
     onClose: onNotesModalClose,
   } = useDisclosure();
 
-  // A function that takes uploaded image and sets it as the icon
-  const handleUploadIcon = (event: any) => {
+  // A function that takes uploaded image, compresses it using compressImage and sets it as the icon
+  const handleUploadIcon = async (event: any) => {
     const uploadedImage = event.target.files[0];
+    const compressedImage = await compressImage(uploadedImage);
     const reader = new FileReader();
-    reader.readAsDataURL(uploadedImage);
+    reader.readAsDataURL(compressedImage);
     reader.onloadend = () => {
       setUploadedIconImage(reader.result as string);
     };
