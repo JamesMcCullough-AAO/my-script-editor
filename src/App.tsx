@@ -388,7 +388,6 @@ function App() {
         zIndex="100"
         padding="1em"
       >
-        // Green when above target, red when above max
         <Text
           fontWeight={600}
           fontSize="18px"
