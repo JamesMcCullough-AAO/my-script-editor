@@ -329,7 +329,12 @@ function App() {
           <HStack id="title-bar">
             {title && (
               <Box marginRight="5px">
-                <EditDocumentIcon color="#00FFB6" width="40px" />
+                 { iconImage && <Image
+                            src={iconImage}
+                            width="40px"
+                          />}
+                          { !iconImage && <DocumentIcon color="#00FFB6" width="40px" />}
+                {/* <EditDocumentIcon color="#00FFB6" width="40px" /> */}
               </Box>
             )}
             <Text color="white" fontWeight={600} fontSize="24px">
@@ -374,16 +379,6 @@ function App() {
           </VStack>
         </VStack>
       </VStack>
-      {/* Script icon in top right corner fixed */}
-      <Box position="absolute" top="0" right="0" width="10%" zIndex="100">
-        <Image
-          src={iconImage}
-          width="100%"
-          borderBottomLeftRadius="3xl"
-          borderLeft="3px solid black"
-          borderBottom="3px solid black"
-        />
-      </Box>
       {/* Info box in the lower right corner that shows word count, updated live*/}
       <Box
         position="absolute"
