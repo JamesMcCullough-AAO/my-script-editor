@@ -388,7 +388,19 @@ function App() {
         zIndex="100"
         padding="1em"
       >
-        <Text color="white" fontWeight={600} fontSize="18px" textAlign="right">
+        // Green when above target, red when above max
+        <Text
+          fontWeight={600}
+          fontSize="18px"
+          textAlign="right"
+          color={
+            wordCount > editorSettings.maxWordCount
+              ? "red"
+              : wordCount > editorSettings.targetWordCount
+              ? "lightgreen"
+              : "white"
+          }
+        >
           {wordCount}
         </Text>
       </Box>
