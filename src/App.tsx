@@ -52,6 +52,8 @@ import { getScriptVersions } from "./utils/getScriptVersions";
 import { formatTimestampExact } from "./utils/formatTimestampExact";
 import { loadScript } from "./utils/loadScript";
 import { compressImage } from "./utils/ImageCompressor";
+import {EditDocumentIcon} from "./icons/editDocument";
+import {DocumentIcon} from "./icons/DocumentIcon";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -319,13 +321,16 @@ function App() {
               Click the menu button in the top left to select a script or create
               a new one.
             </Text>
-            <Image src="favicon.png" width="300px" />
+            {/* <Image src="favicon.png" width="300px" /> */}
+            <EditDocumentIcon color="#00FFB6" width="300px" />
           </VStack>
         )}
         <VStack maxWidth="1000px" width="full" alignItems="start" height="100%">
           <HStack id="title-bar">
             {title && (
-              <Image src="favicon.png" width="40px" marginRight="5px" />
+              <Box marginRight="5px">
+                <EditDocumentIcon color="#00FFB6" width="40px" />
+              </Box>
             )}
             <Text color="white" fontWeight={600} fontSize="24px">
               {title}
@@ -587,10 +592,15 @@ function App() {
                     >
                       <HStack justifyContent="space-between">
                         <HStack>
-                          <Image
+                          { script?.iconImage && <Image
+                            src={script.iconImage}
+                            width="30px"
+                          />}
+                          { !script?.iconImage && <DocumentIcon color="#00FFB6" width="30px" />}
+                          {/* <Image
                             src={script.iconImage || "documentIcon.png"}
                             width="30px"
-                          />
+                          /> */}
                           <Text>{script.title}</Text>
                         </HStack>
                         <Text>
@@ -880,10 +890,11 @@ function App() {
                     >
                       <HStack justifyContent="space-between">
                         <HStack>
-                          <Image
-                            src={script.iconImage || "documentIcon.png"}
+                        { script?.iconImage && <Image
+                            src={script.iconImage}
                             width="30px"
-                          />
+                          />}
+                          { !script?.iconImage && <DocumentIcon color="#00FFB6" width="30px" />}
                           <Text>
                             Version{" "}
                             {scriptVersions.length -

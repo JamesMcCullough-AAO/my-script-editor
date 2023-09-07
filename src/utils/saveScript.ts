@@ -35,7 +35,7 @@ export const saveScript = async ({
     };
 
     const existingScripts = (await getItem(`script_${scriptToFileName(title)}`))
-      .existingScripts;
+      ?.existingScripts;
 
     if (shouldVersion) {
       // Save as a new version.
