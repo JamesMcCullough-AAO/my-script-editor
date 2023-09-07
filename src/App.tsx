@@ -254,6 +254,7 @@ function App() {
         }}
         onClick={() => {
           setIconColor(color);
+          setIconImage("");
           onIconModalClose();
           onMenuClose();
         }}
