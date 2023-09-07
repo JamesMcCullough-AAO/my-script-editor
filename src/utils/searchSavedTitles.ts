@@ -23,7 +23,7 @@ export const searchSavedTitles = async ({
         savedTitles.push({
           title: fileNameToScript(item.id.substring(7)),
           timestamp: mostRecentData.timestamp,
-          iconImage: mostRecentData.iconImage,
+          iconImage: item.iconImage,
         });
       }
     }
