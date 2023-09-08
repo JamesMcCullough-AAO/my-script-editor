@@ -1,4 +1,4 @@
-import { getAllSavedScripts } from "./getAllSavedScripts";
+import { ifItemExists } from "./indexDB";
 
 type newScriptInput = {
   newScriptTitle: string;
@@ -17,8 +17,7 @@ export const newScript = async ({
   setNotes,
 }: newScriptInput) => {
   if (newScriptTitle) {
-    const savedScripts = await getAllSavedScripts();
-    if (savedScripts.some((script) => script.title === newScriptTitle)) {
+    if (await ifItemExists(newScriptTitle)) {
       alert("This title already exists!");
       return;
     }

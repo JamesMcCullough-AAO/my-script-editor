@@ -65,6 +65,18 @@ export const getAllItems = async () => {
   });
 };
 
+export const ifItemExists = async (id: string) => {
+  const db = await openDB();
+  const transaction = db.transaction("scripts");
+  const store = transaction.objectStore("scripts");
+  const request = store.get(id);
+
+  return new Promise<boolean>((resolve, reject) => {
+    request.onsuccess = () => resolve(!!request.result);
+    request.onerror = () => reject();
+  });
+};
+
 export const deleteAllItems = async () => {
   const db = await openDB();
   const transaction = db.transaction("scripts", "readwrite");
