@@ -65,4 +65,16 @@ export const getAllItems = async () => {
   });
 };
 
+export const deleteAllItems = async () => {
+  const db = await openDB();
+  const transaction = db.transaction("scripts", "readwrite");
+  const store = transaction.objectStore("scripts");
+  const request = store.clear();
+
+  return new Promise<void>((resolve, reject) => {
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject();
+  });
+};
+
 // You can continue adding deleteItem, getAllItems etc.

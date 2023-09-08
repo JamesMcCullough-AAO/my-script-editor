@@ -1,3 +1,4 @@
+import { deleteAllItems, deleteItem } from "./indexDB";
 import { scriptToFileName } from "./scriptToFileName";
 
 type DeleteScriptParams = {
@@ -7,14 +8,14 @@ type DeleteScriptParams = {
   onDeleteModalClose: () => void;
 };
 
-export const deleteScript = ({
+export const deleteScript = async ({
   title,
   contentRef,
   setTitle,
   onDeleteModalClose,
 }: DeleteScriptParams) => {
   // Remove script from local storage
-  localStorage.removeItem(`script_${scriptToFileName(title)}`);
+  await deleteItem(`script_${scriptToFileName(title)}`);
 
   // Clear the input and title
   if (contentRef.current) {
@@ -26,10 +27,7 @@ export const deleteScript = ({
   onDeleteModalClose();
 };
 
-export const deleteAllScripts = () => {
+export const deleteAllScripts = async () => {
   // Remove all scripts from local storage
-  const scripts = Object.keys(localStorage).filter((key) =>
-    key.includes("script_")
-  );
-  scripts.forEach((script) => localStorage.removeItem(script));
+  await deleteAllItems();
 };

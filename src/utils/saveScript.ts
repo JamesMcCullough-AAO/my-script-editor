@@ -39,6 +39,15 @@ export const saveScript = async ({
     const existingScripts = (await getItem(`script_${scriptToFileName(title)}`))
       ?.existingScripts;
 
+    if (!existingScripts) {
+      await setItem(`script_${scriptToFileName(title)}`, {
+        existingScripts: [payload],
+        iconImage,
+        iconColor,
+      });
+      return;
+    }
+
     if (shouldVersion) {
       // Save as a new version.
       console.log("Saving new version");
