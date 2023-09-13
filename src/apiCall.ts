@@ -16,51 +16,54 @@ type convertTextToHtmlProps = {
   generatedText: string;
 };
 
+const processNode = (node: Node): string => {
+  let result = "";
+
+  if (node.nodeType === 3) {
+    // Text node
+    const text = node.textContent?.trim() ?? "";
+    if (text.length > 0) {
+      result += text;
+    }
+  } else if (node.nodeType === 1) {
+    // HTML element
+    const element = node as HTMLElement;
+
+    if (element.tagName === "SPAN") {
+      result += `\n${element.textContent?.trim() ?? ""}: `;
+    } else if (element.tagName === "BR") {
+      result += " ";
+    } else if (element.tagName === "DIV") {
+      result += `\n`;
+      // Process child nodes of the div
+      Array.from(element.childNodes).forEach((child) => {
+        result += processNode(child);
+      });
+    }
+  }
+
+  return result;
+};
+
 export const convertHtmlToPrompt = ({
   contentRef,
 }: convertHtmlToPromptProps) => {
   if (!contentRef || !contentRef.current) {
+    alert("Error: No content ref");
     return "";
   }
 
+  // Console log the HTML of the content div for debugging
+  console.log(contentRef.current.innerHTML);
+
   const contentDiv = contentRef.current;
   let prompt = "";
-  let isCharacterName = false;
-  let isDiv = false;
 
   Array.from(contentDiv.childNodes).forEach((child) => {
-    if (child.nodeType === 3) {
-      // Text node
-      const text = child.textContent?.trim() ?? "";
-      if (text.length > 0) {
-        if (isCharacterName) {
-          prompt += `: ${text}`;
-          isCharacterName = false; // Reset the flag
-          isDiv = false;
-        } else {
-          prompt += `${text} `;
-          isDiv = false; // Reset the flag
-        }
-      }
-    } else if (child.nodeType === 1) {
-      // HTML element
-      const element = child as HTMLElement;
-
-      if (element.tagName === "SPAN") {
-        prompt += `\n${element.textContent?.trim() ?? ""}`;
-        isCharacterName = true; // Flag that we're currently processing a character name
-      } else if (element.tagName === "BR" || element.tagName === "DIV") {
-        if (!isCharacterName && !isDiv) {
-          prompt += " "; // Add a space if it's within a character's line
-        }
-        if (element.tagName === "DIV") {
-          isDiv = true; // Flag that a new div started
-        }
-      }
-    }
+    prompt += processNode(child);
   });
 
-  return prompt.trim(); // Remove any extra spaces at the beginning or the end
+  return prompt.trim(); // Return the processed string, removing any leading or trailing whitespace
 };
 
 export const generateText = async ({

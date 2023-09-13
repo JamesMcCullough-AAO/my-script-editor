@@ -57,8 +57,6 @@ import { DocumentIcon } from "./icons/DocumentIcon";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const [isCharacterName, setIsCharacterName] = useState(false);
-  const [isLineDescription, setIsLineDescription] = useState(false);
   const [importText, setImportText] = useState("");
 
   const [title, setTitle] = useState("");
@@ -401,10 +399,6 @@ function App() {
               onKeyDown={(event) => {
                 handleKeyDown(event, {
                   contentRef,
-                  isCharacterName,
-                  setIsCharacterName,
-                  isLineDescription,
-                  setIsLineDescription,
                 });
               }}
             ></div>

@@ -2,10 +2,6 @@ import { applySpanStyles } from "../styling";
 
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
-  isCharacterName: boolean;
-  setIsCharacterName: React.Dispatch<React.SetStateAction<boolean>>;
-  isLineDescription: boolean;
-  setIsLineDescription: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   const range = document.createRange();
@@ -17,15 +13,23 @@ const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
 };
 const isCursorAtStart = (range: Range) => range.startOffset === 0;
 
+const isInsideCharacterNameSpan = (range: Range) => {
+  let node = range.commonAncestorContainer;
+  while (node != null && !(node instanceof HTMLDivElement)) {
+    if (
+      node instanceof HTMLElement &&
+      node.classList.contains("character-name")
+    ) {
+      return true;
+    }
+    if (node.parentNode) node = node.parentNode;
+  }
+  return false;
+};
+
 export const handleKeyDown = (
   event: React.KeyboardEvent<HTMLDivElement>,
-  {
-    contentRef,
-    isCharacterName,
-    setIsCharacterName,
-    isLineDescription,
-    setIsLineDescription,
-  }: handleKeyDownProps
+  { contentRef }: handleKeyDownProps
 ) => {
   const contentDiv = contentRef.current;
   if (!contentDiv) return;
@@ -75,9 +79,7 @@ export const handleKeyDown = (
   if (event.key === "[" || event.key === "Tab") {
     event.preventDefault();
 
-    if (isCharacterName) return;
-
-    setIsCharacterName(true);
+    if (isInsideCharacterNameSpan(range)) return;
 
     const span = document.createElement("span");
     applySpanStyles(span);
@@ -85,11 +87,11 @@ export const handleKeyDown = (
     range?.setStart(span, 0); // Place the cursor inside the span for typing the character name
   }
 
-  if (event.key === "]" && isCharacterName) {
+  if (
+    (event.key === "]" || event.key === "(") &&
+    isInsideCharacterNameSpan(range)
+  ) {
     event.preventDefault();
-
-    setIsCharacterName(false);
-    setIsLineDescription(true);
 
     const span = range?.commonAncestorContainer?.parentNode;
     if (span && span.nextSibling) {
@@ -103,11 +105,8 @@ export const handleKeyDown = (
     range?.setStartAfter(spaceNode);
   }
 
-  if (event.key === "Enter" && isCharacterName) {
+  if (event.key === "Enter" && isInsideCharacterNameSpan(range)) {
     event.preventDefault();
-
-    setIsCharacterName(false);
-    setIsLineDescription(false);
 
     const span = range?.commonAncestorContainer?.parentNode;
     if (span && span.nextSibling) {
@@ -126,19 +125,6 @@ export const handleKeyDown = (
       range?.insertNode(linebreakNode);
       range?.setStartAfter(linebreakNode);
     }
-  }
-
-  if (event.key === ")" && isLineDescription) {
-    event.preventDefault();
-
-    setIsLineDescription(false);
-    // Move the cursor after the closing bracket
-    const spaceNode = document.createTextNode(")");
-    range?.insertNode(spaceNode);
-    range?.setStartAfter(spaceNode);
-    const linebreakNode = document.createElement("br");
-    range?.insertNode(linebreakNode);
-    range?.setStartAfter(linebreakNode);
   }
 
   if (

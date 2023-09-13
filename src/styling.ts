@@ -5,4 +5,5 @@ export const applySpanStyles = (span: HTMLSpanElement) => {
   span.style.padding = "2px 5px";
   span.style.marginLeft = "30px";
   span.style.marginRight = "5px";
+  span.classList.add("character-name");
 };
