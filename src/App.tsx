@@ -268,8 +268,13 @@ function App() {
     title,
   }: handleShowVersionsModalProps) => {
     const versions = await getScriptVersions(title);
-    setScriptVersions(versions);
-    onVersionsModalOpen();
+    if (versions && versions.length !== 0) {
+      versions.shift();
+      setScriptVersions(versions);
+      onVersionsModalOpen();
+    } else {
+      alert("No versions yet!");
+    }
   };
 
   return (
@@ -728,6 +733,8 @@ function App() {
                   onMenuClose,
                   onNameModalClose,
                   setNotes,
+                  setIconImage,
+                  setIconColor,
                 });
               }}
             >

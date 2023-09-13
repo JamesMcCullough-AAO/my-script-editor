@@ -28,7 +28,7 @@ export const saveScript = async ({
     const currentTime = Date.now();
 
     // Your condition for deciding when to version (this is just an example)
-    const shouldVersion = currentTime - lastSavedTimestamp > 30000; // 30 seconds
+    const shouldVersion = currentTime - lastSavedTimestamp > 60000; // 1 minute
 
     const payload = {
       content: currentContent,
@@ -52,6 +52,11 @@ export const saveScript = async ({
       // Save as a new version.
       console.log("Saving new version");
       existingScripts.push(payload);
+
+      // Limit to 10 versions.
+      if (existingScripts.length > 10) {
+        existingScripts.shift();
+      }
     } else {
       // Overwrite the last version.
       existingScripts[existingScripts.length - 1] = payload;

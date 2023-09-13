@@ -7,6 +7,8 @@ type newScriptInput = {
   onMenuClose: () => void;
   onNameModalClose: () => void;
   setNotes: React.Dispatch<React.SetStateAction<string>>;
+  setIconImage?: React.Dispatch<React.SetStateAction<string>>;
+  setIconColor?: React.Dispatch<React.SetStateAction<string>>;
 };
 export const newScript = async ({
   newScriptTitle,
@@ -15,6 +17,8 @@ export const newScript = async ({
   onMenuClose,
   onNameModalClose,
   setNotes,
+  setIconImage,
+  setIconColor,
 }: newScriptInput) => {
   if (newScriptTitle) {
     if (await ifItemExists(newScriptTitle)) {
@@ -26,6 +30,12 @@ export const newScript = async ({
     }
     setTitle(newScriptTitle);
     setNotes("");
+    if (setIconImage) {
+      setIconImage("");
+    }
+    if (setIconColor) {
+      setIconColor("#00FFB6");
+    }
     onNameModalClose();
     onMenuClose();
   }
