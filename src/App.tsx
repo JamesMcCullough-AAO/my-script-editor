@@ -309,6 +309,17 @@ function App() {
           }}
           isDisabled={isGenerating}
         />
+
+        <IconButton
+          aria-label="Edit notes"
+          icon={<NoteIcon />}
+          onClick={() => {
+            onNotesModalOpen();
+          }}
+          colorScheme="yellow"
+          isDisabled={isGenerating || !title}
+          visibility={title ? "visible" : "hidden"}
+        />
         <IconButton
           colorScheme="blue"
           aria-label="Generate text"
@@ -321,17 +332,10 @@ function App() {
             });
           }}
           isDisabled={isGenerating}
-          visibility={title ? "visible" : "hidden"}
-        />
-        <IconButton
-          aria-label="Edit notes"
-          icon={<NoteIcon />}
-          onClick={() => {
-            onNotesModalOpen();
-          }}
-          colorScheme="yellow"
-          isDisabled={isGenerating || !title}
-          visibility={title ? "visible" : "hidden"}
+          // Visiblity is hidden if there is no title or if there is no editorSettings.novelAiApiKey
+          visibility={
+            title && editorSettings.novelAiApiKey ? "visible" : "hidden"
+          }
         />
         {isLoading && <PendingIcon />}
       </VStack>
@@ -842,16 +846,20 @@ function App() {
           <ModalHeader>Editor Settings</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>NovelAI API Key</Text>
-            <Input
-              value={editorSettings.novelAiApiKey}
-              onChange={(e) =>
-                setEditorSettings({
-                  ...editorSettings,
-                  novelAiApiKey: e.target.value,
-                })
-              }
-            />
+            {window.location.hostname === "localhost" && (
+              <VStack alignItems="start" spacing="0">
+                <Text>NovelAI API Key (only works locally)</Text>
+                <Input
+                  value={editorSettings.novelAiApiKey}
+                  onChange={(e) =>
+                    setEditorSettings({
+                      ...editorSettings,
+                      novelAiApiKey: e.target.value,
+                    })
+                  }
+                />
+              </VStack>
+            )}
             <Text>Target Word Count</Text>
             <Input
               value={editorSettings.targetWordCount}
