@@ -37,7 +37,7 @@ export const loadScript = async ({
   const id = `script_${scriptToFileName(loadTitle)}`;
   const databaseLoad = await getItem(id);
   const savedScripts = databaseLoad.existingScripts;
-  const { iconImage: loadIconImage } = databaseLoad;
+  const { iconImage: loadIconImage, iconColor: loadIconColor } = databaseLoad;
 
   console.log("savedScripts", savedScripts);
 
@@ -64,6 +64,12 @@ export const loadScript = async ({
         setIconImage(loadIconImage);
       } else {
         setIconImage("");
+      }
+
+      if (loadIconColor) {
+        setIconColor(loadIconColor);
+      } else {
+        setIconColor("#00FFB6");
       }
 
       if (notes) {
