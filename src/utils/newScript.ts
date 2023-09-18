@@ -1,3 +1,4 @@
+import { baseIconColor } from "./constants";
 import { ifItemExists } from "./indexDB";
 
 type newScriptInput = {
@@ -34,7 +35,7 @@ export const newScript = async ({
       setIconImage("");
     }
     if (setIconColor) {
-      setIconColor("#00FFB6");
+      setIconColor(baseIconColor);
     }
     onNameModalClose();
     onMenuClose();

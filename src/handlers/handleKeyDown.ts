@@ -1,4 +1,5 @@
 import { applySpanStyles } from "../styling";
+import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling";
 
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -103,6 +104,8 @@ export const handleKeyDown = (
     const spaceNode = document.createTextNode(" (");
     range?.insertNode(spaceNode);
     range?.setStartAfter(spaceNode);
+
+    updateCharacterNameStyling({ contentRef });
   }
 
   if (event.key === "Enter" && isInsideCharacterNameSpan(range)) {
@@ -125,6 +128,8 @@ export const handleKeyDown = (
       range?.insertNode(linebreakNode);
       range?.setStartAfter(linebreakNode);
     }
+
+    updateCharacterNameStyling({ contentRef });
   }
 
   if (

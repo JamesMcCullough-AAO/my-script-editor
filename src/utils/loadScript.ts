@@ -1,3 +1,4 @@
+import { baseIconColor } from "./constants";
 import { getItem } from "./indexDB";
 import { saveScript } from "./saveScript";
 import { scriptToFileName } from "./scriptToFileName";
@@ -69,7 +70,7 @@ export const loadScript = async ({
       if (loadIconColor) {
         setIconColor(loadIconColor);
       } else {
-        setIconColor("#00FFB6");
+        setIconColor(baseIconColor);
       }
 
       if (notes) {

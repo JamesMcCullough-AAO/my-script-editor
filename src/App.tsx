@@ -54,6 +54,8 @@ import { loadScript } from "./utils/loadScript";
 import { compressImage } from "./utils/ImageCompressor";
 import { EditDocumentIcon } from "./icons/editDocument";
 import { DocumentIcon } from "./icons/DocumentIcon";
+import { baseIconColor } from "./utils/constants";
+import { updateCharacterNameStyling } from "./utils/updateCharacterNameStyling";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -68,12 +70,12 @@ function App() {
   const [uploadedIconImage, setUploadedIconImage] = useState("");
   const [notes, setNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [iconColor, setIconColor] = useState("#00FFB6" as string);
+  const [iconColor, setIconColor] = useState(baseIconColor as string);
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
       timestamp: 0,
-      iconColor: "#00FFB6",
+      iconColor: baseIconColor,
     },
   ] as {
     title: string;
@@ -320,23 +322,26 @@ function App() {
           isDisabled={isGenerating || !title}
           visibility={title ? "visible" : "hidden"}
         />
-        <IconButton
-          colorScheme="blue"
-          aria-label="Generate text"
-          icon={isGenerating ? <PendingIcon /> : <CreateIcon />}
-          onClick={() => {
-            handleGenerateText({
-              contentRef,
-              setIsGenerating,
-              apiToken: editorSettings.novelAiApiKey,
-            });
-          }}
-          isDisabled={isGenerating}
-          // Visiblity is hidden if there is no title or if there is no editorSettings.novelAiApiKey
-          visibility={
-            title && editorSettings.novelAiApiKey ? "visible" : "hidden"
-          }
-        />
+
+        {editorSettings.novelAiApiKey && (
+          <IconButton
+            colorScheme="blue"
+            aria-label="Generate text"
+            icon={isGenerating ? <PendingIcon /> : <CreateIcon />}
+            onClick={() => {
+              handleGenerateText({
+                contentRef,
+                setIsGenerating,
+                apiToken: editorSettings.novelAiApiKey,
+              });
+            }}
+            isDisabled={isGenerating}
+            // Visiblity is hidden if there is no title or if there is no editorSettings.novelAiApiKey
+            visibility={
+              title && editorSettings.novelAiApiKey ? "visible" : "hidden"
+            }
+          />
+        )}
         {isLoading && <PendingIcon />}
       </VStack>
       <VStack
@@ -362,7 +367,7 @@ function App() {
               a new one.
             </Text>
             {/* <Image src="favicon.png" width="300px" /> */}
-            <EditDocumentIcon color="#00FFB6" width="300px" />
+            <EditDocumentIcon color={baseIconColor} width="300px" />
           </VStack>
         )}
         <VStack maxWidth="1000px" width="full" alignItems="start" height="100%">
@@ -373,7 +378,6 @@ function App() {
                 {!iconImage && (
                   <EditDocumentIcon color={iconColor} width="40px" />
                 )}
-                {/* <EditDocumentIcon color="#00FFB6" width="40px" /> */}
               </Box>
             )}
             <Text color="white" fontWeight={600} fontSize="24px">
@@ -629,7 +633,7 @@ function App() {
                           )}
                           {!script?.iconImage && (
                             <DocumentIcon
-                              color={script.iconColor || "#00FFB6"}
+                              color={script.iconColor || baseIconColor}
                               width="30px"
                             />
                           )}
@@ -967,7 +971,7 @@ function App() {
                           )}
                           {!script?.iconImage && (
                             <DocumentIcon
-                              color={script.iconColor || "#00FFB6"}
+                              color={script.iconColor || baseIconColor}
                               width="30px"
                             />
                           )}
