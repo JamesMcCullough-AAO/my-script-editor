@@ -71,6 +71,14 @@ function App() {
   const [notes, setNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [iconColor, setIconColor] = useState(baseIconColor as string);
+  const [selectedVersion, setSelectedVersion] = useState<{
+    title: string;
+    timestamp: number;
+    iconImage?: string;
+    index: number;
+    iconColor: string;
+    content: string;
+  } | null>(null);
   const [savedScriptTitles, setSavedScriptTitles] = useState([
     {
       title: "",
@@ -102,6 +110,7 @@ function App() {
       iconImage?: string;
       index: number;
       iconColor: string;
+      content: string;
     }[],
     any
   ];
@@ -277,6 +286,19 @@ function App() {
     } else {
       alert("No versions yet!");
     }
+  };
+
+  type handleVersionSelectProps = {
+    title: string;
+    timestamp: number;
+    iconImage?: string;
+    index: number;
+    iconColor: string;
+    content: string;
+  };
+
+  const handleVersionSelect = (script: handleVersionSelectProps) => {
+    setSelectedVersion(script);
   };
 
   return (
@@ -941,23 +963,7 @@ function App() {
                       backgroundColor="#1d2330"
                       padding="0.5em"
                       key={scriptVersions.indexOf(script)}
-                      onClick={async () => {
-                        await loadScript({
-                          loadTitle: title,
-                          title,
-                          contentRef,
-                          setTitle,
-                          setIconImage,
-                          iconImage,
-                          versionIndex: script.index,
-                          notes,
-                          setNotes,
-                          setIsLoading,
-                          iconColor,
-                          setIconColor,
-                        });
-                        onVersionsModalClose();
-                      }}
+                      onClick={() => handleVersionSelect(script)}
                       // Hilight the hovered item
                       _hover={{
                         backgroundColor: "#007050",
@@ -993,6 +999,73 @@ function App() {
               </VStack>
             )}
           </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={!!selectedVersion}
+        onClose={() => setSelectedVersion(null)}
+        size="4xl"
+      >
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>
+            Are you sure you want to restore the following version?
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <div
+              style={{
+                border: "1px solid #ccc",
+                overflowY: "auto", // Enable vertical scrolling
+                width: "100%",
+                maxHeight: "400px",
+                backgroundColor: "#424242",
+                color: "white",
+                padding: "1em",
+                borderRadius: "0.25em",
+                fontSize: "18px",
+              }}
+              dangerouslySetInnerHTML={{
+                __html: selectedVersion?.content || "",
+              }}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <HStack justifyContent="space-between" flex="1">
+              // Italics
+              <Text color="red" fontStyle="italic">
+                This is irriversible, and will overwrite the current version.
+              </Text>
+              <HStack spacing="1">
+                <Button mr={3} onClick={() => setSelectedVersion(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  onClick={async () => {
+                    await loadScript({
+                      loadTitle: title,
+                      title,
+                      contentRef,
+                      setTitle,
+                      setIconImage,
+                      iconImage,
+                      versionIndex: selectedVersion?.index,
+                      notes,
+                      setNotes,
+                      setIsLoading,
+                      iconColor,
+                      setIconColor,
+                    });
+                    setSelectedVersion(null); // Close the confirmation modal
+                    onVersionsModalClose(); // Close the versions modal
+                  }}
+                >
+                  Restore
+                </Button>
+              </HStack>
+            </HStack>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </HStack>
