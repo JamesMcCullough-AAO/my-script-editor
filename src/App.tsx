@@ -63,6 +63,8 @@ import { characterNote } from "./utils/types";
 import { handleSaveEditedName } from "./handlers/handleSaveEditedName";
 import { handleAddNewCharacter } from "./handlers/handleAddNewCharacter";
 import { populateCharacterNotes } from "./utils/populateCharacterNotes";
+import { NotesModal } from "./modals/NotesModal";
+import { UploadModal } from "./modals/UploadModal";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -520,51 +522,19 @@ function App() {
           {wordCount}
         </Text>
       </Box>
-      {/* Notes modal */}
-      <Modal isOpen={isNotesModalOpen} onClose={onNotesModalClose} size="4xl">
-        <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
-          <ModalHeader>Notes</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Textarea
-              placeholder="Notes..."
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              height="50vh"
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={onNotesModalClose}>Close</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <Modal isOpen={isUploadModalOpen} onClose={onUploadModalClose}>
-        <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
-          <ModalHeader>Import/Export Script</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Textarea
-              placeholder="Paste your script here to import..."
-              value={importText}
-              onChange={(event) => setImportText(event.target.value)}
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={() => {
-                importScript({ text: importText, contentRef });
-                onUploadModalClose();
-              }}
-            >
-              Import
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <NotesModal
+        {...{ isNotesModalOpen, onNotesModalClose, notes, setNotes }}
+      />
+      <UploadModal
+        {...{
+          isUploadModalOpen,
+          onUploadModalClose,
+          importText,
+          setImportText,
+          importScript,
+          contentRef,
+        }}
+      />
       <Modal isOpen={isMenuOpen} onClose={onMenuClose} size="2xl">
         <ModalOverlay />
         <ModalContent backgroundColor="#424242" color="white">
@@ -934,7 +904,6 @@ function App() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      {/* Settings modal */}
       <Modal isOpen={isSettingsModalOpen} onClose={onSettingsModalClose}>
         <ModalOverlay />
         <ModalContent backgroundColor="#424242" color="white">
@@ -1157,7 +1126,7 @@ function App() {
                   <HStack justifyContent="start">
                     <IconButton
                       aria-label="Rename character"
-                      icon={<EditIcon />}
+                      icon={<DriveFileRenameOutlineIcon />}
                       title="Rename Character"
                       onClick={() => handleEditName({ name: charNote.name })}
                     />
