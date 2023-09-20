@@ -2,6 +2,7 @@ import { baseIconColor } from "./constants";
 import { getItem } from "./indexDB";
 import { saveScript } from "./saveScript";
 import { scriptToFileName } from "./scriptToFileName";
+import { characterNote } from "./types";
 
 type loadScriptInput = {
   loadTitle: string;
@@ -16,6 +17,8 @@ type loadScriptInput = {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   iconColor: string;
   setIconColor: React.Dispatch<React.SetStateAction<string>>;
+  characterNotes: characterNote[];
+  setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
 };
 export const loadScript = async ({
   loadTitle,
@@ -30,10 +33,19 @@ export const loadScript = async ({
   setIsLoading,
   iconColor,
   setIconColor,
+  characterNotes,
+  setCharacterNotes,
 }: loadScriptInput & { versionIndex?: number }) => {
   setIsLoading(true);
   console.log("loadTitle", loadTitle);
-  saveScript({ title, contentRef, iconImage, notes, iconColor });
+  saveScript({
+    title,
+    contentRef,
+    iconImage,
+    notes,
+    iconColor,
+    characterNotes,
+  });
 
   const id = `script_${scriptToFileName(loadTitle)}`;
   const databaseLoad = await getItem(id);
@@ -50,7 +62,7 @@ export const loadScript = async ({
 
     console.log("scriptToLoad", scriptToLoad);
     if (scriptToLoad) {
-      const { content, notes } = scriptToLoad;
+      const { content, notes, characterNotes } = scriptToLoad;
 
       setTitle(loadTitle);
       if (content && contentRef.current) {
@@ -77,6 +89,12 @@ export const loadScript = async ({
         setNotes(notes);
       } else {
         setNotes("");
+      }
+
+      if (characterNotes) {
+        setCharacterNotes(characterNotes);
+      } else {
+        setCharacterNotes([]);
       }
     }
   }

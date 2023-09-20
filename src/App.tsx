@@ -31,6 +31,8 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import HistoryIcon from "@mui/icons-material/History";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import NoteIcon from "@mui/icons-material/Note";
+import Face2Icon from "@mui/icons-material/Face2";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { useEffect, useRef, useState } from "react";
 import { deleteAllScripts, deleteScript } from "./utils/deleteScript";
@@ -56,6 +58,10 @@ import { EditDocumentIcon } from "./icons/editDocument";
 import { DocumentIcon } from "./icons/DocumentIcon";
 import { baseIconColor } from "./utils/constants";
 import { updateCharacterNameStyling } from "./utils/updateCharacterNameStyling";
+import { characterNote } from "./utils/types";
+import { handleSaveEditedName } from "./handlers/handleSaveEditedName";
+import { handleAddNewCharacter } from "./handlers/handleAddNewCharacter";
+import { populateCharacterNotes } from "./utils/populateCharacterNotes";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -71,6 +77,10 @@ function App() {
   const [notes, setNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [iconColor, setIconColor] = useState(baseIconColor as string);
+  const [editCharacterModalOpen, setEditCharacterModalOpen] = useState(false);
+  const [characterToEdit, setCharacterToEdit] = useState<string | null>(null);
+  const [newCharacterName, setNewCharacterName] = useState("");
+  const [characterNotes, setCharacterNotes] = useState<characterNote[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<{
     title: string;
     timestamp: number;
@@ -171,6 +181,15 @@ function App() {
     };
   };
 
+  type handleEditNameProps = {
+    name: string;
+  };
+  const handleEditName = ({ name }: handleEditNameProps) => {
+    setCharacterToEdit(name);
+    setNewCharacterName(name);
+    setEditCharacterModalOpen(true);
+  };
+
   useEffect(() => {
     const settings = localStorage.getItem("editorSettings");
     if (settings) {
@@ -199,7 +218,14 @@ function App() {
 
   useEffect(() => {
     if (contentRef.current) {
-      saveScript({ title, contentRef, iconImage, notes, iconColor });
+      saveScript({
+        title,
+        contentRef,
+        iconImage,
+        notes,
+        iconColor,
+        characterNotes,
+      });
     }
   }, [
     contentRef.current?.innerHTML,
@@ -207,6 +233,7 @@ function App() {
     iconImage,
     notes,
     iconColor,
+    characterNotes,
   ]);
 
   const updateWordCount = throttle(() => {
@@ -229,7 +256,14 @@ function App() {
       // Attach the event listener to detect changes
       element.addEventListener("input", () => {
         updateWordCount();
-        saveScript({ title, contentRef, iconImage, notes, iconColor });
+        saveScript({
+          title,
+          contentRef,
+          iconImage,
+          notes,
+          iconColor,
+          characterNotes,
+        });
       });
 
       // Update word count initially
@@ -341,6 +375,22 @@ function App() {
             onNotesModalOpen();
           }}
           colorScheme="yellow"
+          isDisabled={isGenerating || !title}
+          visibility={title ? "visible" : "hidden"}
+        />
+
+        <IconButton
+          aria-label="Edit character notes"
+          icon={<Face2Icon />}
+          onClick={() => {
+            populateCharacterNotes({
+              contentRef,
+              characterNotes,
+              setCharacterNotes,
+            });
+            setEditCharacterModalOpen(true);
+          }}
+          colorScheme="blue"
           isDisabled={isGenerating || !title}
           visibility={title ? "visible" : "hidden"}
         />
@@ -639,6 +689,8 @@ function App() {
                           setIsLoading,
                           iconColor,
                           setIconColor,
+                          characterNotes,
+                          setCharacterNotes,
                         });
                         onMenuClose();
                       }}
@@ -1056,6 +1108,8 @@ function App() {
                       setIsLoading,
                       iconColor,
                       setIconColor,
+                      characterNotes,
+                      setCharacterNotes,
                     });
                     setSelectedVersion(null); // Close the confirmation modal
                     onVersionsModalClose(); // Close the versions modal
@@ -1065,6 +1119,128 @@ function App() {
                 </Button>
               </HStack>
             </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={editCharacterModalOpen}
+        onClose={() => {
+          setEditCharacterModalOpen(false);
+        }}
+        size="4xl"
+      >
+        <ModalOverlay />
+        <ModalContent backgroundColor="#424242" color="white">
+          <ModalHeader>Character Notes</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack>
+              {characterNotes.map((charNote, index) => (
+                <Box key={index} width="100%" marginBottom="4">
+                  <HStack justifyContent="start">
+                    <IconButton
+                      aria-label="Edit character"
+                      colorScheme="yellow"
+                      icon={<EditIcon />}
+                      onClick={() => handleEditName({ name: charNote.name })}
+                    />
+                    {charNote.notes == "EMPTY" && (
+                      <IconButton
+                        colorScheme="blue"
+                        aria-label="Add notes"
+                        icon={<EditNoteIcon />}
+                        onClick={() => {
+                          setCharacterNotes((prevNotes) =>
+                            prevNotes.map((note, idx) =>
+                              idx === index ? { ...note, notes: " " } : note
+                            )
+                          );
+                        }}
+                      />
+                    )}
+                    {charNote.notes != "EMPTY" && (
+                      <IconButton
+                        colorScheme="red"
+                        aria-label="Clear notes"
+                        icon={<DeleteIcon />}
+                        onClick={() => {
+                          setCharacterNotes((prevNotes) =>
+                            prevNotes.map((note, idx) =>
+                              idx === index ? { ...note, notes: "EMPTY" } : note
+                            )
+                          );
+                        }}
+                      />
+                    )}
+
+                    <Text fontWeight="bold" fontSize="18px">
+                      {charNote.name}
+                    </Text>
+                  </HStack>
+
+                  {charNote.notes != "EMPTY" && (
+                    <Textarea
+                      value={charNote.notes}
+                      marginTop="2"
+                      onChange={(e) =>
+                        setCharacterNotes((prevNotes) =>
+                          prevNotes.map((note, idx) =>
+                            idx === index
+                              ? { ...note, notes: e.target.value }
+                              : note
+                          )
+                        )
+                      }
+                    />
+                  )}
+                </Box>
+              ))}
+              <Button
+                colorScheme="teal"
+                onClick={() => {
+                  handleAddNewCharacter({
+                    setCharacterNotes,
+                    characterNotes,
+                  });
+                }}
+              >
+                Add New Character
+              </Button>
+            </VStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={characterToEdit !== null}
+        onClose={() => setCharacterToEdit(null)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Character Name</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              placeholder="New character name"
+              value={newCharacterName}
+              onChange={(e) => setNewCharacterName(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={() =>
+                handleSaveEditedName({
+                  newName: newCharacterName,
+                  contentRef,
+                  setCharacterNotes,
+                  setEditCharacterModalOpen,
+                  setCharacterToEdit,
+                  characterToEdit,
+                })
+              }
+            >
+              Save
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

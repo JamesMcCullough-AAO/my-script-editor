@@ -1,5 +1,6 @@
 import { getItem, setItem } from "./indexDB";
 import { scriptToFileName } from "./scriptToFileName";
+import { characterNote } from "./types";
 
 type saveScriptInput = {
   title: string;
@@ -7,6 +8,7 @@ type saveScriptInput = {
   iconImage?: string;
   notes?: string;
   iconColor: string;
+  characterNotes: characterNote[];
 };
 // You might want to define this outside your React component to avoid re-initializing it.
 let lastSavedTimestamp: number = 0;
@@ -17,6 +19,7 @@ export const saveScript = async ({
   iconImage,
   notes,
   iconColor,
+  characterNotes,
 }: saveScriptInput) => {
   if (
     title &&
@@ -34,6 +37,7 @@ export const saveScript = async ({
       content: currentContent,
       timestamp: currentTime,
       notes,
+      characterNotes,
     };
 
     const existingScripts = (await getItem(`script_${scriptToFileName(title)}`))
