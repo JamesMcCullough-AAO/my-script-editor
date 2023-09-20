@@ -534,7 +534,6 @@ function App() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      {/* Modal Area */}
       <Modal isOpen={isUploadModalOpen} onClose={onUploadModalClose}>
         <ModalOverlay />
         <ModalContent backgroundColor="#424242" color="white">
@@ -580,6 +579,7 @@ function App() {
                   }}
                   colorScheme="green"
                   isDisabled={isGenerating}
+                  title="Create New Script"
                 />
                 <IconButton
                   aria-label="Import script"
@@ -587,6 +587,7 @@ function App() {
                   onClick={onUploadModalOpen}
                   isDisabled={isGenerating || !title}
                   colorScheme="blue"
+                  title="Import Script"
                 />
                 <IconButton
                   aria-label="Export script"
@@ -602,6 +603,7 @@ function App() {
                   }}
                   isDisabled={isGenerating || !title}
                   colorScheme="blue"
+                  title="Export Script"
                 />
                 <IconButton
                   aria-label="Rename script"
@@ -617,13 +619,15 @@ function App() {
                     })
                   }
                   isDisabled={isGenerating || !title}
+                  title="Rename Script"
                 />
                 <IconButton
-                  aria-label="Upload Script Icon"
+                  aria-label="Update Script Icon"
                   icon={<AddPhotoAlternateIcon />}
                   colorScheme="yellow"
                   onClick={onIconModalOpen}
                   isDisabled={isGenerating || !title}
+                  title="Update Script Icon"
                 />
                 <IconButton
                   aria-label="Delete script"
@@ -634,9 +638,10 @@ function App() {
                     onMenuClose();
                   }}
                   isDisabled={isGenerating || !title}
+                  title="Delete Script"
                 />
                 <IconButton
-                  aria-label="Versions"
+                  aria-label="Restore previous versions"
                   colorScheme="pink"
                   icon={<HistoryIcon />}
                   onClick={async () => {
@@ -644,6 +649,7 @@ function App() {
                     onMenuClose();
                   }}
                   isDisabled={isGenerating || !title}
+                  title="Restore Previous Versions"
                 />
               </HStack>
               <HStack justifyContent="center" spacing="2">
@@ -652,12 +658,14 @@ function App() {
                   icon={<InfoIcon />}
                   colorScheme="purple"
                   onClick={onInfoModalOpen}
+                  title="Info Box"
                 />
                 <IconButton
                   aria-label="Settings"
                   icon={<SettingsIcon />}
                   colorScheme="purple"
                   onClick={onSettingsModalOpen}
+                  title="Settings"
                 />
               </HStack>
             </HStack>
