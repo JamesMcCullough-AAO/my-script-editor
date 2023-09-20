@@ -33,6 +33,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import NoteIcon from "@mui/icons-material/Note";
 import Face2Icon from "@mui/icons-material/Face2";
 import EditIcon from "@mui/icons-material/Edit";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { useEffect, useRef, useState } from "react";
 import { deleteAllScripts, deleteScript } from "./utils/deleteScript";
@@ -557,18 +558,6 @@ function App() {
             >
               Import
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                exportScript({
-                  title,
-                  contentRef,
-                });
-                onUploadModalClose();
-              }}
-            >
-              Export
-            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -593,9 +582,24 @@ function App() {
                   isDisabled={isGenerating}
                 />
                 <IconButton
-                  aria-label="Download script"
-                  icon={<DownloadIcon />}
+                  aria-label="Import script"
+                  icon={<FileUploadIcon />}
                   onClick={onUploadModalOpen}
+                  isDisabled={isGenerating || !title}
+                  colorScheme="blue"
+                />
+                <IconButton
+                  aria-label="Export script"
+                  icon={<DownloadIcon />}
+                  onClick={() => {
+                    exportScript({
+                      title,
+                      contentRef,
+                      notes,
+                      characterNotes,
+                    });
+                    onMenuClose();
+                  }}
                   isDisabled={isGenerating || !title}
                   colorScheme="blue"
                 />

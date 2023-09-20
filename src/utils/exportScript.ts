@@ -1,11 +1,37 @@
+import { characterNote } from "./types";
+
 type exportScriptProps = {
   title: string;
   contentRef: React.RefObject<HTMLDivElement>;
+  notes: string;
+  characterNotes: characterNote[];
 };
 
-export const exportScript = ({ title, contentRef }: exportScriptProps) => {
+export const exportScript = ({
+  title,
+  contentRef,
+  notes,
+  characterNotes,
+}: exportScriptProps) => {
   const contentDiv = contentRef.current;
   let scriptText = "";
+
+  // Add character notes that aren't 'EMPTY'
+  let charNotes = "";
+  characterNotes.forEach((note) => {
+    if (note.notes !== "EMPTY") {
+      charNotes += `[${note.name}]:\n ${note.notes}\n`;
+    }
+  });
+
+  if (charNotes !== "") {
+    scriptText += `---Character Notes---\n\n${charNotes}\n`;
+  }
+
+  // Add notes
+  if (notes !== "") {
+    scriptText += `\n---Notes---\n ${notes}\n`;
+  }
 
   const traverseNode = (node: Node) => {
     if (node.nodeType === 3) {
