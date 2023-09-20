@@ -367,6 +367,7 @@ function App() {
             });
           }}
           isDisabled={isGenerating}
+          title="Menu"
         />
 
         <IconButton
@@ -375,9 +376,10 @@ function App() {
           onClick={() => {
             onNotesModalOpen();
           }}
-          colorScheme="yellow"
+          colorScheme="blue"
           isDisabled={isGenerating || !title}
           visibility={title ? "visible" : "hidden"}
+          title="Edit Notes"
         />
 
         <IconButton
@@ -394,6 +396,7 @@ function App() {
           colorScheme="blue"
           isDisabled={isGenerating || !title}
           visibility={title ? "visible" : "hidden"}
+          title="Edit Character Notes"
         />
 
         {editorSettings.novelAiApiKey && (
@@ -1151,9 +1154,9 @@ function App() {
                 <Box key={index} width="100%" marginBottom="4">
                   <HStack justifyContent="start">
                     <IconButton
-                      aria-label="Edit character"
-                      colorScheme="yellow"
+                      aria-label="Rename character"
                       icon={<EditIcon />}
+                      title="Rename Character"
                       onClick={() => handleEditName({ name: charNote.name })}
                     />
                     {charNote.notes == "EMPTY" && (
@@ -1161,6 +1164,7 @@ function App() {
                         colorScheme="blue"
                         aria-label="Add notes"
                         icon={<EditNoteIcon />}
+                        title="Add Notes"
                         onClick={() => {
                           setCharacterNotes((prevNotes) =>
                             prevNotes.map((note, idx) =>
@@ -1175,6 +1179,7 @@ function App() {
                         colorScheme="red"
                         aria-label="Clear notes"
                         icon={<DeleteIcon />}
+                        title="Clear Notes"
                         onClick={() => {
                           setCharacterNotes((prevNotes) =>
                             prevNotes.map((note, idx) =>
@@ -1227,7 +1232,11 @@ function App() {
         onClose={() => setCharacterToEdit(null)}
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent
+          backgroundColor="#424242"
+          color="white"
+          width="fit-content"
+        >
           <ModalHeader>Edit Character Name</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
