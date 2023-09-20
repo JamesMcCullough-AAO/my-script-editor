@@ -450,7 +450,9 @@ function App() {
           <HStack id="title-bar">
             {title && (
               <Box marginRight="5px">
-                {iconImage && <Image src={iconImage} width="40px" />}
+                {iconImage && (
+                  <Image src={iconImage} width="40px" borderRadius="4" />
+                )}
                 {!iconImage && (
                   <EditDocumentIcon color={iconColor} width="40px" />
                 )}
@@ -718,7 +720,11 @@ function App() {
                       <HStack justifyContent="space-between">
                         <HStack>
                           {script?.iconImage && (
-                            <Image src={script.iconImage} width="30px" />
+                            <Image
+                              src={script.iconImage}
+                              width="30px"
+                              borderRadius="4"
+                            />
                           )}
                           {!script?.iconImage && (
                             <DocumentIcon
@@ -726,10 +732,6 @@ function App() {
                               width="30px"
                             />
                           )}
-                          {/* <Image
-                            src={script.iconImage || "documentIcon.png"}
-                            width="30px"
-                          /> */}
                           <Text>{script.title}</Text>
                         </HStack>
                         <Text>
