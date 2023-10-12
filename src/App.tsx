@@ -790,6 +790,8 @@ function App() {
               <b>"]"</b> - Finish a character name, begin line description.{" "}
               <br />
               <b>")"</b> - Finish a line description, start line. <br />
+              <b>"/"</b> - Create an in-script link to another script (beta).{" "}
+              <br />
             </Text>
             <Text paddingTop="4" fontWeight="bold">
               --- Saving ---
