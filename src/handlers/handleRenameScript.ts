@@ -1,4 +1,5 @@
-import { ifItemExists } from "../utils/indexDB";
+import { set } from "lodash";
+import { ifItemExists, renameItem } from "../utils/indexDB";
 import { saveScript } from "../utils/saveScript";
 import { scriptToFileName } from "../utils/scriptToFileName";
 
@@ -20,11 +21,17 @@ export const handleRenameScript = async ({
   setTitle,
 }: handleRenameScriptInput) => {
   if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
-    if (await ifItemExists(newScriptTitle)) {
+    const oldTitle = "script_" + scriptToFileName(oldScriptTitle);
+    const newTitle = "script_" + scriptToFileName(newScriptTitle);
+
+    if (await ifItemExists(newTitle)) {
       alert("This title already exists!");
       return;
     }
-    // TODO: Rename the script.
+
+    await renameItem(oldTitle, newTitle);
+
+    setTitle(newScriptTitle);
   }
   setOldScriptTitle("");
   setNewScriptTitle("");

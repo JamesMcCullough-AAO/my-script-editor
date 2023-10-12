@@ -77,6 +77,24 @@ export const ifItemExists = async (id: string) => {
   });
 };
 
+export const renameItem = async (id: string, newID: string) => {
+  const db = await openDB();
+  const transaction = db.transaction("scripts", "readwrite");
+  const store = transaction.objectStore("scripts");
+  const request = store.get(id);
+
+  return new Promise<void>((resolve, reject) => {
+    request.onsuccess = () => {
+      const data = request.result;
+      data.id = newID;
+      store.put(data);
+      store.delete(id);
+      resolve();
+    };
+    request.onerror = () => reject();
+  });
+};
+
 export const deleteAllItems = async () => {
   const db = await openDB();
   const transaction = db.transaction("scripts", "readwrite");
