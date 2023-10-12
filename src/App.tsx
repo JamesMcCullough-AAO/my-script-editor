@@ -65,13 +65,16 @@ import { handleAddNewCharacter } from "./handlers/handleAddNewCharacter";
 import { populateCharacterNotes } from "./utils/populateCharacterNotes";
 import { NotesModal } from "./modals/NotesModal";
 import { UploadModal } from "./modals/UploadModal";
+import { loadScriptFromSpan } from "./utils/loadScriptFromSpan";
+import { SelectScript } from "./components/selectScript";
+import { SelectScriptModal } from "./modals/selectScriptModal";
+import { addLinkSpan } from "./utils/createLinkFromSelection";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [importText, setImportText] = useState("");
 
   const [title, setTitle] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [newScriptTitle, setNewScriptTitle] = useState("");
   const [oldScriptTitle, setOldScriptTitle] = useState("");
@@ -84,6 +87,7 @@ function App() {
   const [characterToEdit, setCharacterToEdit] = useState<string | null>(null);
   const [newCharacterName, setNewCharacterName] = useState("");
   const [characterNotes, setCharacterNotes] = useState<characterNote[]>([]);
+  const [savedRange, setSavedRange] = useState<Range>();
   const [selectedVersion, setSelectedVersion] = useState<{
     title: string;
     timestamp: number;
@@ -92,19 +96,6 @@ function App() {
     iconColor: string;
     content: string;
   } | null>(null);
-  const [savedScriptTitles, setSavedScriptTitles] = useState([
-    {
-      title: "",
-      timestamp: 0,
-      iconColor: baseIconColor,
-    },
-  ] as {
-    title: string;
-    timestamp: number;
-    iconImage?: string;
-    notes?: string;
-    iconColor: string;
-  }[]);
   const {
     isOpen: isUploadModalOpen,
     onOpen: onUploadModalOpen,
@@ -168,6 +159,12 @@ function App() {
     onClose: onVersionsModalClose,
   } = useDisclosure();
   const {
+    isOpen: isSelectScriptModalOpen,
+    onOpen: onSelectScriptModalOpen,
+    onClose: onSelectScriptModalClose,
+  } = useDisclosure();
+
+  const {
     isOpen: isNotesModalOpen,
     onOpen: onNotesModalOpen,
     onClose: onNotesModalClose,
@@ -199,25 +196,6 @@ function App() {
       setEditorSettings(JSON.parse(settings));
     }
   }, []);
-
-  useEffect(() => {
-    const fetchTitles = async () => {
-      setIsLoading(true);
-      try {
-        const updatedScriptTitles = await searchSavedTitles({
-          title,
-          searchTerm,
-        });
-        setSavedScriptTitles(updatedScriptTitles);
-      } catch (error) {
-        // Handle the error appropriately.
-        console.error("An error occurred while fetching titles:", error);
-      }
-      setIsLoading(false);
-    };
-
-    fetchTitles();
-  }, [searchTerm]);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -253,11 +231,14 @@ function App() {
   }, 10000);
 
   useEffect(() => {
+    let isLoadingScript = false; // Step 1: Declare a variable
+
     const element = contentRef.current;
 
     if (element) {
-      // Attach the event listener to detect changes
       element.addEventListener("input", () => {
+        if (isLoadingScript) return; // Step 3: Check flag
+
         updateWordCount();
         saveScript({
           title,
@@ -269,11 +250,33 @@ function App() {
         });
       });
 
-      // Update word count initially
+      element.addEventListener("click", (e: MouseEvent) => {
+        if ((e.target as HTMLElement).classList.contains("script-link")) {
+          isLoadingScript = true; // Step 2: Set flag before loading
+
+          loadScriptFromSpan({
+            span: e.target as HTMLElement,
+            title,
+            contentRef,
+            setTitle,
+            setIconImage,
+            iconImage,
+            notes,
+            setNotes,
+            setIsLoading,
+            iconColor,
+            setIconColor,
+            characterNotes,
+            setCharacterNotes,
+          });
+
+          isLoadingScript = false; // Step 4: Reset flag after loading
+        }
+      });
+
       updateWordCount();
     }
 
-    // Cleanup
     return () => {
       if (element) {
         element.removeEventListener("input", updateWordCount);
@@ -362,9 +365,6 @@ function App() {
           icon={<MenuIcon />}
           onClick={() => {
             handleOpenMenu({
-              title,
-              setSavedScriptTitles,
-              setSearchTerm,
               onMenuOpen,
             });
           }}
@@ -492,6 +492,8 @@ function App() {
               onKeyDown={(event) => {
                 handleKeyDown(event, {
                   contentRef,
+                  setSavedRange,
+                  onSelectScriptModalOpen,
                 });
               }}
             ></div>
@@ -644,75 +646,29 @@ function App() {
                 />
               </HStack>
             </HStack>
-            {savedScriptTitles.length === 0 && (
-              <Text>No saved scripts yet!</Text>
-            )}
-            {(savedScriptTitles.length > 0 || searchTerm.length > 0) && (
-              <VStack flex="1" width="100%">
-                <Text>Saved Scripts</Text>
-                <Input
-                  placeholder="Search scripts..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-                />
-                <List width="100%" spacing="1">
-                  {savedScriptTitles.map((script) => (
-                    <ListItem
-                      border="1px solid #ccc"
-                      borderRadius="0.25em"
-                      backgroundColor="#1d2330"
-                      padding="0.5em"
-                      key={script.title}
-                      onClick={async () => {
-                        await loadScript({
-                          loadTitle: script.title,
-                          title,
-                          contentRef,
-                          setTitle,
-                          iconImage,
-                          setIconImage,
-                          notes,
-                          setNotes,
-                          setIsLoading,
-                          iconColor,
-                          setIconColor,
-                          characterNotes,
-                          setCharacterNotes,
-                        });
-                        onMenuClose();
-                      }}
-                      // Hilight the hovered item
-                      _hover={{
-                        backgroundColor: "#007050",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <HStack justifyContent="space-between">
-                        <HStack>
-                          {script?.iconImage && (
-                            <Image
-                              src={script.iconImage}
-                              width="30px"
-                              borderRadius="4"
-                            />
-                          )}
-                          {!script?.iconImage && (
-                            <DocumentIcon
-                              color={script.iconColor || baseIconColor}
-                              width="30px"
-                            />
-                          )}
-                          <Text>{script.title}</Text>
-                        </HStack>
-                        <Text>
-                          {formatTimestamp({ timestamp: script.timestamp })}
-                        </Text>
-                      </HStack>
-                    </ListItem>
-                  ))}
-                </List>
-              </VStack>
-            )}
+            <SelectScript
+              title={title}
+              onSelect={(loadTitle) => {
+                loadScript({
+                  loadTitle,
+                  title,
+                  contentRef,
+                  setTitle,
+                  setNotes,
+                  notes,
+                  setIsLoading,
+                  setIconImage,
+                  iconImage,
+                  setIconColor,
+                  iconColor,
+                  setCharacterNotes,
+                  characterNotes,
+                  versionIndex: -1,
+                });
+                onMenuClose();
+              }}
+              setIsLoading={setIsLoading}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -1236,6 +1192,18 @@ function App() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <SelectScriptModal
+        isSelectScriptModalOpen={isSelectScriptModalOpen}
+        onSelectScriptModalClose={onSelectScriptModalClose}
+        title={title}
+        setIsLoading={setIsLoading}
+        onSelect={(title) => {
+          if (savedRange) {
+            addLinkSpan(title, savedRange);
+            setSavedRange(undefined);
+          }
+        }}
+      />
     </HStack>
   );
 }

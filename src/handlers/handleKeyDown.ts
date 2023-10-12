@@ -1,8 +1,15 @@
+import { create } from "lodash";
 import { applySpanStyles } from "../styling";
+import {
+  addLinkSpan,
+  createLinkFromSelection,
+} from "../utils/createLinkFromSelection";
 import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling";
 
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
+  setSavedRange: React.Dispatch<React.SetStateAction<Range | undefined>>;
+  onSelectScriptModalOpen: () => void;
 };
 const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   const range = document.createRange();
@@ -30,7 +37,7 @@ const isInsideCharacterNameSpan = (range: Range) => {
 
 export const handleKeyDown = (
   event: React.KeyboardEvent<HTMLDivElement>,
-  { contentRef }: handleKeyDownProps
+  { contentRef, setSavedRange, onSelectScriptModalOpen }: handleKeyDownProps
 ) => {
   const contentDiv = contentRef.current;
   if (!contentDiv) return;
@@ -130,6 +137,11 @@ export const handleKeyDown = (
     }
 
     updateCharacterNameStyling({ contentRef });
+  }
+
+  if (event.key === "/") {
+    event.preventDefault();
+    createLinkFromSelection({ range, setSavedRange, onSelectScriptModalOpen });
   }
 
   if (
