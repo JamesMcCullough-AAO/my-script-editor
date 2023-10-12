@@ -1,4 +1,5 @@
 import { ifItemExists } from "../utils/indexDB";
+import { saveScript } from "../utils/saveScript";
 import { scriptToFileName } from "../utils/scriptToFileName";
 
 type handleRenameScriptInput = {
@@ -23,15 +24,7 @@ export const handleRenameScript = async ({
       alert("This title already exists!");
       return;
     }
-    const scriptJSON = localStorage.getItem(
-      `script_${scriptToFileName(oldScriptTitle)}`
-    );
-    localStorage.removeItem(`script_${scriptToFileName(oldScriptTitle)}`);
-    localStorage.setItem(
-      `script_${scriptToFileName(newScriptTitle)}`,
-      scriptJSON || ""
-    );
-    setTitle(newScriptTitle);
+    // TODO: Rename the script.
   }
   setOldScriptTitle("");
   setNewScriptTitle("");
