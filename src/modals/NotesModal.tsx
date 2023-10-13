@@ -9,6 +9,7 @@ import {
   Button,
   Textarea,
 } from "@chakra-ui/react";
+import { designColors } from "../utils/constants";
 
 type NotesModalProps = {
   isNotesModalOpen: boolean;
@@ -26,7 +27,7 @@ export const NotesModal = ({
   return (
     <Modal isOpen={isNotesModalOpen} onClose={onNotesModalClose} size="4xl">
       <ModalOverlay />
-      <ModalContent backgroundColor="#424242" color="white">
+      <ModalContent backgroundColor={designColors.backgroundgray} color="white">
         <ModalHeader>Notes</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

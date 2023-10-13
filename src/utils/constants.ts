@@ -1,5 +1,10 @@
 export const baseIconColor = "#00FFB6";
 
+export const designColors = {
+  backgroundgray: "#424242",
+  darkblue: "#1d2330",
+};
+
 export const colorIconDefaults = [
   "#00FFB6",
   "#00C8FF",

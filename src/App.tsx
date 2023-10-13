@@ -57,7 +57,7 @@ import { loadScript } from "./utils/loadScript";
 import { compressImage } from "./utils/ImageCompressor";
 import { EditDocumentIcon } from "./icons/editDocument";
 import { DocumentIcon } from "./icons/DocumentIcon";
-import { baseIconColor } from "./utils/constants";
+import { baseIconColor, designColors } from "./utils/constants";
 import { updateCharacterNameStyling } from "./utils/updateCharacterNameStyling";
 import { characterNote } from "./utils/types";
 import { handleSaveEditedName } from "./handlers/handleSaveEditedName";
@@ -355,7 +355,7 @@ function App() {
       <VStack
         spacing={2}
         p="2"
-        backgroundColor="#1d2330"
+        backgroundColor={designColors.darkblue}
         width="fit-content"
         alignItems="start"
         height="100vh"
@@ -482,7 +482,7 @@ function App() {
                 overflowY: "auto", // Enable vertical scrolling
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#424242",
+                backgroundColor: designColors.backgroundgray,
                 color: "white",
                 padding: "1em",
                 borderRadius: "0.25em",
@@ -539,7 +539,10 @@ function App() {
       />
       <Modal isOpen={isMenuOpen} onClose={onMenuClose} size="2xl">
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Menu</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -674,7 +677,10 @@ function App() {
       </Modal>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Confirm Deletion</ModalHeader>
           <ModalCloseButton />
           <ModalBody>Are you sure you want to delete this script?</ModalBody>
@@ -736,7 +742,10 @@ function App() {
       </Modal>
       <Modal isOpen={isNameModalOpen} onClose={onNameModalClose}>
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Name New Script</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -773,7 +782,10 @@ function App() {
       </Modal>
       <Modal isOpen={isInfoModalOpen} onClose={onInfoModalClose}>
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Information</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -806,7 +818,10 @@ function App() {
       {/* Script icon modal - Upload the icon for the script */}
       <Modal isOpen={isIconModalOpen} onClose={onIconModalClose} size="xl">
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Update Script Icon</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -864,7 +879,10 @@ function App() {
       </Modal>
       <Modal isOpen={isSettingsModalOpen} onClose={onSettingsModalClose}>
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Editor Settings</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -944,7 +962,10 @@ function App() {
       {/* Versions modal */}
       <Modal isOpen={isVersionsModalOpen} onClose={onVersionsModalClose}>
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Versions</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -956,7 +977,7 @@ function App() {
                     <ListItem
                       border="1px solid #ccc"
                       borderRadius="0.25em"
-                      backgroundColor="#1d2330"
+                      backgroundColor={designColors.darkblue}
                       padding="0.5em"
                       key={scriptVersions.indexOf(script)}
                       onClick={() => handleVersionSelect(script)}
@@ -1003,7 +1024,10 @@ function App() {
         size="4xl"
       >
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>
             Are you sure you want to restore the following version?
           </ModalHeader>
@@ -1015,7 +1039,7 @@ function App() {
                 overflowY: "auto", // Enable vertical scrolling
                 width: "100%",
                 maxHeight: "400px",
-                backgroundColor: "#424242",
+                backgroundColor: designColors.backgroundgray,
                 color: "white",
                 padding: "1em",
                 borderRadius: "0.25em",
@@ -1074,7 +1098,10 @@ function App() {
         size="4xl"
       >
         <ModalOverlay />
-        <ModalContent backgroundColor="#424242" color="white">
+        <ModalContent
+          backgroundColor={designColors.backgroundgray}
+          color="white"
+        >
           <ModalHeader>Character Notes</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -1162,7 +1189,7 @@ function App() {
       >
         <ModalOverlay />
         <ModalContent
-          backgroundColor="#424242"
+          backgroundColor={designColors.backgroundgray}
           color="white"
           width="fit-content"
         >

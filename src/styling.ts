@@ -1,4 +1,5 @@
 import { createScriptSVGIcon } from "./icons/editDocument";
+import { designColors } from "./utils/constants";
 import { getItem } from "./utils/indexDB";
 import { loadScript } from "./utils/loadScript";
 import { scriptToFileName } from "./utils/scriptToFileName";
@@ -20,7 +21,7 @@ export const applyLinkSpanStyles = async (
   range: Range
 ) => {
   const color = await getScriptIconColor(selectedScript);
-  span.style.backgroundColor = "#202020";
+  span.style.backgroundColor = designColors.darkblue;
   span.style.borderRadius = "30px";
   span.style.color = "white";
   span.style.border = "1px solid " + color;

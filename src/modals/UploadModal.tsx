@@ -9,6 +9,7 @@ import {
   Button,
   Textarea,
 } from "@chakra-ui/react";
+import { designColors } from "../utils/constants";
 
 type UpdateModalProps = {
   isUploadModalOpen: boolean;
@@ -30,7 +31,7 @@ export const UploadModal = ({
   return (
     <Modal isOpen={isUploadModalOpen} onClose={onUploadModalClose}>
       <ModalOverlay />
-      <ModalContent backgroundColor="#424242" color="white">
+      <ModalContent backgroundColor={designColors.backgroundgray} color="white">
         <ModalHeader>Import/Export Script</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

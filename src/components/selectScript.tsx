@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { DocumentIcon } from "../icons/DocumentIcon";
-import { baseIconColor } from "../utils/constants";
+import { baseIconColor, designColors } from "../utils/constants";
 import { formatTimestamp } from "../utils/formatTimestamp";
 import { searchSavedTitles } from "../utils/searchSavedTitles";
 
@@ -76,7 +76,7 @@ export const SelectScript = ({
               <ListItem
                 border="1px solid #ccc"
                 borderRadius="0.25em"
-                backgroundColor="#1d2330"
+                backgroundColor={designColors.darkblue}
                 padding="0.5em"
                 key={script.title}
                 onClick={async () => {

@@ -7,6 +7,7 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import { SelectScript } from "../components/selectScript";
+import { designColors } from "../utils/constants";
 
 type SelectScriptModalProps = {
   isSelectScriptModalOpen: boolean;
@@ -31,7 +32,7 @@ export const SelectScriptModal = ({
       size="2xl"
     >
       <ModalOverlay />
-      <ModalContent backgroundColor="#424242" color="white">
+      <ModalContent backgroundColor={designColors.backgroundgray} color="white">
         <ModalHeader>Which Script do you want to Link?</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
