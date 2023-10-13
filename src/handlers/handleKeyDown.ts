@@ -35,6 +35,17 @@ const isInsideCharacterNameSpan = (range: Range) => {
   return false;
 };
 
+const isInsideLinkSpan = (range: Range) => {
+  let node = range.commonAncestorContainer;
+  while (node != null && !(node instanceof HTMLDivElement)) {
+    if (node instanceof HTMLElement && node.classList.contains("script-link")) {
+      return true;
+    }
+    if (node.parentNode) node = node.parentNode;
+  }
+  return false;
+};
+
 export const handleKeyDown = (
   event: React.KeyboardEvent<HTMLDivElement>,
   { contentRef, setSavedRange, onSelectScriptModalOpen }: handleKeyDownProps
@@ -137,6 +148,28 @@ export const handleKeyDown = (
     }
 
     updateCharacterNameStyling({ contentRef });
+  }
+
+  if (event.key === "Enter" && isInsideLinkSpan(range)) {
+    event.preventDefault();
+
+    const span = range?.commonAncestorContainer?.parentNode;
+    if (span && span.nextSibling) {
+      range?.setStartBefore(span.nextSibling); // Move cursor outside the span
+    } else if (span && span.parentNode) {
+      range?.setStartAfter(span); // If no next sibling exists, place cursor at the end
+    }
+
+    // Check the document is the contentDiv or a child of it
+    if (
+      contentDiv === range?.commonAncestorContainer ||
+      contentDiv.contains(range?.commonAncestorContainer)
+    ) {
+      // add a space and open brack after the span
+      const linebreakNode = document.createElement("br");
+      range?.insertNode(linebreakNode);
+      range?.setStartAfter(linebreakNode);
+    }
   }
 
   if (event.key === "/") {

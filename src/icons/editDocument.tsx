@@ -34,7 +34,7 @@ export const EditDocumentIcon = ({ color, width }: EditDocumentIconProps) => (
 
 export const createScriptSVGIcon = (color: string): SVGSVGElement => {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "20");
+  svg.setAttribute("width", "22");
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("fill", "none");
 

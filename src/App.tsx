@@ -1204,6 +1204,7 @@ function App() {
             addLinkSpan(title, savedRange);
             setSavedRange(undefined);
           }
+          onSelectScriptModalClose();
         }}
       />
     </HStack>

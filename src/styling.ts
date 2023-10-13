@@ -15,7 +15,7 @@ export const applyLinkSpanStyles = (
   selectedScript: string,
   range: Range
 ) => {
-  span.style.backgroundColor = "#505050";
+  span.style.backgroundColor = "#606060";
   span.style.borderRadius = "12px";
   span.style.color = "white";
   span.style.padding = "6px 10px";
@@ -26,6 +26,8 @@ export const applyLinkSpanStyles = (
   span.classList.add("script-link");
   span.dataset.scriptTitle = selectedScript;
   const icon = createScriptSVGIcon("#00FFB6");
+  const iconStyle = icon.style;
+  iconStyle.marginRight = "5px";
   span.appendChild(icon);
 
   const scriptNameTextNode = document.createTextNode(selectedScript);

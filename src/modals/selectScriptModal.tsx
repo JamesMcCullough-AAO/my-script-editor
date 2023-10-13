@@ -32,7 +32,7 @@ export const SelectScriptModal = ({
     >
       <ModalOverlay />
       <ModalContent backgroundColor="#424242" color="white">
-        <ModalHeader>Select Script</ModalHeader>
+        <ModalHeader>Which Script do you want to Link?</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <SelectScript
