@@ -16,9 +16,9 @@ export const applyLinkSpanStyles = (
   range: Range
 ) => {
   span.style.backgroundColor = "#606060";
-  span.style.borderRadius = "12px";
+  span.style.borderRadius = "30px";
   span.style.color = "white";
-  span.style.padding = "6px 10px";
+  span.style.padding = "6px 10px 6px 10px";
   span.style.marginRight = "5px";
   span.style.cursor = "pointer";
   span.style.display = "inline-flex";
