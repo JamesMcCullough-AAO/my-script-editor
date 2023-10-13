@@ -107,4 +107,16 @@ export const deleteAllItems = async () => {
   });
 };
 
+export const getScriptIconColor = async (id: string) => {
+  const db = await openDB();
+  const transaction = db.transaction("scripts");
+  const store = transaction.objectStore("scripts");
+  const request = store.get(id);
+
+  return new Promise<string>((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result.color);
+    request.onerror = () => reject();
+  });
+};
+
 // You can continue adding deleteItem, getAllItems etc.
