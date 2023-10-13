@@ -15,6 +15,7 @@ type loadScriptFromSpanProps = {
   setIconColor: React.Dispatch<React.SetStateAction<string>>;
   characterNotes: characterNote[];
   setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
+  setScriptLinkHistory: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export const loadScriptFromSpan = async ({
@@ -31,6 +32,7 @@ export const loadScriptFromSpan = async ({
   setIconColor,
   characterNotes,
   setCharacterNotes,
+  setScriptLinkHistory,
 }: loadScriptFromSpanProps) => {
   const scriptTitle = span.dataset.scriptTitle;
   if (!scriptTitle) return;
@@ -51,5 +53,6 @@ export const loadScriptFromSpan = async ({
     setIconColor,
     characterNotes,
     setCharacterNotes,
+    setScriptLinkHistory,
   });
 };

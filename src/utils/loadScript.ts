@@ -19,6 +19,7 @@ type loadScriptInput = {
   setIconColor: React.Dispatch<React.SetStateAction<string>>;
   characterNotes: characterNote[];
   setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
+  setScriptLinkHistory: React.Dispatch<React.SetStateAction<string[]>>;
 };
 export const loadScript = async ({
   loadTitle,
@@ -35,10 +36,13 @@ export const loadScript = async ({
   setIconColor,
   characterNotes,
   setCharacterNotes,
+  setScriptLinkHistory,
 }: loadScriptInput & { versionIndex?: number }) => {
   setIsLoading(true);
   console.log("loadTitle", loadTitle);
-  saveScript({
+  console.log("title", title);
+  setScriptLinkHistory((prev) => [...prev, loadTitle]);
+  await saveScript({
     title,
     contentRef,
     iconImage,

@@ -33,6 +33,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import NoteIcon from "@mui/icons-material/Note";
 import Face2Icon from "@mui/icons-material/Face2";
 import EditIcon from "@mui/icons-material/Edit";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { useEffect, useRef, useState } from "react";
@@ -50,14 +51,14 @@ import { handleOpenMenu } from "./handlers/handleOpenMenu";
 import { handleKeyDown } from "./handlers/handleKeyDown";
 import { handleGenerateText } from "./handlers/handleGenerateText";
 import PendingIcon from "@mui/icons-material/Pending";
-import { throttle } from "lodash";
+import { set, throttle } from "lodash";
 import { getScriptVersions } from "./utils/getScriptVersions";
 import { formatTimestampExact } from "./utils/formatTimestampExact";
 import { loadScript } from "./utils/loadScript";
 import { compressImage } from "./utils/ImageCompressor";
 import { EditDocumentIcon } from "./icons/editDocument";
 import { DocumentIcon } from "./icons/DocumentIcon";
-import { baseIconColor, designColors } from "./utils/constants";
+import { baseIconColor, darkIconColor, designColors } from "./utils/constants";
 import { updateCharacterNameStyling } from "./utils/updateCharacterNameStyling";
 import { characterNote } from "./utils/types";
 import { handleSaveEditedName } from "./handlers/handleSaveEditedName";
@@ -88,6 +89,8 @@ function App() {
   const [newCharacterName, setNewCharacterName] = useState("");
   const [characterNotes, setCharacterNotes] = useState<characterNote[]>([]);
   const [savedRange, setSavedRange] = useState<Range>();
+  const [scriptLinkHistory, setScriptLinkHistory] = useState<string[]>([]);
+  const [isLoadingScript, setIsLoadingScript] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState<{
     title: string;
     timestamp: number;
@@ -181,6 +184,35 @@ function App() {
     };
   };
 
+  const handleBackButton = () => {
+    if (scriptLinkHistory.length > 1) {
+      const currentPage = scriptLinkHistory.pop();
+      const lastLink = scriptLinkHistory.pop();
+      if (lastLink) {
+        setIsLoadingScript(true);
+        loadScript({
+          loadTitle: lastLink,
+          title,
+          contentRef,
+          setTitle,
+          setNotes,
+          notes,
+          setIsLoading,
+          setIconImage,
+          iconImage,
+          setIconColor,
+          iconColor,
+          setCharacterNotes,
+          characterNotes,
+          versionIndex: -1,
+          setScriptLinkHistory,
+        }).then(() => {
+          setIsLoadingScript(false);
+        });
+      }
+    }
+  };
+
   type handleEditNameProps = {
     name: string;
   };
@@ -196,6 +228,11 @@ function App() {
       setEditorSettings(JSON.parse(settings));
     }
   }, []);
+
+  // coNSOLE LOG script link history
+  useEffect(() => {
+    console.log({ scriptLinkHistory });
+  }, [scriptLinkHistory]);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -231,13 +268,13 @@ function App() {
   }, 10000);
 
   useEffect(() => {
-    let isLoadingScript = false; // Step 1: Declare a variable
+    let currentlyLoadingScript = false;
 
     const element = contentRef.current;
 
     if (element) {
       element.addEventListener("input", () => {
-        if (isLoadingScript) return; // Step 3: Check flag
+        if (isLoadingScript || currentlyLoadingScript) return; // Step 3: Check flag
 
         updateWordCount();
         saveScript({
@@ -251,8 +288,13 @@ function App() {
       });
 
       element.addEventListener("click", (e: MouseEvent) => {
-        if ((e.target as HTMLElement).classList.contains("script-link")) {
-          isLoadingScript = true; // Step 2: Set flag before loading
+        if (
+          (e.target as HTMLElement).classList.contains("script-link") &&
+          !isLoadingScript &&
+          !currentlyLoadingScript
+        ) {
+          setIsLoadingScript(true); // Step 2: Set flag before loading
+          currentlyLoadingScript = true;
 
           loadScriptFromSpan({
             span: e.target as HTMLElement,
@@ -268,9 +310,11 @@ function App() {
             setIconColor,
             characterNotes,
             setCharacterNotes,
+            setScriptLinkHistory,
+          }).then(() => {
+            setIsLoadingScript(false); // Step 4: Reset flag after loading
+            currentlyLoadingScript = false;
           });
-
-          isLoadingScript = false; // Step 4: Reset flag after loading
         }
       });
 
@@ -451,14 +495,30 @@ function App() {
         <VStack maxWidth="1000px" width="full" alignItems="start" height="100%">
           <HStack id="title-bar">
             {title && (
-              <Box marginRight="5px">
+              <HStack marginRight="5px">
+                {scriptLinkHistory.length > 1 && (
+                  <IconButton
+                    aria-label="Back"
+                    icon={<ArrowBackIcon />}
+                    onClick={() => {
+                      handleBackButton();
+                    }}
+                    // no background, green icon, icon goes white on hover
+                    backgroundColor="transparent"
+                    color="white"
+                    _hover={{
+                      color: iconColor,
+                    }}
+                    title="Back"
+                  />
+                )}
                 {iconImage && (
                   <Image src={iconImage} width="40px" borderRadius="4" />
                 )}
                 {!iconImage && (
                   <EditDocumentIcon color={iconColor} width="40px" />
                 )}
-              </Box>
+              </HStack>
             )}
             <Text color="white" fontWeight={600} fontSize="24px">
               {title}
@@ -652,6 +712,8 @@ function App() {
             <SelectScript
               title={title}
               onSelect={(loadTitle) => {
+                setScriptLinkHistory([]);
+                setIsLoadingScript(true);
                 loadScript({
                   loadTitle,
                   title,
@@ -667,6 +729,9 @@ function App() {
                   setCharacterNotes,
                   characterNotes,
                   versionIndex: -1,
+                  setScriptLinkHistory,
+                }).then(() => {
+                  setIsLoadingScript(false);
                 });
                 onMenuClose();
               }}
@@ -983,7 +1048,7 @@ function App() {
                       onClick={() => handleVersionSelect(script)}
                       // Hilight the hovered item
                       _hover={{
-                        backgroundColor: "#007050",
+                        backgroundColor: darkIconColor,
                         cursor: "pointer",
                       }}
                     >
@@ -1078,6 +1143,7 @@ function App() {
                       setIconColor,
                       characterNotes,
                       setCharacterNotes,
+                      setScriptLinkHistory,
                     });
                     setSelectedVersion(null); // Close the confirmation modal
                     onVersionsModalClose(); // Close the versions modal
