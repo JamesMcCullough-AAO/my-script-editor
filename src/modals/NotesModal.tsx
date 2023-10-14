@@ -36,6 +36,7 @@ export const NotesModal = ({
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             height="50vh"
+            autoFocus
           />
         </ModalBody>
         <ModalFooter>
