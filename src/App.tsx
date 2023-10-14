@@ -84,8 +84,13 @@ import {
   typeSlashOptions,
 } from "./handlers/handleOptionSelect";
 import { ExternalLinkModal } from "./modals/ExternalLinkModal";
+import { getSharedScript } from "./utils/supabase/supabaseConnect";
 
-function App() {
+type AppProps = {
+  scriptId?: string;
+};
+
+function App({ scriptId }: AppProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [importText, setImportText] = useState("");
 
@@ -196,6 +201,24 @@ function App() {
     onOpen: onNotesModalOpen,
     onClose: onNotesModalClose,
   } = useDisclosure();
+
+  // if a script is passed in, load it
+  useEffect(() => {
+    if (scriptId) {
+      getSharedScript(scriptId).then((script) => {
+        setTitle(script.title);
+        setNotes(script.notes);
+        if (script.characterNotes) {
+          setCharacterNotes(JSON.parse(script.characterNotes));
+        }
+        setScriptLinkHistory([script.title]);
+        if (contentRef.current) {
+          contentRef.current?.insertAdjacentHTML("beforeend", script.html);
+          updateCharacterNameStyling({ contentRef });
+        }
+      });
+    }
+  }, []);
 
   // A function that takes uploaded image, compresses it using compressImage and sets it as the icon
   const handleUploadIcon = async (event: any) => {

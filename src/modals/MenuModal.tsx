@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
+import IosShareIcon from "@mui/icons-material/IosShare";
 import { handleNewScript } from "../handlers/handleNewScript";
 import { exportScript } from "../utils/scriptManagement/exportScript";
 import { handleOpenRenameModal } from "../handlers/handleOpenRenameModal";
@@ -30,6 +31,7 @@ import { loadScript } from "../utils/scriptManagement/loadScript";
 import React, { SetStateAction } from "react";
 import { characterNote } from "../utils/general/types";
 import { ScriptVersion } from "../utils/scriptManagement/getScriptVersions";
+import { shareScript } from "../utils/supabase/supabaseConnect";
 
 type MenuModalProps = {
   isOpen: boolean;
@@ -187,6 +189,21 @@ export const MenuModal = ({
                 }}
                 isDisabled={isGenerating || !title}
                 title="Restore Previous Versions"
+              />
+              <IconButton
+                aria-label="Share Script"
+                colorScheme="pink"
+                icon={<IosShareIcon />}
+                onClick={() => {
+                  shareScript({
+                    title,
+                    contentRef,
+                    notes,
+                    characterNotes,
+                  });
+                }}
+                isDisabled={isGenerating || !title}
+                title="Share Script"
               />
             </HStack>
             <HStack justifyContent="center" spacing="2">

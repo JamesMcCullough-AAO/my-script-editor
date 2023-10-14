@@ -1,6 +1,10 @@
 export const baseIconColor = "#00FFB6";
 export const darkIconColor = "#007050";
 
+export const appURL = "https://local-script-editor.vercel.app/";
+export const appLoadExtension =
+  "https://local-script-editor.vercel.app/loadscript/";
+
 export const designColors = {
   backgroundgray: "#424242",
   darkblue: "#1d2330",
