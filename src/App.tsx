@@ -775,13 +775,12 @@ function App() {
               --- Keyboard Shortcuts ---
             </Text>
             <Text>
-              <b>Tab or "["</b> - Begin a new character name <br />
+              <b>Tab or "["</b> - Begin a new character name. <br />
               <b>Enter</b> - Finish a charcter name, start line. <br />
               <b>"]"</b> - Finish a character name, begin line description.{" "}
               <br />
               <b>")"</b> - Finish a line description, start line. <br />
-              <b>"/"</b> - Create an in-script link to another script (beta).{" "}
-              <br />
+              <b>"/"</b> - Open action menu. <br />
             </Text>
             <Text paddingTop="4" fontWeight="bold">
               --- Saving ---
