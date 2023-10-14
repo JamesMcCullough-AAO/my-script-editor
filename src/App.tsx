@@ -700,9 +700,7 @@ function App({ scriptId }: AppProps) {
             >
               Delete
             </Button>
-            <Button variant="ghost" onClick={onDeleteModalClose}>
-              Cancel
-            </Button>
+            <Button onClick={onDeleteModalClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -735,9 +733,7 @@ function App({ scriptId }: AppProps) {
             >
               Rename
             </Button>
-            <Button variant="ghost" onClick={onRenameModalClose}>
-              Cancel
-            </Button>
+            <Button onClick={onRenameModalClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -775,9 +771,7 @@ function App({ scriptId }: AppProps) {
             >
               Create
             </Button>
-            <Button variant="ghost" onClick={onRenameModalClose}>
-              Cancel
-            </Button>
+            <Button onClick={onRenameModalClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -871,9 +865,7 @@ function App({ scriptId }: AppProps) {
             >
               Upload
             </Button>
-            <Button variant="ghost" onClick={onIconModalClose}>
-              Cancel
-            </Button>
+            <Button onClick={onIconModalClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -953,9 +945,7 @@ function App({ scriptId }: AppProps) {
             >
               Save
             </Button>
-            <Button variant="ghost" onClick={onSettingsModalClose}>
-              Cancel
-            </Button>
+            <Button onClick={onSettingsModalClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
