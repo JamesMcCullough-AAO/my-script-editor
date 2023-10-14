@@ -43,7 +43,7 @@ export const loadScript = async ({
   console.log("title", title);
   setScriptLinkHistory((prev) => {
     // if last is not equal to loadTitle, add it
-    if (prev[prev.length - 1] !== loadTitle) {
+    if (prev[prev.length - 1] != loadTitle) {
       return [...prev, loadTitle];
     }
     return prev;
