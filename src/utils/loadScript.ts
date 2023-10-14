@@ -41,7 +41,13 @@ export const loadScript = async ({
   setIsLoading(true);
   console.log("loadTitle", loadTitle);
   console.log("title", title);
-  setScriptLinkHistory((prev) => [...prev, loadTitle]);
+  setScriptLinkHistory((prev) => {
+    // if last is not equal to loadTitle, add it
+    if (prev[prev.length - 1] !== loadTitle) {
+      return [...prev, loadTitle];
+    }
+    return prev;
+  });
   await saveScript({
     title,
     contentRef,

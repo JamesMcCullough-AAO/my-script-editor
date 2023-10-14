@@ -70,6 +70,7 @@ import { loadScriptFromSpan } from "./utils/loadScriptFromSpan";
 import { SelectScript } from "./components/selectScript";
 import { SelectScriptModal } from "./modals/selectScriptModal";
 import { addLinkSpan } from "./utils/createLinkFromSelection";
+import { MenuModal } from "./modals/MenuModal";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -229,11 +230,6 @@ function App() {
     }
   }, []);
 
-  // coNSOLE LOG script link history
-  useEffect(() => {
-    console.log({ scriptLinkHistory });
-  }, [scriptLinkHistory]);
-
   useEffect(() => {
     if (contentRef.current) {
       saveScript({
@@ -353,23 +349,6 @@ function App() {
         }}
       />
     );
-  };
-
-  type handleShowVersionsModalProps = {
-    title: string;
-  };
-
-  const handleShowVersionsModal = async ({
-    title,
-  }: handleShowVersionsModalProps) => {
-    const versions = await getScriptVersions(title);
-    if (versions && versions.length !== 0) {
-      versions.shift();
-      setScriptVersions(versions);
-      onVersionsModalOpen();
-    } else {
-      alert("No versions yet!");
-    }
   };
 
   type handleVersionSelectProps = {
@@ -597,149 +576,36 @@ function App() {
           contentRef,
         }}
       />
-      <Modal isOpen={isMenuOpen} onClose={onMenuClose} size="2xl">
-        <ModalOverlay />
-        <ModalContent
-          backgroundColor={designColors.backgroundgray}
-          color="white"
-        >
-          <ModalHeader>Menu</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <HStack justifyContent="space-between" mb="4">
-              <HStack justifyContent="center" spacing="2">
-                <IconButton
-                  aria-label="Create Script"
-                  icon={<NoteAddIcon />}
-                  onClick={() => {
-                    handleNewScript({
-                      setNewScriptTitle,
-                      onNameModalOpen,
-                    });
-                  }}
-                  colorScheme="green"
-                  isDisabled={isGenerating}
-                  title="Create New Script"
-                />
-                <IconButton
-                  aria-label="Import script"
-                  icon={<FileUploadIcon />}
-                  onClick={onUploadModalOpen}
-                  isDisabled={isGenerating || !title}
-                  colorScheme="blue"
-                  title="Import Script"
-                />
-                <IconButton
-                  aria-label="Export script"
-                  icon={<DownloadIcon />}
-                  onClick={() => {
-                    exportScript({
-                      title,
-                      contentRef,
-                      notes,
-                      characterNotes,
-                    });
-                    onMenuClose();
-                  }}
-                  isDisabled={isGenerating || !title}
-                  colorScheme="blue"
-                  title="Export Script"
-                />
-                <IconButton
-                  aria-label="Rename script"
-                  icon={<DriveFileRenameOutlineIcon />}
-                  colorScheme="yellow"
-                  onClick={() =>
-                    handleOpenRenameModal({
-                      scriptTitle: title,
-                      onMenuClose,
-                      onRenameModalOpen,
-                      setNewScriptTitle,
-                      setOldScriptTitle,
-                    })
-                  }
-                  isDisabled={isGenerating || !title}
-                  title="Rename Script"
-                />
-                <IconButton
-                  aria-label="Update Script Icon"
-                  icon={<AddPhotoAlternateIcon />}
-                  colorScheme="yellow"
-                  onClick={onIconModalOpen}
-                  isDisabled={isGenerating || !title}
-                  title="Update Script Icon"
-                />
-                <IconButton
-                  aria-label="Delete script"
-                  colorScheme="red"
-                  icon={<DeleteIcon />}
-                  onClick={() => {
-                    onDeleteModalOpen();
-                    onMenuClose();
-                  }}
-                  isDisabled={isGenerating || !title}
-                  title="Delete Script"
-                />
-                <IconButton
-                  aria-label="Restore previous versions"
-                  colorScheme="pink"
-                  icon={<HistoryIcon />}
-                  onClick={async () => {
-                    await handleShowVersionsModal({ title });
-                    onMenuClose();
-                  }}
-                  isDisabled={isGenerating || !title}
-                  title="Restore Previous Versions"
-                />
-              </HStack>
-              <HStack justifyContent="center" spacing="2">
-                <IconButton
-                  aria-label="Info Box"
-                  icon={<InfoIcon />}
-                  colorScheme="purple"
-                  onClick={onInfoModalOpen}
-                  title="Info Box"
-                />
-                <IconButton
-                  aria-label="Settings"
-                  icon={<SettingsIcon />}
-                  colorScheme="purple"
-                  onClick={onSettingsModalOpen}
-                  title="Settings"
-                />
-              </HStack>
-            </HStack>
-            <SelectScript
-              title={title}
-              onSelect={(loadTitle) => {
-                setScriptLinkHistory([]);
-                setIsLoadingScript(true);
-                loadScript({
-                  loadTitle,
-                  title,
-                  contentRef,
-                  setTitle,
-                  setNotes,
-                  notes,
-                  setIsLoading,
-                  setIconImage,
-                  iconImage,
-                  setIconColor,
-                  iconColor,
-                  setCharacterNotes,
-                  characterNotes,
-                  versionIndex: -1,
-                  setScriptLinkHistory,
-                }).then(() => {
-                  setIsLoadingScript(false);
-                });
-                onMenuClose();
-              }}
-              setIsLoading={setIsLoading}
-            />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <MenuModal
+        isOpen={isMenuOpen}
+        onClose={onMenuClose}
+        notes={notes}
+        setNotes={setNotes}
+        setNewScriptTitle={setNewScriptTitle}
+        onNameModalOpen={onNameModalOpen}
+        isGenerating={isGenerating}
+        onUploadModalOpen={onUploadModalOpen}
+        title={title}
+        contentRef={contentRef}
+        characterNotes={characterNotes}
+        onRenameModalOpen={onRenameModalOpen}
+        setOldScriptTitle={setOldScriptTitle}
+        onIconModalOpen={onIconModalOpen}
+        onDeleteModalOpen={onDeleteModalOpen}
+        setScriptVersions={setScriptVersions}
+        onVersionsModalOpen={onVersionsModalOpen}
+        onInfoModalOpen={onInfoModalOpen}
+        onSettingsModalOpen={onSettingsModalOpen}
+        setScriptLinkHistory={setScriptLinkHistory}
+        setIsLoadingScript={setIsLoadingScript}
+        setTitle={setTitle}
+        setIsLoading={setIsLoading}
+        setIconImage={setIconImage}
+        iconImage={iconImage}
+        setIconColor={setIconColor}
+        iconColor={iconColor}
+        setCharacterNotes={setCharacterNotes}
+      />
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
         <ModalContent

@@ -1,7 +1,7 @@
 import { getItem } from "./indexDB";
 import { scriptToFileName } from "./scriptToFileName";
 
-type ScriptVersion = {
+export type ScriptVersion = {
   content: string;
   timestamp: number;
   iconImage?: string;
