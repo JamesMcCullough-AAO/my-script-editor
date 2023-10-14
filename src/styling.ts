@@ -7,12 +7,14 @@ import { createLinkSVGIcon } from "./icons/linkIcon";
 
 export const applySpanStyles = (span: HTMLSpanElement) => {
   span.style.backgroundColor = "#00805B";
-  span.style.borderRadius = "12px";
+  span.style.borderRadius = "16px";
   span.style.color = "white";
-  span.style.padding = "2px 5px";
+  span.style.paddingLeft = "10px";
+  span.style.paddingRight = "10px";
   span.style.marginLeft = "30px";
   span.style.marginRight = "5px";
-  span.style.marginTop = "10px";
+  span.style.marginTop = "25px";
+  span.style.display = "inline-flex";
   span.classList.add("character-name");
 };
 
