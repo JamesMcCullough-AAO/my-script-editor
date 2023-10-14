@@ -1,4 +1,7 @@
-import { ScriptVersion, getScriptVersions } from "../utils/getScriptVersions";
+import {
+  ScriptVersion,
+  getScriptVersions,
+} from "../utils/scriptManagement/getScriptVersions";
 
 type handleShowVersionsModalProps = {
   title: string;

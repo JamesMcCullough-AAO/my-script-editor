@@ -7,7 +7,7 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import { SelectScript } from "../components/selectScript";
-import { designColors } from "../utils/constants";
+import { designColors } from "../utils/general/constants";
 
 type SelectScriptModalProps = {
   isSelectScriptModalOpen: boolean;

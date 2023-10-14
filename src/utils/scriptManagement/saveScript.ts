@@ -1,6 +1,6 @@
-import { getItem, setItem } from "./indexDB";
-import { scriptToFileName } from "./scriptToFileName";
-import { characterNote } from "./types";
+import { getItem, setItem } from "../database/indexDB";
+import { scriptToFileName } from "../database/scriptToFileName";
+import { characterNote } from "../general/types";
 
 type saveScriptInput = {
   title: string;

@@ -1,7 +1,7 @@
 import { set } from "lodash";
-import { ifItemExists, renameItem } from "../utils/indexDB";
-import { saveScript } from "../utils/saveScript";
-import { scriptToFileName } from "../utils/scriptToFileName";
+import { ifItemExists, renameItem } from "../utils/database/indexDB";
+import { saveScript } from "../utils/scriptManagement/saveScript";
+import { scriptToFileName } from "../utils/database/scriptToFileName";
 
 type handleRenameScriptInput = {
   newScriptTitle: string;

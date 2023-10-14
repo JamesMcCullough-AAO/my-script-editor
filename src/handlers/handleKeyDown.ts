@@ -3,7 +3,7 @@ import { applySpanStyles } from "../styling";
 import {
   addLinkSpan,
   createLinkFromSelection,
-} from "../utils/createLinkFromSelection";
+} from "../utils/general/createLinkFromSelection";
 import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling";
 
 type handleKeyDownProps = {

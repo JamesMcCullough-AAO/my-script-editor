@@ -11,7 +11,7 @@ import {
   HStack,
   IconButton,
 } from "@chakra-ui/react";
-import { designColors } from "../utils/constants";
+import { designColors } from "../utils/general/constants";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -22,14 +22,14 @@ import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { handleNewScript } from "../handlers/handleNewScript";
-import { exportScript } from "../utils/exportScript";
+import { exportScript } from "../utils/scriptManagement/exportScript";
 import { handleOpenRenameModal } from "../handlers/handleOpenRenameModal";
 import { handleShowVersionsModal } from "../handlers/handleShowVersionModal";
 import { SelectScript } from "../components/selectScript";
-import { loadScript } from "../utils/loadScript";
+import { loadScript } from "../utils/scriptManagement/loadScript";
 import React, { SetStateAction } from "react";
-import { characterNote } from "../utils/types";
-import { ScriptVersion } from "../utils/getScriptVersions";
+import { characterNote } from "../utils/general/types";
+import { ScriptVersion } from "../utils/scriptManagement/getScriptVersions";
 
 type MenuModalProps = {
   isOpen: boolean;

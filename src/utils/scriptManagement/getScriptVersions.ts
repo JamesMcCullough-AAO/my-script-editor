@@ -1,5 +1,5 @@
-import { getItem } from "./indexDB";
-import { scriptToFileName } from "./scriptToFileName";
+import { getItem } from "../database/indexDB";
+import { scriptToFileName } from "../database/scriptToFileName";
 
 export type ScriptVersion = {
   content: string;

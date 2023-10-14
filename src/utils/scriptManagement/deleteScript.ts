@@ -1,5 +1,5 @@
-import { deleteAllItems, deleteItem } from "./indexDB";
-import { scriptToFileName } from "./scriptToFileName";
+import { deleteAllItems, deleteItem } from "../database/indexDB";
+import { scriptToFileName } from "../database/scriptToFileName";
 
 type DeleteScriptParams = {
   title: string;

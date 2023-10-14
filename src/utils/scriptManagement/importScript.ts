@@ -1,4 +1,4 @@
-import { applySpanStyles } from "../styling";
+import { applySpanStyles } from "../../styling";
 
 type importScriptProps = {
   contentRef: React.RefObject<HTMLDivElement>;

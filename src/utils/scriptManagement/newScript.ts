@@ -1,5 +1,5 @@
-import { baseIconColor } from "./constants";
-import { ifItemExists } from "./indexDB";
+import { baseIconColor } from "../general/constants";
+import { ifItemExists } from "../database/indexDB";
 
 type newScriptInput = {
   newScriptTitle: string;

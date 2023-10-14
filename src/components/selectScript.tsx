@@ -9,9 +9,9 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { DocumentIcon } from "../icons/DocumentIcon";
-import { baseIconColor, designColors } from "../utils/constants";
-import { formatTimestamp } from "../utils/formatTimestamp";
-import { searchSavedTitles } from "../utils/searchSavedTitles";
+import { baseIconColor, designColors } from "../utils/general/constants";
+import { formatTimestamp } from "../utils/general/formatTimestamp";
+import { searchSavedTitles } from "../utils/scriptManagement/searchSavedTitles";
 
 type SelectScriptProps = {
   title: string;

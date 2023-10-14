@@ -1,6 +1,6 @@
 import { on } from "events";
-import { applyLinkSpanStyles } from "../styling";
-import { getAllSavedScripts } from "./getAllSavedScripts";
+import { applyLinkSpanStyles } from "../../styling";
+import { getAllSavedScripts } from "../scriptManagement/getAllSavedScripts";
 import { set } from "lodash";
 
 type createLinkFromSelectionProps = {

@@ -1,5 +1,5 @@
-import { getAllItems } from "./indexDB";
-import { fileNameToScript } from "./scriptToFileName";
+import { getAllItems } from "../database/indexDB";
+import { fileNameToScript } from "../database/scriptToFileName";
 
 export const searchSavedTitles = async ({
   title,

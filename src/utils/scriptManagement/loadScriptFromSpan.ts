@@ -1,5 +1,5 @@
 import { loadScript } from "./loadScript";
-import { characterNote } from "./types";
+import { characterNote } from "../general/types";
 
 type loadScriptFromSpanProps = {
   span: HTMLElement;

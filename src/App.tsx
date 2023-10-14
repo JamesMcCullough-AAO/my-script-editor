@@ -37,13 +37,16 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { useEffect, useRef, useState } from "react";
-import { deleteAllScripts, deleteScript } from "./utils/deleteScript";
-import { newScript } from "./utils/newScript";
-import { searchSavedTitles } from "./utils/searchSavedTitles";
-import { saveScript } from "./utils/saveScript";
-import { importScript } from "./utils/importScript";
-import { exportScript } from "./utils/exportScript";
-import { formatTimestamp } from "./utils/formatTimestamp";
+import {
+  deleteAllScripts,
+  deleteScript,
+} from "./utils/scriptManagement/deleteScript";
+import { newScript } from "./utils/scriptManagement/newScript";
+import { searchSavedTitles } from "./utils/scriptManagement/searchSavedTitles";
+import { saveScript } from "./utils/scriptManagement/saveScript";
+import { importScript } from "./utils/scriptManagement/importScript";
+import { exportScript } from "./utils/scriptManagement/exportScript";
+import { formatTimestamp } from "./utils/general/formatTimestamp";
 import { handleNewScript } from "./handlers/handleNewScript";
 import { handleRenameScript } from "./handlers/handleRenameScript";
 import { handleOpenRenameModal } from "./handlers/handleOpenRenameModal";
@@ -52,24 +55,28 @@ import { handleKeyDown } from "./handlers/handleKeyDown";
 import { handleGenerateText } from "./handlers/handleGenerateText";
 import PendingIcon from "@mui/icons-material/Pending";
 import { set, throttle } from "lodash";
-import { getScriptVersions } from "./utils/getScriptVersions";
-import { formatTimestampExact } from "./utils/formatTimestampExact";
-import { loadScript } from "./utils/loadScript";
-import { compressImage } from "./utils/ImageCompressor";
+import { getScriptVersions } from "./utils/scriptManagement/getScriptVersions";
+import { formatTimestampExact } from "./utils/general/formatTimestampExact";
+import { loadScript } from "./utils/scriptManagement/loadScript";
+import { compressImage } from "./utils/database/ImageCompressor";
 import { EditDocumentIcon } from "./icons/editDocument";
 import { DocumentIcon } from "./icons/DocumentIcon";
-import { baseIconColor, darkIconColor, designColors } from "./utils/constants";
+import {
+  baseIconColor,
+  darkIconColor,
+  designColors,
+} from "./utils/general/constants";
 import { updateCharacterNameStyling } from "./utils/updateCharacterNameStyling";
-import { characterNote } from "./utils/types";
+import { characterNote } from "./utils/general/types";
 import { handleSaveEditedName } from "./handlers/handleSaveEditedName";
 import { handleAddNewCharacter } from "./handlers/handleAddNewCharacter";
-import { populateCharacterNotes } from "./utils/populateCharacterNotes";
+import { populateCharacterNotes } from "./utils/general/populateCharacterNotes";
 import { NotesModal } from "./modals/NotesModal";
 import { UploadModal } from "./modals/UploadModal";
-import { loadScriptFromSpan } from "./utils/loadScriptFromSpan";
+import { loadScriptFromSpan } from "./utils/scriptManagement/loadScriptFromSpan";
 import { SelectScript } from "./components/selectScript";
 import { SelectScriptModal } from "./modals/selectScriptModal";
-import { addLinkSpan } from "./utils/createLinkFromSelection";
+import { addLinkSpan } from "./utils/general/createLinkFromSelection";
 import { MenuModal } from "./modals/MenuModal";
 
 function App() {

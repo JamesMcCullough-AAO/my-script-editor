@@ -1,4 +1,4 @@
-import { extractCharacterNames } from "./updateCharacterNameStyling";
+import { extractCharacterNames } from "../updateCharacterNameStyling";
 
 type populateCharacterNotesProps = {
   contentRef: React.RefObject<HTMLDivElement>;

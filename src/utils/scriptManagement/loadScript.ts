@@ -1,8 +1,8 @@
-import { baseIconColor } from "./constants";
-import { getItem } from "./indexDB";
+import { baseIconColor } from "../general/constants";
+import { getItem } from "../database/indexDB";
 import { saveScript } from "./saveScript";
-import { scriptToFileName } from "./scriptToFileName";
-import { characterNote } from "./types";
+import { scriptToFileName } from "../database/scriptToFileName";
+import { characterNote } from "../general/types";
 
 type loadScriptInput = {
   loadTitle: string;

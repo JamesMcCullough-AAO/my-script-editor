@@ -1,4 +1,4 @@
-import { characterNote } from "../utils/types";
+import { characterNote } from "../utils/general/types";
 
 type handleSaveEditedNameProps = {
   newName: string;

@@ -1,8 +1,8 @@
 import { createScriptSVGIcon } from "./icons/editDocument";
-import { designColors } from "./utils/constants";
-import { getItem } from "./utils/indexDB";
-import { loadScript } from "./utils/loadScript";
-import { scriptToFileName } from "./utils/scriptToFileName";
+import { designColors } from "./utils/general/constants";
+import { getItem } from "./utils/database/indexDB";
+import { loadScript } from "./utils/scriptManagement/loadScript";
+import { scriptToFileName } from "./utils/database/scriptToFileName";
 
 export const applySpanStyles = (span: HTMLSpanElement) => {
   span.style.backgroundColor = "#00805B";

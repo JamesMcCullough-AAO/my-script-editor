@@ -9,7 +9,7 @@ import {
   Button,
   Textarea,
 } from "@chakra-ui/react";
-import { designColors } from "../utils/constants";
+import { designColors } from "../utils/general/constants";
 
 type UpdateModalProps = {
   isUploadModalOpen: boolean;

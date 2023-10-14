@@ -1,4 +1,4 @@
-import { characterNote } from "./types";
+import { characterNote } from "../general/types";
 
 type exportScriptProps = {
   title: string;

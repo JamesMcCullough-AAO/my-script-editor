@@ -1,4 +1,4 @@
-import { colorCharacterNameSpanDefaults } from "./constants";
+import { colorCharacterNameSpanDefaults } from "./general/constants";
 
 type extractCharacterNamesProps = {
   contentRef: React.RefObject<HTMLDivElement>;
