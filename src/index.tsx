@@ -4,13 +4,14 @@ import { ChakraProvider } from "@chakra-ui/react";
 import App from "./App";
 import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import { getSharedScript } from "./utils/supabase/supabaseConnect";
+import ReadModeApp from "./ReadModeApp";
 
 const LoadScript = () => {
   const { uuid } = useParams();
 
   if (!uuid) return <div>Invalid script</div>;
 
-  return <App scriptId={uuid} />;
+  return <ReadModeApp scriptId={uuid} />;
 };
 
 ReactDOM.render(
