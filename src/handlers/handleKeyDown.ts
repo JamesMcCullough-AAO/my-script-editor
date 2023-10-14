@@ -9,7 +9,7 @@ import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling"
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
   setSavedRange: React.Dispatch<React.SetStateAction<Range | undefined>>;
-  onSelectScriptModalOpen: () => void;
+  onSelectOptionModalOpen: () => void;
 };
 const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   const range = document.createRange();
@@ -48,7 +48,7 @@ const isInsideLinkSpan = (range: Range) => {
 
 export const handleKeyDown = (
   event: React.KeyboardEvent<HTMLDivElement>,
-  { contentRef, setSavedRange, onSelectScriptModalOpen }: handleKeyDownProps
+  { contentRef, setSavedRange, onSelectOptionModalOpen }: handleKeyDownProps
 ) => {
   const contentDiv = contentRef.current;
   if (!contentDiv) return;
@@ -174,7 +174,7 @@ export const handleKeyDown = (
 
   if (event.key === "/") {
     event.preventDefault();
-    createLinkFromSelection({ range, setSavedRange, onSelectScriptModalOpen });
+    createLinkFromSelection({ range, setSavedRange, onSelectOptionModalOpen });
   }
 
   if (

@@ -78,6 +78,11 @@ import { SelectScript } from "./components/selectScript";
 import { SelectScriptModal } from "./modals/selectScriptModal";
 import { addLinkSpan } from "./utils/general/createLinkFromSelection";
 import { MenuModal } from "./modals/MenuModal";
+import SelectOptionModal from "./modals/SelectOptionModal";
+import {
+  handleOptionSelect,
+  typeSlashOptions,
+} from "./handlers/handleOptionSelect";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -173,6 +178,11 @@ function App() {
     isOpen: isSelectScriptModalOpen,
     onOpen: onSelectScriptModalOpen,
     onClose: onSelectScriptModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isSelectOptionModalOpen,
+    onOpen: onSelectOptionModalOpen,
+    onClose: onSelectOptionModalClose,
   } = useDisclosure();
 
   const {
@@ -539,7 +549,7 @@ function App() {
                 handleKeyDown(event, {
                   contentRef,
                   setSavedRange,
-                  onSelectScriptModalOpen,
+                  onSelectOptionModalOpen,
                 });
               }}
             ></div>
@@ -1160,6 +1170,20 @@ function App() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <SelectOptionModal
+        isOpen={isSelectOptionModalOpen}
+        onClose={onSelectOptionModalClose}
+        options={Object.values(typeSlashOptions)}
+        onSelectOption={(option: string) =>
+          handleOptionSelect({
+            option,
+            onSelectScriptModalOpen,
+            contentRef,
+            setSavedRange,
+            savedRange,
+          })
+        }
+      />
       <SelectScriptModal
         isSelectScriptModalOpen={isSelectScriptModalOpen}
         onSelectScriptModalClose={onSelectScriptModalClose}

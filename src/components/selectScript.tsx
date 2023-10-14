@@ -70,6 +70,7 @@ export const SelectScript = ({
             placeholder="Search scripts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+            autoFocus // Auto-select the search bar
           />
           <List width="100%" spacing="1">
             {savedScriptTitles.map((script) => (

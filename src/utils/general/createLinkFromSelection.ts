@@ -6,16 +6,16 @@ import { set } from "lodash";
 type createLinkFromSelectionProps = {
   range: Range;
   setSavedRange: React.Dispatch<React.SetStateAction<Range | undefined>>;
-  onSelectScriptModalOpen: () => void;
+  onSelectOptionModalOpen: () => void;
 };
 
 export const createLinkFromSelection = async ({
   range,
   setSavedRange,
-  onSelectScriptModalOpen,
+  onSelectOptionModalOpen,
 }: createLinkFromSelectionProps) => {
   setSavedRange(range);
-  onSelectScriptModalOpen();
+  onSelectOptionModalOpen();
 };
 
 export const addLinkSpan = (selectedScript: string, range: Range) => {
