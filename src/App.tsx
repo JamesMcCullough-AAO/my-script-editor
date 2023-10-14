@@ -550,6 +550,9 @@ function App() {
                   contentRef,
                   setSavedRange,
                   onSelectOptionModalOpen,
+                  title,
+                  notes,
+                  characterNotes,
                 });
               }}
             ></div>

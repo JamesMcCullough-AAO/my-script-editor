@@ -5,11 +5,16 @@ import {
   createLinkFromSelection,
 } from "../utils/general/createLinkFromSelection";
 import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling";
+import { exportScript } from "../utils/scriptManagement/exportScript";
+import { characterNote } from "../utils/general/types";
 
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
   setSavedRange: React.Dispatch<React.SetStateAction<Range | undefined>>;
   onSelectOptionModalOpen: () => void;
+  title: string;
+  notes: string;
+  characterNotes: characterNote[];
 };
 const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   const range = document.createRange();
@@ -48,7 +53,14 @@ const isInsideLinkSpan = (range: Range) => {
 
 export const handleKeyDown = (
   event: React.KeyboardEvent<HTMLDivElement>,
-  { contentRef, setSavedRange, onSelectOptionModalOpen }: handleKeyDownProps
+  {
+    contentRef,
+    setSavedRange,
+    onSelectOptionModalOpen,
+    title,
+    notes,
+    characterNotes,
+  }: handleKeyDownProps
 ) => {
   const contentDiv = contentRef.current;
   if (!contentDiv) return;
@@ -92,6 +104,16 @@ export const handleKeyDown = (
     if (event.key === "u") {
       document.execCommand("underline");
       event.preventDefault();
+    }
+    // s to save
+    if (event.key === "s") {
+      event.preventDefault();
+      exportScript({
+        title,
+        contentRef,
+        notes,
+        characterNotes,
+      });
     }
   }
 
