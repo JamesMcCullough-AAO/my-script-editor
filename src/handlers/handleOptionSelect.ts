@@ -3,6 +3,9 @@ import React from "react";
 export enum typeSlashOptions {
   CREATE_SCRIPT_LINK = "Create Script Link",
   CREATE_URL_LINK = "Create URL Link",
+  OPEN_MENU = "Open Menu",
+  OPEN_NOTES = "Open Notes",
+  OPEN_CHARACTER_NOTES = "Open Character Notes",
   TYPE_SLASH = "Type /",
 }
 
@@ -13,6 +16,9 @@ type HandleOptionSelectProps = {
   setSavedRange: (range: Range | undefined) => void;
   savedRange: Range | undefined;
   onExternalLinkModalOpen: () => void;
+  onMenuOpen: () => void;
+  onNotesModalOpen: () => void;
+  setEditCharacterModalOpen: (value: boolean) => void;
 };
 
 export const handleOptionSelect = ({
@@ -22,6 +28,9 @@ export const handleOptionSelect = ({
   setSavedRange,
   savedRange,
   onExternalLinkModalOpen,
+  onMenuOpen,
+  onNotesModalOpen,
+  setEditCharacterModalOpen,
 }: HandleOptionSelectProps) => {
   switch (option) {
     case typeSlashOptions.CREATE_SCRIPT_LINK:
@@ -44,6 +53,12 @@ export const handleOptionSelect = ({
       setSavedRange(undefined);
       contentDiv.focus();
       return;
+    case typeSlashOptions.OPEN_MENU:
+      return onMenuOpen();
+    case typeSlashOptions.OPEN_NOTES:
+      return onNotesModalOpen();
+    case typeSlashOptions.OPEN_CHARACTER_NOTES:
+      return setEditCharacterModalOpen(true);
 
     default:
       return;

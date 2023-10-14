@@ -1211,6 +1211,9 @@ function App() {
             setSavedRange,
             savedRange,
             onExternalLinkModalOpen,
+            onMenuOpen,
+            onNotesModalOpen,
+            setEditCharacterModalOpen,
           })
         }
       />
