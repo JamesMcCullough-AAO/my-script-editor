@@ -2,7 +2,7 @@ import { create } from "lodash";
 import { applySpanStyles } from "../styling";
 import {
   addLinkSpan,
-  createLinkFromSelection,
+  openSlashMenu,
 } from "../utils/general/createLinkFromSelection";
 import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling";
 import { exportScript } from "../utils/scriptManagement/exportScript";
@@ -196,7 +196,7 @@ export const handleKeyDown = (
 
   if (event.key === "/") {
     event.preventDefault();
-    createLinkFromSelection({ range, setSavedRange, onSelectOptionModalOpen });
+    openSlashMenu({ range, setSavedRange, onSelectOptionModalOpen });
   }
 
   if (

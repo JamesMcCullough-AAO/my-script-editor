@@ -83,6 +83,7 @@ import {
   handleOptionSelect,
   typeSlashOptions,
 } from "./handlers/handleOptionSelect";
+import { ExternalLinkModal } from "./modals/ExternalLinkModal";
 
 function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -183,6 +184,11 @@ function App() {
     isOpen: isSelectOptionModalOpen,
     onOpen: onSelectOptionModalOpen,
     onClose: onSelectOptionModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isExternalLinkModalOpen,
+    onOpen: onExternalLinkModalOpen,
+    onClose: onExternalLinkModalClose,
   } = useDisclosure();
 
   const {
@@ -328,6 +334,13 @@ function App() {
             setIsLoadingScript(false); // Step 4: Reset flag after loading
             currentlyLoadingScript = false;
           });
+        }
+        if ((e.target as HTMLElement).classList.contains("url-link")) {
+          // get url from span.dataset.linkUrl = url; and open in new tab
+          const url = (e.target as HTMLElement).dataset.linkUrl;
+          if (url) {
+            window.open(url, "_blank");
+          }
         }
       });
 
@@ -1184,6 +1197,7 @@ function App() {
             contentRef,
             setSavedRange,
             savedRange,
+            onExternalLinkModalOpen,
           })
         }
       />
@@ -1199,6 +1213,12 @@ function App() {
           }
           onSelectScriptModalClose();
         }}
+      />
+      <ExternalLinkModal
+        isOpen={isExternalLinkModalOpen}
+        onClose={onExternalLinkModalClose}
+        savedRange={savedRange}
+        setSavedRange={setSavedRange}
       />
     </HStack>
   );

@@ -3,6 +3,7 @@ import { designColors } from "./utils/general/constants";
 import { getItem } from "./utils/database/indexDB";
 import { loadScript } from "./utils/scriptManagement/loadScript";
 import { scriptToFileName } from "./utils/database/scriptToFileName";
+import { createLinkSVGIcon } from "./icons/linkIcon";
 
 export const applySpanStyles = (span: HTMLSpanElement) => {
   span.style.backgroundColor = "#00805B";
@@ -15,7 +16,7 @@ export const applySpanStyles = (span: HTMLSpanElement) => {
   span.classList.add("character-name");
 };
 
-export const applyLinkSpanStyles = async (
+export const applyScriptLinkSpanStyles = async (
   span: HTMLSpanElement,
   selectedScript: string,
   range: Range
@@ -53,4 +54,38 @@ const getScriptIconColor = async (scriptName: string) => {
   const scriptData = await getItem(id);
 
   return scriptData?.iconColor || "#00FFB6";
+};
+
+export const applyExternalLinkSpanStyles = async (
+  span: HTMLSpanElement,
+  url: string,
+  name: string,
+  range: Range
+) => {
+  const color = "#00FFB6";
+  span.style.backgroundColor = designColors.darkblue;
+  span.style.borderRadius = "30px";
+  span.style.color = "white";
+  span.style.border = "1px solid #ccc";
+  span.style.padding = "6px 10px 6px 10px";
+  span.style.marginRight = "5px";
+  span.style.marginLeft = "5px";
+  span.style.marginTop = "10px";
+  span.style.marginBottom = "10px";
+  span.style.cursor = "pointer";
+  span.style.display = "inline-flex";
+  span.style.alignItems = "center";
+  span.classList.add("url-link");
+  span.dataset.linkUrl = url;
+  const icon = createLinkSVGIcon(color);
+  const iconStyle = icon.style;
+  iconStyle.marginRight = "5px";
+  span.appendChild(icon);
+
+  const scriptNameTextNode = document.createTextNode(name);
+  span.appendChild(scriptNameTextNode);
+
+  range.deleteContents();
+  range.insertNode(span);
+  range.setStartAfter(span);
 };
