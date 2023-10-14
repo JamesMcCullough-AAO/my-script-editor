@@ -312,6 +312,8 @@ function App() {
           !isLoadingScript &&
           !currentlyLoadingScript
         ) {
+          // prevent default behavior
+          e.preventDefault();
           setIsLoadingScript(true); // Step 2: Set flag before loading
           currentlyLoadingScript = true;
 
@@ -335,12 +337,24 @@ function App() {
             currentlyLoadingScript = false;
           });
         }
-        if ((e.target as HTMLElement).classList.contains("url-link")) {
+        if (
+          (e.target as HTMLElement).classList.contains("url-link") &&
+          !isLoadingScript &&
+          !currentlyLoadingScript
+        ) {
+          e.preventDefault();
           // get url from span.dataset.linkUrl = url; and open in new tab
+          currentlyLoadingScript = true;
           const url = (e.target as HTMLElement).dataset.linkUrl;
           if (url) {
             window.open(url, "_blank");
+            const selection = window.getSelection();
+            if (selection) {
+              selection.removeAllRanges();
+            }
           }
+
+          currentlyLoadingScript = false;
         }
       });
 
