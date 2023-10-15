@@ -17,6 +17,7 @@ console.log("supabase", supabase);
 type shareScriptProps = {
   contentRef: React.MutableRefObject<HTMLDivElement | null>;
   title: string;
+  scriptUUID: string;
   notes?: string;
   characterNotes?: characterNote[];
   setScriptShareLink: (link: string) => void;
@@ -25,16 +26,16 @@ type shareScriptProps = {
 export const shareScript = async ({
   contentRef,
   title,
+  scriptUUID,
   notes,
   characterNotes,
   setScriptShareLink,
 }: shareScriptProps) => {
-  // Insert the script, return the id
-  const id = v4();
+  // Insert or update the script if
 
-  const { data, error } = await supabase.from("shared_scripts").insert([
+  const { data, error } = await supabase.from("shared_scripts").upsert([
     {
-      id,
+      id: scriptUUID,
       title,
       html: contentRef.current?.innerHTML,
       notes,
@@ -46,8 +47,8 @@ export const shareScript = async ({
     console.log("error", error);
     throw error;
   }
-  console.log("ID: ", id);
-  const linkUrl = appLoadExtension + id;
+  console.log("ID: ", scriptUUID);
+  const linkUrl = appLoadExtension + scriptUUID;
   // prompt the user, and put link in clipboard
   navigator.clipboard.writeText(linkUrl);
   setScriptShareLink(linkUrl);

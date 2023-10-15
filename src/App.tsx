@@ -98,6 +98,7 @@ function App({ scriptId }: AppProps) {
   const [importText, setImportText] = useState("");
 
   const [title, setTitle] = useState("");
+  const [scriptUUID, setScriptUUID] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [newScriptTitle, setNewScriptTitle] = useState("");
   const [oldScriptTitle, setOldScriptTitle] = useState("");
@@ -244,6 +245,8 @@ function App({ scriptId }: AppProps) {
         loadScript({
           loadTitle: lastLink,
           title,
+          scriptUUID,
+          setScriptUUID,
           contentRef,
           setTitle,
           setNotes,
@@ -284,6 +287,7 @@ function App({ scriptId }: AppProps) {
     if (contentRef.current) {
       saveScript({
         title,
+        scriptUUID,
         contentRef,
         iconImage,
         notes,
@@ -325,6 +329,7 @@ function App({ scriptId }: AppProps) {
         updateWordCount();
         saveScript({
           title,
+          scriptUUID,
           contentRef,
           iconImage,
           notes,
@@ -347,6 +352,8 @@ function App({ scriptId }: AppProps) {
           loadScriptFromSpan({
             span: e.target as HTMLElement,
             title,
+            scriptUUID,
+            setScriptUUID,
             contentRef,
             setTitle,
             setIconImage,
@@ -683,6 +690,8 @@ function App({ scriptId }: AppProps) {
         isGenerating={isGenerating}
         onUploadModalOpen={onUploadModalOpen}
         title={title}
+        scriptUUID={scriptUUID}
+        setScriptUUID={setScriptUUID}
         contentRef={contentRef}
         characterNotes={characterNotes}
         onRenameModalOpen={onRenameModalOpen}
@@ -794,6 +803,7 @@ function App({ scriptId }: AppProps) {
                   setNotes,
                   setIconImage,
                   setIconColor,
+                  setScriptUUID,
                 });
               }}
             >
@@ -1084,6 +1094,8 @@ function App({ scriptId }: AppProps) {
                     await loadScript({
                       loadTitle: title,
                       title,
+                      scriptUUID,
+                      setScriptUUID,
                       contentRef,
                       setTitle,
                       setIconImage,

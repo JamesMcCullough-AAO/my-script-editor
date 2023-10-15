@@ -1,5 +1,6 @@
 import { baseIconColor } from "../general/constants";
 import { ifItemExists } from "../database/indexDB";
+import { v4 } from "uuid";
 
 type newScriptInput = {
   newScriptTitle: string;
@@ -10,6 +11,7 @@ type newScriptInput = {
   setNotes: React.Dispatch<React.SetStateAction<string>>;
   setIconImage?: React.Dispatch<React.SetStateAction<string>>;
   setIconColor?: React.Dispatch<React.SetStateAction<string>>;
+  setScriptUUID: React.Dispatch<React.SetStateAction<string>>;
 };
 export const newScript = async ({
   newScriptTitle,
@@ -20,6 +22,7 @@ export const newScript = async ({
   setNotes,
   setIconImage,
   setIconColor,
+  setScriptUUID,
 }: newScriptInput) => {
   if (newScriptTitle) {
     if (await ifItemExists(newScriptTitle)) {
@@ -31,6 +34,7 @@ export const newScript = async ({
     }
     setTitle(newScriptTitle);
     setNotes("");
+    setScriptUUID(v4());
     if (setIconImage) {
       setIconImage("");
     }

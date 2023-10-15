@@ -3,10 +3,13 @@ import { getItem } from "../database/indexDB";
 import { saveScript } from "./saveScript";
 import { scriptToFileName } from "../database/scriptToFileName";
 import { characterNote } from "../general/types";
+import { v4 } from "uuid";
 
 type loadScriptInput = {
   loadTitle: string;
   title: string;
+  scriptUUID: string;
+  setScriptUUID: React.Dispatch<React.SetStateAction<string>>;
   contentRef: React.RefObject<HTMLDivElement>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setIconImage: React.Dispatch<React.SetStateAction<string>>;
@@ -24,6 +27,8 @@ type loadScriptInput = {
 export const loadScript = async ({
   loadTitle,
   title,
+  scriptUUID,
+  setScriptUUID,
   contentRef,
   setTitle,
   setIconImage,
@@ -50,6 +55,7 @@ export const loadScript = async ({
   });
   await saveScript({
     title,
+    scriptUUID,
     contentRef,
     iconImage,
     notes,
@@ -60,9 +66,21 @@ export const loadScript = async ({
   const id = `script_${scriptToFileName(loadTitle)}`;
   const databaseLoad = await getItem(id);
   const savedScripts = databaseLoad.existingScripts;
-  const { iconImage: loadIconImage, iconColor: loadIconColor } = databaseLoad;
+  const {
+    iconImage: loadIconImage,
+    iconColor: loadIconColor,
+    scriptUUID: loadScriptUUID,
+  } = databaseLoad;
 
   console.log("savedScripts", savedScripts);
+
+  // if the loadScriptUUID is "" or undefined, generate a new one, otherwise use the one from the database
+  if (!loadScriptUUID || loadScriptUUID === "") {
+    const newScriptUUID = v4();
+    setScriptUUID(newScriptUUID);
+  } else {
+    setScriptUUID(loadScriptUUID);
+  }
 
   if (savedScripts) {
     const scriptToLoad =

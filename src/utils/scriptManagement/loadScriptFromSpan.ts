@@ -4,6 +4,8 @@ import { characterNote } from "../general/types";
 type loadScriptFromSpanProps = {
   span: HTMLElement;
   title: string;
+  scriptUUID: string;
+  setScriptUUID: React.Dispatch<React.SetStateAction<string>>;
   contentRef: React.RefObject<HTMLDivElement>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setIconImage: React.Dispatch<React.SetStateAction<string>>;
@@ -21,6 +23,8 @@ type loadScriptFromSpanProps = {
 export const loadScriptFromSpan = async ({
   span,
   title,
+  scriptUUID,
+  setScriptUUID,
   contentRef,
   setTitle,
   setIconImage,
@@ -41,6 +45,8 @@ export const loadScriptFromSpan = async ({
   await loadScript({
     loadTitle: scriptTitle,
     title,
+    scriptUUID,
+    setScriptUUID,
     contentRef,
     setTitle,
     setIconImage,

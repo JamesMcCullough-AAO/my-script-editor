@@ -43,6 +43,8 @@ type MenuModalProps = {
   isGenerating: boolean;
   onUploadModalOpen: () => void;
   title: string;
+  scriptUUID: string;
+  setScriptUUID: React.Dispatch<React.SetStateAction<string>>;
   contentRef: React.MutableRefObject<HTMLDivElement | null>;
   characterNotes: characterNote[];
   onRenameModalOpen: () => void;
@@ -75,6 +77,8 @@ export const MenuModal = ({
   isGenerating,
   onUploadModalOpen,
   title,
+  scriptUUID,
+  setScriptUUID,
   contentRef,
   characterNotes,
   onRenameModalOpen,
@@ -199,6 +203,7 @@ export const MenuModal = ({
                 onClick={() => {
                   shareScript({
                     title,
+                    scriptUUID,
                     contentRef,
                     notes,
                     characterNotes,
@@ -235,6 +240,8 @@ export const MenuModal = ({
               loadScript({
                 loadTitle,
                 title,
+                scriptUUID,
+                setScriptUUID,
                 contentRef,
                 setTitle,
                 setNotes,

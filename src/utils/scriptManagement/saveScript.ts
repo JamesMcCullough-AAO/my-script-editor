@@ -4,6 +4,7 @@ import { characterNote } from "../general/types";
 
 type saveScriptInput = {
   title: string;
+  scriptUUID: string;
   contentRef: React.RefObject<HTMLDivElement>;
   iconImage?: string;
   notes?: string;
@@ -15,6 +16,7 @@ let lastSavedTimestamp: number = 0;
 
 export const saveScript = async ({
   title,
+  scriptUUID,
   contentRef,
   iconImage,
   notes,
@@ -46,6 +48,7 @@ export const saveScript = async ({
     if (!existingScripts) {
       await setItem(`script_${scriptToFileName(title)}`, {
         existingScripts: [payload],
+        scriptUUID,
         iconImage,
         iconColor,
       });
@@ -68,7 +71,7 @@ export const saveScript = async ({
 
     const id = `script_${scriptToFileName(title)}`;
 
-    await setItem(id, { existingScripts, iconImage, iconColor });
+    await setItem(id, { existingScripts, iconImage, iconColor, scriptUUID });
     lastSavedTimestamp = currentTime;
   }
 };
