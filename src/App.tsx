@@ -213,8 +213,8 @@ function App({ scriptId }: AppProps) {
       getSharedScript(scriptId).then((script) => {
         setTitle(script.title);
         setNotes(script.notes);
-        if (script.characterNotes) {
-          setCharacterNotes(JSON.parse(script.characterNotes));
+        if (script.character_notes) {
+          setCharacterNotes(JSON.parse(script.character_notes));
         }
         setScriptLinkHistory([script.title]);
         if (contentRef.current) {
