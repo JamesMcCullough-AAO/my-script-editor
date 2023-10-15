@@ -19,6 +19,7 @@ type shareScriptProps = {
   title: string;
   notes?: string;
   characterNotes?: characterNote[];
+  setScriptShareLink: (link: string) => void;
 };
 
 export const shareScript = async ({
@@ -26,6 +27,7 @@ export const shareScript = async ({
   title,
   notes,
   characterNotes,
+  setScriptShareLink,
 }: shareScriptProps) => {
   // Insert the script, return the id
   const id = v4();
@@ -48,8 +50,8 @@ export const shareScript = async ({
   const linkUrl = appLoadExtension + id;
   // prompt the user, and put link in clipboard
   navigator.clipboard.writeText(linkUrl);
-  alert(`Link copied to clipboard: ${linkUrl}`);
-  return id;
+  setScriptShareLink(linkUrl);
+  return;
 };
 
 export const getSharedScript = async (id: string) => {

@@ -62,6 +62,7 @@ type MenuModalProps = {
   setIconColor: React.Dispatch<SetStateAction<string>>;
   iconColor: string;
   setCharacterNotes: React.Dispatch<SetStateAction<characterNote[]>>;
+  setScriptShareLink: React.Dispatch<SetStateAction<string>>;
 };
 
 export const MenuModal = ({
@@ -93,6 +94,7 @@ export const MenuModal = ({
   setIconColor,
   iconColor,
   setCharacterNotes,
+  setScriptShareLink,
 }: MenuModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
@@ -200,7 +202,9 @@ export const MenuModal = ({
                     contentRef,
                     notes,
                     characterNotes,
+                    setScriptShareLink,
                   });
+                  onClose();
                 }}
                 isDisabled={isGenerating || !title}
                 title="Share Script"

@@ -86,6 +86,8 @@ import {
 } from "./handlers/handleOptionSelect";
 import { ExternalLinkModal } from "./modals/ExternalLinkModal";
 import { getSharedScript } from "./utils/supabase/supabaseConnect";
+import { LinkIcon } from "./icons/linkIcon";
+import { ShareSuccessModal } from "./modals/ShareSuccessModal";
 
 type AppProps = {
   scriptId?: string;
@@ -111,6 +113,7 @@ function App({ scriptId }: AppProps) {
   const [savedRange, setSavedRange] = useState<Range>();
   const [scriptLinkHistory, setScriptLinkHistory] = useState<string[]>([]);
   const [isLoadingScript, setIsLoadingScript] = useState(false);
+  const [scriptShareLink, setScriptShareLink] = useState("");
   const [selectedVersion, setSelectedVersion] = useState<{
     title: string;
     timestamp: number;
@@ -699,6 +702,7 @@ function App({ scriptId }: AppProps) {
         setIconColor={setIconColor}
         iconColor={iconColor}
         setCharacterNotes={setCharacterNotes}
+        setScriptShareLink={setScriptShareLink}
       />
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
@@ -1272,6 +1276,10 @@ function App({ scriptId }: AppProps) {
         onClose={onExternalLinkModalClose}
         savedRange={savedRange}
         setSavedRange={setSavedRange}
+      />
+      <ShareSuccessModal
+        scriptShareLink={scriptShareLink}
+        setScriptShareLink={setScriptShareLink}
       />
     </Stack>
   );
