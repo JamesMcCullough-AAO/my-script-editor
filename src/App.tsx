@@ -128,6 +128,12 @@ function App({ scriptId }: AppProps) {
   const [scriptLinkHistory, setScriptLinkHistory] = useState<string[]>([]);
   const [isLoadingScript, setIsLoadingScript] = useState(false);
   const [scriptShareLink, setScriptShareLink] = useState("");
+  const [currentInfoNoteText, setCurrentInfoNoteText] = useState<string | null>(
+    null
+  );
+  const [currentInfoNoteSpan, setCurrentInfoNoteSpan] = useState<
+    HTMLElement | undefined
+  >(undefined);
   const [selectedVersion, setSelectedVersion] = useState<{
     title: string;
     timestamp: number;
@@ -404,6 +410,19 @@ function App({ scriptId }: AppProps) {
           }
 
           currentlyLoadingScript = false;
+        }
+        if (
+          (e.target as HTMLElement).classList.contains("info-note") &&
+          !isLoadingScript &&
+          !currentlyLoadingScript
+        ) {
+          e.preventDefault();
+          // get the data-note-id from the span and set it as the current info note
+          const note = (e.target as HTMLElement).dataset.note;
+          if (note) {
+            setCurrentInfoNoteText(note);
+            setCurrentInfoNoteSpan(e.target as HTMLElement);
+          }
         }
       });
 
@@ -712,6 +731,18 @@ function App({ scriptId }: AppProps) {
       </Box>
       <NotesModal
         {...{ isNotesModalOpen, onNotesModalClose, notes, setNotes }}
+      />
+      <NotesModal
+        isNotesModalOpen={currentInfoNoteText !== null}
+        onNotesModalClose={() => {
+          if (currentInfoNoteSpan && currentInfoNoteText) {
+            currentInfoNoteSpan.dataset.note = currentInfoNoteText;
+          }
+          setCurrentInfoNoteText(null);
+          setCurrentInfoNoteSpan(undefined);
+        }}
+        notes={currentInfoNoteText || ""}
+        setNotes={setCurrentInfoNoteText}
       />
       <UploadModal
         {...{

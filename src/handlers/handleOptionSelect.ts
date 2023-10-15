@@ -1,8 +1,10 @@
 import React from "react";
+import { createInfoNoteSpan } from "../utils/general/createInfoNoteSpan";
 
 export enum typeSlashOptions {
   CREATE_SCRIPT_LINK = "Create Script Link",
   CREATE_URL_LINK = "Create URL Link",
+  CREATE_INFO_NOTE = "Create Info Note",
   OPEN_MENU = "Open Menu",
   OPEN_NOTES = "Open Notes",
   OPEN_CHARACTER_NOTES = "Open Character Notes",
@@ -57,6 +59,11 @@ export const handleOptionSelect = ({
       return onMenuOpen();
     case typeSlashOptions.OPEN_NOTES:
       return onNotesModalOpen();
+    case typeSlashOptions.CREATE_INFO_NOTE:
+      if (!savedRange) return;
+      createInfoNoteSpan(savedRange);
+      setSavedRange(undefined);
+      return;
     case typeSlashOptions.OPEN_CHARACTER_NOTES:
       return setEditCharacterModalOpen(true);
 

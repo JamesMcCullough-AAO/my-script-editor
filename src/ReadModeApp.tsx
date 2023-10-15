@@ -116,6 +116,12 @@ function ReadModeApp({ scriptId }: AppProps) {
   const [savedRange, setSavedRange] = useState<Range>();
   const [scriptLinkHistory, setScriptLinkHistory] = useState<string[]>([]);
   const [isLoadingScript, setIsLoadingScript] = useState(false);
+  const [currentInfoNoteText, setCurrentInfoNoteText] = useState<string | null>(
+    null
+  );
+  const [currentInfoNoteSpan, setCurrentInfoNoteSpan] = useState<
+    HTMLElement | undefined
+  >(undefined);
   const [selectedVersion, setSelectedVersion] = useState<{
     title: string;
     timestamp: number;
@@ -294,6 +300,19 @@ function ReadModeApp({ scriptId }: AppProps) {
             const selection = window.getSelection();
             if (selection) {
               selection.removeAllRanges();
+            }
+          }
+          if (
+            (e.target as HTMLElement).classList.contains("info-note") &&
+            !isLoadingScript &&
+            !currentlyLoadingScript
+          ) {
+            e.preventDefault();
+            // get the data-note-id from the span and set it as the current info note
+            const note = (e.target as HTMLElement).dataset.note;
+            if (note) {
+              setCurrentInfoNoteText(note);
+              setCurrentInfoNoteSpan(e.target as HTMLElement);
             }
           }
 
@@ -531,6 +550,18 @@ function ReadModeApp({ scriptId }: AppProps) {
       </Box>
       <NotesModal
         {...{ isNotesModalOpen, onNotesModalClose, notes, setNotes }}
+      />
+      <NotesModal
+        isNotesModalOpen={currentInfoNoteText !== null}
+        onNotesModalClose={() => {
+          if (currentInfoNoteSpan && currentInfoNoteText) {
+            currentInfoNoteSpan.dataset.note = currentInfoNoteText;
+          }
+          setCurrentInfoNoteText(null);
+          setCurrentInfoNoteSpan(undefined);
+        }}
+        notes={currentInfoNoteText || ""}
+        setNotes={setCurrentInfoNoteText}
       />
       <Modal
         isOpen={editCharacterModalOpen}

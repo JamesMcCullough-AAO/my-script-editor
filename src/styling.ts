@@ -131,3 +131,27 @@ export const applyExternalLinkSpanStyles = async (
   range.insertNode(span);
   range.setStartAfter(span);
 };
+
+export const applyInfoNoteSpanStyles = (span: HTMLSpanElement) => {
+  // A purple circle with the word 'info' in it
+  span.style.backgroundColor = "#B300FF";
+  span.style.borderRadius = "50%";
+  span.style.color = "white";
+  span.style.width = "25px";
+  span.style.height = "25px";
+  span.style.border = "1px solid #ccc";
+  span.style.padding = "6px";
+  span.style.marginRight = "5px";
+  span.style.marginLeft = "5px";
+  span.style.cursor = "pointer";
+  span.style.display = "inline-flex";
+  span.style.alignItems = "center";
+  span.style.justifyContent = "center";
+  span.style.fontSize = "1.2rem";
+  span.style.fontWeight = "bold";
+  span.style.fontStyle = "italic";
+  span.classList.add("info-note");
+  span.dataset.note = "Type your info note here";
+  const icon = document.createTextNode("i");
+  span.appendChild(icon);
+};

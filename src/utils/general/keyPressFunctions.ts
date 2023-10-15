@@ -33,7 +33,8 @@ export const isInsideLinkSpan = (range: Range) => {
     if (
       node instanceof HTMLElement &&
       (node.classList.contains("script-link") ||
-        node.classList.contains("url-link"))
+        node.classList.contains("url-link") ||
+        node.classList.contains("info-note"))
     ) {
       return true;
     }
