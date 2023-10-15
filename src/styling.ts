@@ -20,10 +20,16 @@ export const applySpanStyles = (span: HTMLSpanElement) => {
 
 export const applyScriptLinkSpanStyles = async (
   span: HTMLSpanElement,
-  selectedScript: string,
-  range: Range
+  selectedScript?: string
 ) => {
-  const color = await getScriptIconColor(selectedScript);
+  const targetScript = selectedScript || span.dataset.scriptTitle;
+
+  if (!targetScript || !(await referenceScriptExists(targetScript))) {
+    span.remove();
+    return;
+  }
+
+  const color = await getScriptIconColor(targetScript);
   span.style.backgroundColor = designColors.darkblue;
   span.style.borderRadius = "30px";
   span.style.color = "white";
@@ -37,18 +43,28 @@ export const applyScriptLinkSpanStyles = async (
   span.style.display = "inline-flex";
   span.style.alignItems = "center";
   span.classList.add("script-link");
-  span.dataset.scriptTitle = selectedScript;
-  const icon = createScriptSVGIcon(color);
-  const iconStyle = icon.style;
-  iconStyle.marginRight = "5px";
-  span.appendChild(icon);
+  span.dataset.scriptTitle = targetScript;
 
-  const scriptNameTextNode = document.createTextNode(selectedScript);
-  span.appendChild(scriptNameTextNode);
+  // if the span is empty, or if the color is different, or if the text is different, then update the span
+  if (span.textContent === "") {
+    const icon = createScriptSVGIcon(color);
+    const iconStyle = icon.style;
+    iconStyle.marginRight = "5px";
+    span.appendChild(icon);
 
-  range.deleteContents();
-  range.insertNode(span);
-  range.setStartAfter(span);
+    const scriptNameTextNode = document.createTextNode(targetScript);
+    span.appendChild(scriptNameTextNode);
+  } else {
+    // update the icon child by replacing it with a new one in the same position
+    const icon = createScriptSVGIcon(color);
+    const iconStyle = icon.style;
+    iconStyle.marginRight = "5px";
+    span.replaceChild(icon, span.childNodes[0]);
+
+    // update the text child by replacing it with a new one in the same position
+    const scriptNameTextNode = document.createTextNode(targetScript);
+    span.replaceChild(scriptNameTextNode, span.childNodes[1]);
+  }
 };
 
 const getScriptIconColor = async (scriptName: string) => {
@@ -56,6 +72,13 @@ const getScriptIconColor = async (scriptName: string) => {
   const scriptData = await getItem(id);
 
   return scriptData?.iconColor || "#00FFB6";
+};
+
+const referenceScriptExists = async (scriptName: string) => {
+  const id = "script_" + scriptToFileName(scriptName);
+  const scriptData = await getItem(id);
+
+  return scriptData !== undefined;
 };
 
 export const applyExternalLinkSpanStyles = async (

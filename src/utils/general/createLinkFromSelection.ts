@@ -24,7 +24,10 @@ export const openSlashMenu = async ({
 
 export const addLinkSpan = (selectedScript: string, range: Range) => {
   const linkSpan = document.createElement("span");
-  applyScriptLinkSpanStyles(linkSpan, selectedScript, range);
+  range.deleteContents();
+  range.insertNode(linkSpan);
+  range.setStartAfter(linkSpan);
+  applyScriptLinkSpanStyles(linkSpan, selectedScript);
 };
 
 export const addExternalLinkSpan = (

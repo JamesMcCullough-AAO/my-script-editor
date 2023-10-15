@@ -1,3 +1,4 @@
+import { applyScriptLinkSpanStyles, applySpanStyles } from "../styling";
 import { colorCharacterNameSpanDefaults } from "./general/constants";
 
 type extractCharacterNamesProps = {
@@ -57,10 +58,18 @@ export const updateCharacterNameStyling = ({
     "span.character-name"
   );
   characterSpans.forEach((span) => {
+    applySpanStyles(span as HTMLSpanElement);
     const name = span.textContent;
     if (name && nameToColorMapping[name]) {
       (span as HTMLSpanElement).style.backgroundColor =
         nameToColorMapping[name];
     }
+  });
+
+  // Go through the content and update the styling of each script-link and url-link span
+  const scriptLinks = contentRef.current.querySelectorAll("span.script-link");
+
+  scriptLinks.forEach((span) => {
+    applyScriptLinkSpanStyles(span as HTMLSpanElement);
   });
 };

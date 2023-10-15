@@ -43,7 +43,11 @@ const isInsideCharacterNameSpan = (range: Range) => {
 const isInsideLinkSpan = (range: Range) => {
   let node = range.commonAncestorContainer;
   while (node != null && !(node instanceof HTMLDivElement)) {
-    if (node instanceof HTMLElement && node.classList.contains("script-link")) {
+    if (
+      node instanceof HTMLElement &&
+      (node.classList.contains("script-link") ||
+        node.classList.contains("url-link"))
+    ) {
       return true;
     }
     if (node.parentNode) node = node.parentNode;
@@ -69,6 +73,30 @@ export const handleKeyDown = (
   if (!selection) return;
 
   const range = selection?.getRangeAt(0);
+
+  // if inside a link span, don't allow typing, except backspace which deletes the span
+  if (isInsideLinkSpan(range)) {
+    // arrow keys are allowed
+    if (
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "ArrowUp" ||
+      event.key === "ArrowDown"
+    )
+      return;
+
+    event.preventDefault();
+    if (event.key === "Backspace") {
+      const span = range?.commonAncestorContainer?.parentNode;
+      if (span) {
+        range?.setStartBefore(span); // Move cursor outside the span
+        // remove the span
+        const spanObj = span as HTMLSpanElement;
+        spanObj.remove();
+      }
+    }
+    return;
+  }
 
   // Handling backspace at the beginning of a span
   if (event.key === "Backspace") {
