@@ -1,11 +1,17 @@
-import { applySpanStyles } from "../../styling";
+import { applySpanStyles, scriptSpacingTypes } from "../../styling";
+import { updateCharacterNameStyling } from "../updateCharacterNameStyling";
 
 type importScriptProps = {
   contentRef: React.RefObject<HTMLDivElement>;
   text: string;
+  scriptSpacing: scriptSpacingTypes;
 };
 
-export const importScript = ({ contentRef, text }: importScriptProps) => {
+export const importScript = ({
+  contentRef,
+  text,
+  scriptSpacing,
+}: importScriptProps) => {
   const contentDiv = contentRef.current;
 
   if (contentDiv) {
@@ -35,5 +41,7 @@ export const importScript = ({ contentRef, text }: importScriptProps) => {
       const linebreakNode = document.createElement("br");
       contentDiv.appendChild(linebreakNode);
     });
+
+    updateCharacterNameStyling({ contentRef, scriptSpacing });
   }
 };

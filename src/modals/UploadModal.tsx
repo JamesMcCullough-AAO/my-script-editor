@@ -10,14 +10,16 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { designColors } from "../utils/general/constants";
+import { importScript } from "../utils/scriptManagement/importScript";
+import { scriptSpacingTypes } from "../styling";
 
 type UpdateModalProps = {
   isUploadModalOpen: boolean;
   onUploadModalClose: () => void;
   importText: string;
   setImportText: (importText: string) => void;
-  importScript: (args: { text: string; contentRef: any }) => void;
   contentRef: any;
+  scriptSpacing: scriptSpacingTypes;
 };
 
 export const UploadModal = ({
@@ -25,8 +27,8 @@ export const UploadModal = ({
   onUploadModalClose,
   importText,
   setImportText,
-  importScript,
   contentRef,
+  scriptSpacing,
 }: UpdateModalProps) => {
   return (
     <Modal isOpen={isUploadModalOpen} onClose={onUploadModalClose}>
@@ -46,7 +48,7 @@ export const UploadModal = ({
             colorScheme="blue"
             mr={3}
             onClick={() => {
-              importScript({ text: importText, contentRef });
+              importScript({ text: importText, contentRef, scriptSpacing });
               onUploadModalClose();
             }}
           >

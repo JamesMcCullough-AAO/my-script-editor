@@ -713,8 +713,8 @@ function App({ scriptId }: AppProps) {
           onUploadModalClose,
           importText,
           setImportText,
-          importScript,
           contentRef,
+          scriptSpacing,
         }}
       />
       <MenuModal
