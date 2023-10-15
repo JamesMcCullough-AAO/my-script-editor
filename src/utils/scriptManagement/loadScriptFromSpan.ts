@@ -1,5 +1,6 @@
 import { loadScript } from "./loadScript";
 import { characterNote } from "../general/types";
+import { scriptSpacingTypes } from "../../styling";
 
 type loadScriptFromSpanProps = {
   span: HTMLElement;
@@ -18,6 +19,7 @@ type loadScriptFromSpanProps = {
   characterNotes: characterNote[];
   setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
   setScriptLinkHistory: React.Dispatch<React.SetStateAction<string[]>>;
+  scriptSpacing: scriptSpacingTypes;
 };
 
 export const loadScriptFromSpan = async ({
@@ -37,6 +39,7 @@ export const loadScriptFromSpan = async ({
   characterNotes,
   setCharacterNotes,
   setScriptLinkHistory,
+  scriptSpacing,
 }: loadScriptFromSpanProps) => {
   const scriptTitle = span.dataset.scriptTitle;
   if (!scriptTitle) return;
@@ -60,5 +63,6 @@ export const loadScriptFromSpan = async ({
     characterNotes,
     setCharacterNotes,
     setScriptLinkHistory,
+    scriptSpacing,
   });
 };

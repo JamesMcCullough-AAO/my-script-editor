@@ -32,6 +32,7 @@ import React, { SetStateAction } from "react";
 import { characterNote } from "../utils/general/types";
 import { ScriptVersion } from "../utils/scriptManagement/getScriptVersions";
 import { shareScript } from "../utils/supabase/supabaseConnect";
+import { scriptSpacingTypes } from "../styling";
 
 type MenuModalProps = {
   isOpen: boolean;
@@ -65,6 +66,7 @@ type MenuModalProps = {
   iconColor: string;
   setCharacterNotes: React.Dispatch<SetStateAction<characterNote[]>>;
   setScriptShareLink: React.Dispatch<SetStateAction<string>>;
+  scriptSpacing: scriptSpacingTypes;
 };
 
 export const MenuModal = ({
@@ -99,6 +101,7 @@ export const MenuModal = ({
   iconColor,
   setCharacterNotes,
   setScriptShareLink,
+  scriptSpacing,
 }: MenuModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
@@ -255,6 +258,7 @@ export const MenuModal = ({
                 characterNotes,
                 versionIndex: -1,
                 setScriptLinkHistory,
+                scriptSpacing,
               }).then(() => {
                 setIsLoadingScript(false);
               });

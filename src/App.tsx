@@ -264,6 +264,7 @@ function App({ scriptId }: AppProps) {
           characterNotes,
           versionIndex: -1,
           setScriptLinkHistory,
+          scriptSpacing,
         }).then(() => {
           setIsLoadingScript(false);
         });
@@ -370,6 +371,7 @@ function App({ scriptId }: AppProps) {
             characterNotes,
             setCharacterNotes,
             setScriptLinkHistory,
+            scriptSpacing,
           }).then(() => {
             setIsLoadingScript(false); // Step 4: Reset flag after loading
             currentlyLoadingScript = false;
@@ -747,6 +749,7 @@ function App({ scriptId }: AppProps) {
         iconColor={iconColor}
         setCharacterNotes={setCharacterNotes}
         setScriptShareLink={setScriptShareLink}
+        scriptSpacing={scriptSpacing}
       />
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
@@ -1144,6 +1147,7 @@ function App({ scriptId }: AppProps) {
                       characterNotes,
                       setCharacterNotes,
                       setScriptLinkHistory,
+                      scriptSpacing,
                     });
                     setSelectedVersion(null); // Close the confirmation modal
                     onVersionsModalClose(); // Close the versions modal

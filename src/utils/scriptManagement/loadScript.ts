@@ -4,6 +4,8 @@ import { saveScript } from "./saveScript";
 import { scriptToFileName } from "../database/scriptToFileName";
 import { characterNote } from "../general/types";
 import { v4 } from "uuid";
+import { updateCharacterNameStyling } from "../updateCharacterNameStyling";
+import { scriptSpacingTypes } from "../../styling";
 
 type loadScriptInput = {
   loadTitle: string;
@@ -23,6 +25,7 @@ type loadScriptInput = {
   characterNotes: characterNote[];
   setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
   setScriptLinkHistory: React.Dispatch<React.SetStateAction<string[]>>;
+  scriptSpacing: scriptSpacingTypes;
 };
 export const loadScript = async ({
   loadTitle,
@@ -42,6 +45,7 @@ export const loadScript = async ({
   characterNotes,
   setCharacterNotes,
   setScriptLinkHistory,
+  scriptSpacing,
 }: loadScriptInput & { versionIndex?: number }) => {
   setIsLoading(true);
   console.log("loadTitle", loadTitle);
@@ -128,4 +132,5 @@ export const loadScript = async ({
   }
 
   setIsLoading(false);
+  updateCharacterNameStyling({ contentRef, scriptSpacing });
 };
