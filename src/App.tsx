@@ -64,6 +64,9 @@ import { loadScript } from "./utils/scriptManagement/loadScript";
 import { compressImage } from "./utils/database/ImageCompressor";
 import { EditDocumentIcon } from "./icons/editDocument";
 import { DocumentIcon } from "./icons/DocumentIcon";
+import DataArrayIcon from "@mui/icons-material/DataArray";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import ShortTextIcon from "@mui/icons-material/ShortText";
 import {
   baseIconColor,
   darkIconColor,
@@ -91,6 +94,12 @@ import { getSharedScript } from "./utils/supabase/supabaseConnect";
 import { LinkIcon } from "./icons/linkIcon";
 import { ShareSuccessModal } from "./modals/ShareSuccessModal";
 import { scriptSpacingTypes } from "./styling";
+import {
+  beginCharacterName,
+  endCharacterNameBracket,
+  endCharacterNameEnter,
+  isInsideCharacterNameSpan,
+} from "./utils/general/keyPressFunctions";
 
 type AppProps = {
   scriptId?: string;
@@ -481,7 +490,6 @@ function App({ scriptId }: AppProps) {
           isDisabled={isGenerating}
           title="Menu"
         />
-
         <IconButton
           aria-label="Edit notes"
           icon={<NoteIcon />}
@@ -493,7 +501,6 @@ function App({ scriptId }: AppProps) {
           visibility={title ? "visible" : "hidden"}
           title="Edit Notes"
         />
-
         <IconButton
           aria-label="Edit character notes"
           icon={<Face2Icon />}
@@ -510,7 +517,6 @@ function App({ scriptId }: AppProps) {
           visibility={title ? "visible" : "hidden"}
           title="Edit Character Notes"
         />
-
         <IconButton
           aria-label="Toggle Spacing"
           visibility={title ? "visible" : "hidden"}
@@ -540,7 +546,61 @@ function App({ scriptId }: AppProps) {
           isDisabled={isGenerating}
           title="Toggle Spacing"
         />
-
+        {/* Mobile only buttons */}
+        {window.getSelection()?.getRangeAt(0) &&
+          !isInsideCharacterNameSpan(window.getSelection()?.getRangeAt(0)) && (
+            <IconButton
+              aria-label="Add character name"
+              icon={<DataArrayIcon />}
+              onClick={() => {
+                const range = window.getSelection()?.getRangeAt(0);
+                if (range) {
+                  beginCharacterName(range);
+                }
+              }}
+              colorScheme="blue"
+              isDisabled={isGenerating}
+              visibility={title ? "visible" : "hidden"}
+              title="Add Character Name"
+              display={["inline-flex", "none"]}
+            />
+          )}
+        {window.getSelection()?.getRangeAt(0) &&
+          isInsideCharacterNameSpan(window.getSelection()?.getRangeAt(0)) && (
+            <IconButton
+              aria-label="End Name"
+              icon={<KeyboardReturnIcon />}
+              onClick={() => {
+                const range = window.getSelection()?.getRangeAt(0);
+                if (range) {
+                  endCharacterNameEnter({ range, contentRef, scriptSpacing });
+                }
+              }}
+              colorScheme="blue"
+              isDisabled={isGenerating}
+              visibility={title ? "visible" : "hidden"}
+              title="End Name"
+              display={["inline-flex", "none"]}
+            />
+          )}
+        {window.getSelection()?.getRangeAt(0) &&
+          isInsideCharacterNameSpan(window.getSelection()?.getRangeAt(0)) && (
+            <IconButton
+              aria-label="Add Line Notes"
+              icon={<ShortTextIcon />}
+              onClick={() => {
+                const range = window.getSelection()?.getRangeAt(0);
+                if (range) {
+                  endCharacterNameBracket({ range, contentRef, scriptSpacing });
+                }
+              }}
+              colorScheme="blue"
+              isDisabled={isGenerating}
+              visibility={title ? "visible" : "hidden"}
+              title="Add Line Notes"
+              display={["inline-flex", "none"]}
+            />
+          )}
         {editorSettings.novelAiApiKey && (
           <IconButton
             colorScheme="blue"

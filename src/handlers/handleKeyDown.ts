@@ -7,6 +7,15 @@ import {
 import { updateCharacterNameStyling } from "../utils/updateCharacterNameStyling";
 import { exportScript } from "../utils/scriptManagement/exportScript";
 import { characterNote } from "../utils/general/types";
+import {
+  beginCharacterName,
+  endCharacterNameBracket,
+  endCharacterNameEnter,
+  isCursorAtStartOfRange,
+  isInsideCharacterNameSpan,
+  isInsideLinkSpan,
+  setCursorAtEnd,
+} from "../utils/general/keyPressFunctions";
 
 type handleKeyDownProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -16,44 +25,6 @@ type handleKeyDownProps = {
   notes: string;
   characterNotes: characterNote[];
   scriptSpacing: scriptSpacingTypes;
-};
-const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
-  const range = document.createRange();
-  const selection = window.getSelection();
-  range.selectNodeContents(contentEditableElement);
-  range.collapse(false);
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-};
-const isCursorAtStart = (range: Range) => range.startOffset === 0;
-
-const isInsideCharacterNameSpan = (range: Range) => {
-  let node = range.commonAncestorContainer;
-  while (node != null && !(node instanceof HTMLDivElement)) {
-    if (
-      node instanceof HTMLElement &&
-      node.classList.contains("character-name")
-    ) {
-      return true;
-    }
-    if (node.parentNode) node = node.parentNode;
-  }
-  return false;
-};
-
-const isInsideLinkSpan = (range: Range) => {
-  let node = range.commonAncestorContainer;
-  while (node != null && !(node instanceof HTMLDivElement)) {
-    if (
-      node instanceof HTMLElement &&
-      (node.classList.contains("script-link") ||
-        node.classList.contains("url-link"))
-    ) {
-      return true;
-    }
-    if (node.parentNode) node = node.parentNode;
-  }
-  return false;
 };
 
 export const handleKeyDown = (
@@ -107,7 +78,7 @@ export const handleKeyDown = (
       parent &&
       parent instanceof HTMLElement &&
       parent.nodeName === "SPAN" &&
-      isCursorAtStart(range)
+      isCursorAtStartOfRange(range)
     ) {
       const previousSibling = parent.previousSibling;
       parent.remove();
@@ -150,12 +121,7 @@ export const handleKeyDown = (
   if (event.key === "[" || event.key === "Tab") {
     event.preventDefault();
 
-    if (isInsideCharacterNameSpan(range)) return;
-
-    const span = document.createElement("span");
-    applySpanStyles({ span });
-    range?.insertNode(span);
-    range?.setStart(span, 0); // Place the cursor inside the span for typing the character name
+    beginCharacterName(range);
   }
 
   if (
@@ -164,64 +130,13 @@ export const handleKeyDown = (
   ) {
     event.preventDefault();
 
-    const span = range?.commonAncestorContainer?.parentNode;
-    if (span && span.nextSibling) {
-      range?.setStartBefore(span.nextSibling); // Move cursor outside the span
-    } else if (span && span.parentNode) {
-      range?.setStartAfter(span); // If no next sibling exists, place cursor at the end
-    }
-    // add a space and open brack after the span
-    const spaceNode = document.createTextNode(" (");
-    range?.insertNode(spaceNode);
-    range?.setStartAfter(spaceNode);
-
-    updateCharacterNameStyling({ contentRef, scriptSpacing });
+    endCharacterNameBracket({ range, contentRef, scriptSpacing });
   }
 
   if (event.key === "Enter" && isInsideCharacterNameSpan(range)) {
     event.preventDefault();
 
-    const span = range?.commonAncestorContainer?.parentNode;
-    if (span && span.nextSibling) {
-      range?.setStartBefore(span.nextSibling); // Move cursor outside the span
-    } else if (span && span.parentNode) {
-      range?.setStartAfter(span); // If no next sibling exists, place cursor at the end
-    }
-
-    // Check the document is the contentDiv or a child of it
-    if (
-      contentDiv === range?.commonAncestorContainer ||
-      contentDiv.contains(range?.commonAncestorContainer)
-    ) {
-      // add a space and open brack after the span
-      const linebreakNode = document.createElement("br");
-      range?.insertNode(linebreakNode);
-      range?.setStartAfter(linebreakNode);
-    }
-
-    updateCharacterNameStyling({ contentRef, scriptSpacing });
-  }
-
-  if (event.key === "Enter" && isInsideLinkSpan(range)) {
-    event.preventDefault();
-
-    const span = range?.commonAncestorContainer?.parentNode;
-    if (span && span.nextSibling) {
-      range?.setStartBefore(span.nextSibling); // Move cursor outside the span
-    } else if (span && span.parentNode) {
-      range?.setStartAfter(span); // If no next sibling exists, place cursor at the end
-    }
-
-    // Check the document is the contentDiv or a child of it
-    if (
-      contentDiv === range?.commonAncestorContainer ||
-      contentDiv.contains(range?.commonAncestorContainer)
-    ) {
-      // add a space and open brack after the span
-      const linebreakNode = document.createElement("br");
-      range?.insertNode(linebreakNode);
-      range?.setStartAfter(linebreakNode);
-    }
+    endCharacterNameEnter({ range, contentRef, scriptSpacing });
   }
 
   if (event.key === "/") {
