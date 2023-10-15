@@ -5,17 +5,39 @@ import { loadScript } from "./utils/scriptManagement/loadScript";
 import { scriptToFileName } from "./utils/database/scriptToFileName";
 import { createLinkSVGIcon } from "./icons/linkIcon";
 
-export const applySpanStyles = (span: HTMLSpanElement) => {
+export enum scriptSpacingTypes {
+  COMPACT = "compact",
+  SPACED = "spaced",
+}
+
+type applySpanStylesProps = {
+  span: HTMLSpanElement;
+  scriptSpacing?: scriptSpacingTypes;
+};
+
+export const applySpanStyles = ({
+  span,
+  scriptSpacing = scriptSpacingTypes.SPACED,
+}: applySpanStylesProps) => {
   span.style.backgroundColor = "#00805B";
   span.style.borderRadius = "16px";
   span.style.color = "white";
-  span.style.paddingLeft = "10px";
-  span.style.paddingRight = "10px";
-  span.style.marginLeft = "30px";
-  span.style.marginRight = "5px";
-  span.style.marginTop = "25px";
-  span.style.display = "inline-flex";
   span.classList.add("character-name");
+  if (scriptSpacing === scriptSpacingTypes.COMPACT) {
+    span.style.paddingLeft = "5px";
+    span.style.paddingRight = "5px";
+    span.style.marginLeft = "30px";
+    span.style.marginRight = "5px";
+    span.style.marginTop = "0px";
+    span.style.display = "inline-flex";
+  } else {
+    span.style.paddingLeft = "10px";
+    span.style.paddingRight = "10px";
+    span.style.marginLeft = "30px";
+    span.style.marginRight = "5px";
+    span.style.marginTop = "25px";
+    span.style.display = "inline-flex";
+  }
 };
 
 export const applyScriptLinkSpanStyles = async (

@@ -35,6 +35,8 @@ import NoteIcon from "@mui/icons-material/Note";
 import Face2Icon from "@mui/icons-material/Face2";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ExpandIcon from "@mui/icons-material/Expand";
+import CompressIcon from "@mui/icons-material/Compress";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { useEffect, useRef, useState } from "react";
@@ -88,6 +90,7 @@ import { ExternalLinkModal } from "./modals/ExternalLinkModal";
 import { getSharedScript } from "./utils/supabase/supabaseConnect";
 import { LinkIcon } from "./icons/linkIcon";
 import { ShareSuccessModal } from "./modals/ShareSuccessModal";
+import { scriptSpacingTypes } from "./styling";
 
 type AppProps = {
   scriptId?: string;
@@ -101,6 +104,7 @@ function App({ scriptId }: AppProps) {
   const [scriptUUID, setScriptUUID] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [newScriptTitle, setNewScriptTitle] = useState("");
+  const [scriptSpacing, setScriptSpacing] = useState(scriptSpacingTypes.SPACED);
   const [oldScriptTitle, setOldScriptTitle] = useState("");
   const [iconImage, setIconImage] = useState("");
   const [uploadedIconImage, setUploadedIconImage] = useState("");
@@ -219,7 +223,7 @@ function App({ scriptId }: AppProps) {
         setScriptLinkHistory([script.title]);
         if (contentRef.current) {
           contentRef.current.innerHTML = script.html;
-          updateCharacterNameStyling({ contentRef });
+          updateCharacterNameStyling({ contentRef, scriptSpacing });
         }
       });
     }
@@ -505,6 +509,36 @@ function App({ scriptId }: AppProps) {
           title="Edit Character Notes"
         />
 
+        <IconButton
+          aria-label="Toggle Spacing"
+          visibility={title ? "visible" : "hidden"}
+          icon={
+            scriptSpacing === scriptSpacingTypes.COMPACT ? (
+              <ExpandIcon />
+            ) : (
+              <CompressIcon />
+            )
+          }
+          onClick={() => {
+            if (scriptSpacing === scriptSpacingTypes.SPACED) {
+              setScriptSpacing(scriptSpacingTypes.COMPACT);
+              updateCharacterNameStyling({
+                contentRef,
+                scriptSpacing: scriptSpacingTypes.COMPACT,
+              });
+            } else {
+              setScriptSpacing(scriptSpacingTypes.SPACED);
+              updateCharacterNameStyling({
+                contentRef,
+                scriptSpacing: scriptSpacingTypes.SPACED,
+              });
+            }
+          }}
+          colorScheme="blue"
+          isDisabled={isGenerating}
+          title="Toggle Spacing"
+        />
+
         {editorSettings.novelAiApiKey && (
           <IconButton
             colorScheme="blue"
@@ -637,6 +671,7 @@ function App({ scriptId }: AppProps) {
                   title,
                   notes,
                   characterNotes,
+                  scriptSpacing,
                 });
               }}
             ></div>

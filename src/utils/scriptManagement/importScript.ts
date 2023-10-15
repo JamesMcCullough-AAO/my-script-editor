@@ -20,7 +20,7 @@ export const importScript = ({ contentRef, text }: importScriptProps) => {
         const character = line.slice(tabIndex + 2, line.indexOf("]"));
         const span = document.createElement("span");
         span.textContent = character;
-        applySpanStyles(span);
+        applySpanStyles({ span });
 
         contentDiv.appendChild(span);
         const remainingText = document.createTextNode(

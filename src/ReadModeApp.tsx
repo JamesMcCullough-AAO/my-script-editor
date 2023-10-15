@@ -33,6 +33,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import NoteIcon from "@mui/icons-material/Note";
 import Face2Icon from "@mui/icons-material/Face2";
+import HeightIcon from "@mui/icons-material/Height";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
@@ -61,6 +62,8 @@ import { formatTimestampExact } from "./utils/general/formatTimestampExact";
 import { loadScript } from "./utils/scriptManagement/loadScript";
 import { compressImage } from "./utils/database/ImageCompressor";
 import { EditDocumentIcon } from "./icons/editDocument";
+import ExpandIcon from "@mui/icons-material/Expand";
+import CompressIcon from "@mui/icons-material/Compress";
 import { DocumentIcon } from "./icons/DocumentIcon";
 import {
   baseIconColor,
@@ -86,6 +89,7 @@ import {
 } from "./handlers/handleOptionSelect";
 import { ExternalLinkModal } from "./modals/ExternalLinkModal";
 import { getSharedScript } from "./utils/supabase/supabaseConnect";
+import { scriptSpacingTypes } from "./styling";
 
 type AppProps = {
   scriptId?: string;
@@ -98,6 +102,7 @@ function ReadModeApp({ scriptId }: AppProps) {
   const [title, setTitle] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [newScriptTitle, setNewScriptTitle] = useState("");
+  const [scriptSpacing, setScriptSpacing] = useState(scriptSpacingTypes.SPACED);
   const [oldScriptTitle, setOldScriptTitle] = useState("");
   const [iconImage, setIconImage] = useState("");
   const [uploadedIconImage, setUploadedIconImage] = useState("");
@@ -215,7 +220,7 @@ function ReadModeApp({ scriptId }: AppProps) {
         setScriptLinkHistory([script.title]);
         if (contentRef.current) {
           contentRef.current.innerHTML = script.html;
-          updateCharacterNameStyling({ contentRef });
+          updateCharacterNameStyling({ contentRef, scriptSpacing });
           updateWordCount();
         }
       });
@@ -361,6 +366,36 @@ function ReadModeApp({ scriptId }: AppProps) {
           isDisabled={isGenerating || !title}
           visibility={title ? "visible" : "hidden"}
           title="Edit Character Notes"
+        />
+
+        <IconButton
+          aria-label="Toggle Spacing"
+          visibility={title ? "visible" : "hidden"}
+          icon={
+            scriptSpacing === scriptSpacingTypes.COMPACT ? (
+              <ExpandIcon />
+            ) : (
+              <CompressIcon />
+            )
+          }
+          onClick={() => {
+            if (scriptSpacing === scriptSpacingTypes.SPACED) {
+              setScriptSpacing(scriptSpacingTypes.COMPACT);
+              updateCharacterNameStyling({
+                contentRef,
+                scriptSpacing: scriptSpacingTypes.COMPACT,
+              });
+            } else {
+              setScriptSpacing(scriptSpacingTypes.SPACED);
+              updateCharacterNameStyling({
+                contentRef,
+                scriptSpacing: scriptSpacingTypes.SPACED,
+              });
+            }
+          }}
+          colorScheme="yellow"
+          isDisabled={isGenerating}
+          title="Toggle Spacing"
         />
 
         {isLoading && <PendingIcon />}

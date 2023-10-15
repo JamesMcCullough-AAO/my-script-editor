@@ -1,5 +1,5 @@
 import { create } from "lodash";
-import { applySpanStyles } from "../styling";
+import { applySpanStyles, scriptSpacingTypes } from "../styling";
 import {
   addLinkSpan,
   openSlashMenu,
@@ -15,6 +15,7 @@ type handleKeyDownProps = {
   title: string;
   notes: string;
   characterNotes: characterNote[];
+  scriptSpacing: scriptSpacingTypes;
 };
 const setCursorAtEnd = (contentEditableElement: HTMLElement) => {
   const range = document.createRange();
@@ -64,6 +65,7 @@ export const handleKeyDown = (
     title,
     notes,
     characterNotes,
+    scriptSpacing,
   }: handleKeyDownProps
 ) => {
   const contentDiv = contentRef.current;
@@ -151,7 +153,7 @@ export const handleKeyDown = (
     if (isInsideCharacterNameSpan(range)) return;
 
     const span = document.createElement("span");
-    applySpanStyles(span);
+    applySpanStyles({ span });
     range?.insertNode(span);
     range?.setStart(span, 0); // Place the cursor inside the span for typing the character name
   }
@@ -173,7 +175,7 @@ export const handleKeyDown = (
     range?.insertNode(spaceNode);
     range?.setStartAfter(spaceNode);
 
-    updateCharacterNameStyling({ contentRef });
+    updateCharacterNameStyling({ contentRef, scriptSpacing });
   }
 
   if (event.key === "Enter" && isInsideCharacterNameSpan(range)) {
@@ -197,7 +199,7 @@ export const handleKeyDown = (
       range?.setStartAfter(linebreakNode);
     }
 
-    updateCharacterNameStyling({ contentRef });
+    updateCharacterNameStyling({ contentRef, scriptSpacing });
   }
 
   if (event.key === "Enter" && isInsideLinkSpan(range)) {

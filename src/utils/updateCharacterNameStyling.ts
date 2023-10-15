@@ -1,4 +1,8 @@
-import { applyScriptLinkSpanStyles, applySpanStyles } from "../styling";
+import {
+  applyScriptLinkSpanStyles,
+  applySpanStyles,
+  scriptSpacingTypes,
+} from "../styling";
 import { colorCharacterNameSpanDefaults } from "./general/constants";
 
 type extractCharacterNamesProps = {
@@ -29,10 +33,12 @@ export const extractCharacterNames = ({
 
 type updateCharacterNameStylingProps = {
   contentRef: React.RefObject<HTMLDivElement>;
+  scriptSpacing: scriptSpacingTypes;
 };
 
 export const updateCharacterNameStyling = ({
   contentRef,
+  scriptSpacing,
 }: updateCharacterNameStylingProps) => {
   if (!contentRef.current) {
     console.warn("The contentRef is not attached to a DOM element.");
@@ -58,7 +64,7 @@ export const updateCharacterNameStyling = ({
     "span.character-name"
   );
   characterSpans.forEach((span) => {
-    applySpanStyles(span as HTMLSpanElement);
+    applySpanStyles({ span: span as HTMLSpanElement, scriptSpacing });
     const name = span.textContent;
     if (name && nameToColorMapping[name]) {
       (span as HTMLSpanElement).style.backgroundColor =

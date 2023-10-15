@@ -149,7 +149,7 @@ export const convertTextToHtml = ({
 
   // Apply styles to all spans
   doc.querySelectorAll("span").forEach((span: HTMLSpanElement) => {
-    applySpanStyles(span);
+    applySpanStyles({ span });
   });
 
   // Convert the DOM fragment back to an HTML string
