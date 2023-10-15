@@ -556,7 +556,7 @@ function App({ scriptId }: AppProps) {
               beginCharacterName(range);
             }
           }}
-          colorScheme="blue"
+          colorScheme="purple"
           isDisabled={isGenerating}
           visibility={title ? "visible" : "hidden"}
           title="Add Character Name"
@@ -571,7 +571,7 @@ function App({ scriptId }: AppProps) {
               endCharacterNameEnter({ range, contentRef, scriptSpacing });
             }
           }}
-          colorScheme="blue"
+          colorScheme="purple"
           isDisabled={isGenerating}
           visibility={title ? "visible" : "hidden"}
           title="End Name"
@@ -587,7 +587,7 @@ function App({ scriptId }: AppProps) {
               endCharacterNameBracket({ range, contentRef, scriptSpacing });
             }
           }}
-          colorScheme="blue"
+          colorScheme="purple"
           isDisabled={isGenerating}
           visibility={title ? "visible" : "hidden"}
           title="Add Line Notes"
