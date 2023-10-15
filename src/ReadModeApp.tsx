@@ -18,6 +18,7 @@ import {
   List,
   ListItem,
   HStack,
+  Stack,
 } from "@chakra-ui/react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -213,7 +214,7 @@ function ReadModeApp({ scriptId }: AppProps) {
         }
         setScriptLinkHistory([script.title]);
         if (contentRef.current) {
-          contentRef.current?.insertAdjacentHTML("beforeend", script.html);
+          contentRef.current.innerHTML = script.html;
           updateCharacterNameStyling({ contentRef });
           updateWordCount();
         }
@@ -310,23 +311,28 @@ function ReadModeApp({ scriptId }: AppProps) {
   }, [title]); // This useEffect runs every time `title` changes
 
   return (
-    <HStack
+    <Stack
       // Box should fill the entire window and expand to fit the content
       display="flex"
       alignItems="center"
       justifyContent="center"
       backgroundColor="black"
       spacing={0}
-      height="100vh"
+      flexDirection={["column-reverse", "row"]}
+      height={["100vh", "100vh"]}
     >
       {/* Button Area */}
-      <VStack
+      <Stack
+        id="button-bar"
         spacing={2}
         p="2"
         backgroundColor={designColors.darkblue}
-        width="fit-content"
+        // V stack for desktop, H stack for mobile
+        // On desktop it's a sidebar, on mobile it's along the bottom
+        direction={["row", "column"]}
+        width={["100vw", "fit-content"]}
+        height={["fit-content", "100vh"]}
         alignItems="start"
-        height="100vh"
       >
         <IconButton
           aria-label="Edit notes"
@@ -358,14 +364,15 @@ function ReadModeApp({ scriptId }: AppProps) {
         />
 
         {isLoading && <PendingIcon />}
-      </VStack>
+      </Stack>
       <VStack
         spacing={3}
         p={2}
         flex="1"
         alignItems="center"
         justifyContent="center"
-        height="100vh"
+        width="100%"
+        height="100%"
       >
         {!title && (
           <VStack position="absolute">
@@ -385,8 +392,21 @@ function ReadModeApp({ scriptId }: AppProps) {
             <EditDocumentIcon color={baseIconColor} width="300px" />
           </VStack>
         )}
-        <VStack maxWidth="1000px" width="full" alignItems="start" height="100%">
-          <HStack id="title-bar">
+        <VStack
+          maxWidth="1000px"
+          width="full"
+          alignItems="start"
+          height={[
+            `calc(100vh - ${
+              Math.min(
+                document.getElementById("button-bar")?.clientHeight || 0,
+                document.getElementById("button-bar")?.clientWidth || 0
+              ) + 16
+            }px)`,
+            "100%",
+          ]}
+        >
+          <HStack id="title-bar" height="40px">
             {title && (
               <HStack marginRight="5px">
                 <IconButton
@@ -411,7 +431,14 @@ function ReadModeApp({ scriptId }: AppProps) {
                 )}
               </HStack>
             )}
-            <Text color="white" fontWeight={600} fontSize="24px">
+            <Text
+              color="white"
+              fontWeight={600}
+              fontSize="24px"
+              height="40px"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
               {title}
             </Text>
           </HStack>
@@ -448,7 +475,7 @@ function ReadModeApp({ scriptId }: AppProps) {
         position="absolute"
         bottom="0"
         right="0"
-        width="10%"
+        width="50%"
         zIndex="100"
         padding="1em"
       >
@@ -546,7 +573,7 @@ function ReadModeApp({ scriptId }: AppProps) {
           </ModalBody>
         </ModalContent>
       </Modal>
-    </HStack>
+    </Stack>
   );
 }
 

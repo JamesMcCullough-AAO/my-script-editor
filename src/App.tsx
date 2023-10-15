@@ -18,6 +18,7 @@ import {
   List,
   ListItem,
   HStack,
+  Stack,
 } from "@chakra-ui/react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -213,7 +214,7 @@ function App({ scriptId }: AppProps) {
         }
         setScriptLinkHistory([script.title]);
         if (contentRef.current) {
-          contentRef.current?.insertAdjacentHTML("beforeend", script.html);
+          contentRef.current.innerHTML = script.html;
           updateCharacterNameStyling({ contentRef });
         }
       });
@@ -432,23 +433,26 @@ function App({ scriptId }: AppProps) {
   };
 
   return (
-    <HStack
+    <Stack
       // Box should fill the entire window and expand to fit the content
       display="flex"
       alignItems="center"
       justifyContent="center"
       backgroundColor="black"
       spacing={0}
-      height="100vh"
+      flexDirection={["column-reverse", "row"]}
+      height={["100vh", "100vh"]}
     >
       {/* Button Area */}
-      <VStack
+      <Stack
+        id="button-bar"
         spacing={2}
         p="2"
         backgroundColor={designColors.darkblue}
-        width="fit-content"
+        direction={["row", "column"]}
+        width={["100vw", "fit-content"]}
+        height={["fit-content", "100vh"]}
         alignItems="start"
-        height="100vh"
       >
         <IconButton
           aria-label="Open menu"
@@ -511,14 +515,15 @@ function App({ scriptId }: AppProps) {
           />
         )}
         {isLoading && <PendingIcon />}
-      </VStack>
+      </Stack>
       <VStack
         spacing={3}
         p={2}
         flex="1"
         alignItems="center"
         justifyContent="center"
-        height="100vh"
+        height="100%"
+        width="100%"
       >
         {!title && (
           <VStack position="absolute">
@@ -534,12 +539,24 @@ function App({ scriptId }: AppProps) {
               Click the menu button in the top left to select a script or create
               a new one.
             </Text>
-            {/* <Image src="favicon.png" width="300px" /> */}
             <EditDocumentIcon color={baseIconColor} width="300px" />
           </VStack>
         )}
-        <VStack maxWidth="1000px" width="full" alignItems="start" height="100%">
-          <HStack id="title-bar">
+        <VStack
+          maxWidth="1000px"
+          width="full"
+          alignItems="start"
+          height={[
+            `calc(100vh - ${
+              Math.min(
+                document.getElementById("button-bar")?.clientHeight || 0,
+                document.getElementById("button-bar")?.clientWidth || 0
+              ) + 16
+            }px)`,
+            "100%",
+          ]}
+        >
+          <HStack id="title-bar" height="40px">
             {title && (
               <HStack marginRight="5px">
                 {scriptLinkHistory.length > 1 && (
@@ -566,7 +583,14 @@ function App({ scriptId }: AppProps) {
                 )}
               </HStack>
             )}
-            <Text color="white" fontWeight={600} fontSize="24px">
+            <Text
+              color="white"
+              fontWeight={600}
+              fontSize="24px"
+              height="40px"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
               {title}
             </Text>
           </HStack>
@@ -614,7 +638,7 @@ function App({ scriptId }: AppProps) {
         position="absolute"
         bottom="0"
         right="0"
-        width="10%"
+        width="50%"
         zIndex="100"
         padding="1em"
       >
@@ -1249,7 +1273,7 @@ function App({ scriptId }: AppProps) {
         savedRange={savedRange}
         setSavedRange={setSavedRange}
       />
-    </HStack>
+    </Stack>
   );
 }
 
