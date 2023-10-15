@@ -103,9 +103,10 @@ import {
 
 type AppProps = {
   scriptId?: string;
+  isReadOnly?: boolean;
 };
 
-function App({ scriptId }: AppProps) {
+function App({ scriptId, isReadOnly }: AppProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [importText, setImportText] = useState("");
 
@@ -255,7 +256,17 @@ function App({ scriptId }: AppProps) {
     };
   };
 
-  const handleBackButton = () => {
+  type handleBackButtonProps = {
+    isReadOnly: boolean | undefined;
+  };
+
+  const handleBackButton = ({ isReadOnly }: handleBackButtonProps) => {
+    if (isReadOnly) {
+      window.history.pushState({}, "", "/");
+      window.location.reload();
+      return;
+    }
+
     if (scriptLinkHistory.length > 1) {
       const currentPage = scriptLinkHistory.pop();
       const lastLink = scriptLinkHistory.pop();
@@ -366,6 +377,12 @@ function App({ scriptId }: AppProps) {
         ) {
           // prevent default behavior
           e.preventDefault();
+
+          if (isReadOnly) {
+            alert("Script links don't work in read only mode!");
+            return;
+          }
+
           setIsLoadingScript(true); // Step 2: Set flag before loading
           currentlyLoadingScript = true;
 
@@ -498,17 +515,19 @@ function App({ scriptId }: AppProps) {
         height={["fit-content", "100vh"]}
         alignItems="start"
       >
-        <IconButton
-          aria-label="Open menu"
-          icon={<MenuIcon />}
-          onClick={() => {
-            handleOpenMenu({
-              onMenuOpen,
-            });
-          }}
-          isDisabled={isGenerating}
-          title="Menu"
-        />
+        {!isReadOnly && (
+          <IconButton
+            aria-label="Open menu"
+            icon={<MenuIcon />}
+            onClick={() => {
+              handleOpenMenu({
+                onMenuOpen,
+              });
+            }}
+            isDisabled={isGenerating}
+            title="Menu"
+          />
+        )}
         <IconButton
           aria-label="Edit notes"
           icon={<NoteIcon />}
@@ -630,12 +649,12 @@ function App({ scriptId }: AppProps) {
           <HStack id="title-bar" height="40px">
             {title && (
               <HStack marginRight="5px">
-                {scriptLinkHistory.length > 1 && (
+                {(scriptLinkHistory.length > 1 || isReadOnly) && (
                   <IconButton
                     aria-label="Back"
                     icon={<ArrowBackIcon />}
                     onClick={() => {
-                      handleBackButton();
+                      handleBackButton({ isReadOnly });
                     }}
                     // no background, green icon, icon goes white on hover
                     backgroundColor="transparent"
@@ -677,7 +696,7 @@ function App({ scriptId }: AppProps) {
             }px)`}
           >
             <div
-              contentEditable={!isGenerating && !!title}
+              contentEditable={!isGenerating && !!title && !isReadOnly}
               placeholder="Type your script here..."
               style={{
                 overflowY: "auto", // Enable vertical scrolling

@@ -11,7 +11,7 @@ const LoadScript = () => {
 
   if (!uuid) return <div>Invalid script</div>;
 
-  return <ReadModeApp scriptId={uuid} />;
+  return <App isReadOnly={true} scriptId={uuid} />;
 };
 
 ReactDOM.render(
