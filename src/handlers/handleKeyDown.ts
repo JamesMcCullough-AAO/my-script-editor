@@ -121,7 +121,7 @@ export const handleKeyDown = (
   if (event.key === "[" || event.key === "Tab") {
     event.preventDefault();
 
-    beginCharacterName(range);
+    beginCharacterName({ range, scriptSpacing });
   }
 
   if (

@@ -43,11 +43,17 @@ export const isInsideLinkSpan = (range: Range) => {
   return false;
 };
 
-export const beginCharacterName = (range: Range) => {
+export const beginCharacterName = ({
+  range,
+  scriptSpacing,
+}: {
+  range: Range;
+  scriptSpacing: scriptSpacingTypes;
+}) => {
   if (isInsideCharacterNameSpan(range)) return;
 
   const span = document.createElement("span");
-  applySpanStyles({ span });
+  applySpanStyles({ span, scriptSpacing });
   range?.insertNode(span);
   range?.setStart(span, 0);
 };

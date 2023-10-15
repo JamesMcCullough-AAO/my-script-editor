@@ -94,12 +94,6 @@ import { getSharedScript } from "./utils/supabase/supabaseConnect";
 import { LinkIcon } from "./icons/linkIcon";
 import { ShareSuccessModal } from "./modals/ShareSuccessModal";
 import { scriptSpacingTypes } from "./styling";
-import {
-  beginCharacterName,
-  endCharacterNameBracket,
-  endCharacterNameEnter,
-  isInsideCharacterNameSpan,
-} from "./utils/general/keyPressFunctions";
 
 type AppProps = {
   scriptId?: string;
