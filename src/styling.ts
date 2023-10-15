@@ -23,18 +23,13 @@ export const applySpanStyles = ({
   span.style.borderRadius = "16px";
   span.style.color = "white";
   span.classList.add("character-name");
+  span.style.paddingLeft = "10px";
+  span.style.paddingRight = "10px";
+  span.style.marginLeft = "30px";
+  span.style.marginRight = "5px";
   if (scriptSpacing === scriptSpacingTypes.COMPACT) {
-    span.style.paddingLeft = "5px";
-    span.style.paddingRight = "5px";
-    span.style.marginLeft = "30px";
-    span.style.marginRight = "5px";
-    span.style.marginTop = "0px";
-    span.style.display = "inline-flex";
+    span.style.display = "inline";
   } else {
-    span.style.paddingLeft = "10px";
-    span.style.paddingRight = "10px";
-    span.style.marginLeft = "30px";
-    span.style.marginRight = "5px";
     span.style.marginTop = "25px";
     span.style.display = "inline-flex";
   }
