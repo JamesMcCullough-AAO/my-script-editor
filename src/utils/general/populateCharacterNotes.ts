@@ -13,8 +13,10 @@ export const populateCharacterNotes = ({
   characterNotes,
   setCharacterNotes,
 }: populateCharacterNotesProps) => {
+  // Remove all EMPTY notes
+  const updatedNotes = characterNotes.filter((note) => note.notes !== "EMPTY");
+
   const names = extractCharacterNames({ contentRef });
-  const updatedNotes = [...characterNotes];
 
   names.forEach((name) => {
     if (!updatedNotes.some((note) => note.name === name)) {
