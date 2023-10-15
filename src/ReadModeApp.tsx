@@ -302,18 +302,18 @@ function ReadModeApp({ scriptId }: AppProps) {
               selection.removeAllRanges();
             }
           }
-          if (
-            (e.target as HTMLElement).classList.contains("info-note") &&
-            !isLoadingScript &&
-            !currentlyLoadingScript
-          ) {
-            e.preventDefault();
-            // get the data-note-id from the span and set it as the current info note
-            const note = (e.target as HTMLElement).dataset.note;
-            if (note) {
-              setCurrentInfoNoteText(note);
-              setCurrentInfoNoteSpan(e.target as HTMLElement);
-            }
+        }
+        if (
+          (e.target as HTMLElement).classList.contains("info-note") &&
+          !isLoadingScript &&
+          !currentlyLoadingScript
+        ) {
+          e.preventDefault();
+          // get the data-note-id from the span and set it as the current info note
+          const note = (e.target as HTMLElement).dataset.note;
+          if (note) {
+            setCurrentInfoNoteText(note);
+            setCurrentInfoNoteSpan(e.target as HTMLElement);
           }
 
           currentlyLoadingScript = false;
