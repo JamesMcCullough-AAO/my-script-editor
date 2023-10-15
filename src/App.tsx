@@ -546,53 +546,6 @@ function App({ scriptId }: AppProps) {
           isDisabled={isGenerating}
           title="Toggle Spacing"
         />
-        {/* Mobile only buttons */}
-        <IconButton
-          aria-label="Add character name"
-          icon={<DataArrayIcon />}
-          onClick={() => {
-            const range = window.getSelection()?.getRangeAt(0);
-            if (range) {
-              beginCharacterName(range);
-            }
-          }}
-          colorScheme="purple"
-          isDisabled={isGenerating}
-          visibility={title ? "visible" : "hidden"}
-          title="Add Character Name"
-          display={["inline-flex", "none"]}
-        />
-        <IconButton
-          aria-label="End Name"
-          icon={<KeyboardReturnIcon />}
-          onClick={() => {
-            const range = window.getSelection()?.getRangeAt(0);
-            if (range) {
-              endCharacterNameEnter({ range, contentRef, scriptSpacing });
-            }
-          }}
-          colorScheme="purple"
-          isDisabled={isGenerating}
-          visibility={title ? "visible" : "hidden"}
-          title="End Name"
-          display={["inline-flex", "none"]}
-        />
-
-        <IconButton
-          aria-label="Add Line Notes"
-          icon={<ShortTextIcon />}
-          onClick={() => {
-            const range = window.getSelection()?.getRangeAt(0);
-            if (range) {
-              endCharacterNameBracket({ range, contentRef, scriptSpacing });
-            }
-          }}
-          colorScheme="purple"
-          isDisabled={isGenerating}
-          visibility={title ? "visible" : "hidden"}
-          title="Add Line Notes"
-          display={["inline-flex", "none"]}
-        />
 
         {editorSettings.novelAiApiKey && (
           <IconButton
