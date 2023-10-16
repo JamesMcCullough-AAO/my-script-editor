@@ -723,9 +723,10 @@ function App({ scriptId, isReadOnly }: AppProps) {
         position="absolute"
         bottom="0"
         right="0"
-        width="50%"
+        width="100px"
         zIndex="100"
         padding="1em"
+        pointerEvents="none"
       >
         <Text
           fontWeight={600}
