@@ -1,6 +1,7 @@
 import { baseIconColor } from "../general/constants";
 import { ifItemExists } from "../database/indexDB";
 import { v4 } from "uuid";
+import { scriptToFileName } from "../database/scriptToFileName";
 
 type newScriptInput = {
   newScriptTitle: string;
@@ -25,7 +26,7 @@ export const newScript = async ({
   setScriptUUID,
 }: newScriptInput) => {
   if (newScriptTitle) {
-    if (await ifItemExists(newScriptTitle)) {
+    if (await ifItemExists("script_" + scriptToFileName(newScriptTitle))) {
       alert("This title already exists!");
       return;
     }
