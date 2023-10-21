@@ -10,13 +10,16 @@ import {
   Textarea,
   HStack,
   IconButton,
+  VStack,
 } from "@chakra-ui/react";
 import { designColors } from "../utils/general/constants";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import DownloadIcon from "@mui/icons-material/Download";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import PhotoIcon from "@mui/icons-material/Photo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
@@ -99,6 +102,13 @@ export const MenuModal = ({
   setScriptShareLink,
   scriptSpacing,
 }: MenuModalProps) => {
+  const [isEditPopupOpen, setIsEditPopupOpen] = React.useState(false);
+
+  // set isEditPopupOpen to false when the menu is closed
+  React.useEffect(() => {
+    setIsEditPopupOpen(false);
+  }, [isOpen]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalOverlay />
@@ -121,6 +131,88 @@ export const MenuModal = ({
                 isDisabled={isGenerating}
                 title="Create New Script"
               />
+              <IconButton
+                aria-label="Edit script"
+                icon={<EditIcon />}
+                onClick={() => {
+                  setIsEditPopupOpen(!isEditPopupOpen);
+                }}
+                isDisabled={isGenerating || !title}
+                colorScheme="yellow"
+                title="Edit Script"
+              />
+              {isEditPopupOpen && (
+                <VStack
+                  // Positioned just below the previous button
+                  position="absolute"
+                  transform="translate(-48px, calc(50% - 28px))"
+                  border="1px solid white"
+                  borderRadius="md"
+                  spacing="2"
+                  p="2"
+                  zIndex="1"
+                  backgroundColor={designColors.darkblue}
+                >
+                  <IconButton
+                    // Close the popup
+                    aria-label="Close edit popup"
+                    icon={<CloseIcon />}
+                    onClick={() => {
+                      setIsEditPopupOpen(false);
+                    }}
+                    colorScheme="transparent"
+                    _hover={{ color: "gray" }}
+                    title="Close"
+                  />
+                  <IconButton
+                    aria-label="Rename script"
+                    icon={<DriveFileRenameOutlineIcon />}
+                    colorScheme="yellow"
+                    onClick={() =>
+                      handleOpenRenameModal({
+                        onMenuClose: onClose,
+                        onRenameModalOpen,
+                      })
+                    }
+                    isDisabled={isGenerating || !title}
+                    title="Rename Script"
+                  />
+                  <IconButton
+                    aria-label="Update Script Icon"
+                    icon={<PhotoIcon />}
+                    colorScheme="yellow"
+                    onClick={onIconModalOpen}
+                    isDisabled={isGenerating || !title}
+                    title="Update Script Icon"
+                  />
+                  <IconButton
+                    aria-label="Restore previous versions"
+                    colorScheme="pink"
+                    icon={<HistoryIcon />}
+                    onClick={async () => {
+                      await handleShowVersionsModal({
+                        title,
+                        setScriptVersions,
+                        onVersionsModalOpen,
+                      });
+                      onClose();
+                    }}
+                    isDisabled={isGenerating || !title}
+                    title="Restore Previous Versions"
+                  />
+                  <IconButton
+                    aria-label="Delete script"
+                    colorScheme="red"
+                    icon={<DeleteIcon />}
+                    onClick={() => {
+                      onDeleteModalOpen();
+                      onClose();
+                    }}
+                    isDisabled={isGenerating || !title}
+                    title="Delete Script"
+                  />
+                </VStack>
+              )}
               <IconButton
                 aria-label="Import script"
                 icon={<FileUploadIcon />}
@@ -145,53 +237,7 @@ export const MenuModal = ({
                 colorScheme="blue"
                 title="Export Script"
               />
-              <IconButton
-                aria-label="Rename script"
-                icon={<DriveFileRenameOutlineIcon />}
-                colorScheme="yellow"
-                onClick={() =>
-                  handleOpenRenameModal({
-                    onMenuClose: onClose,
-                    onRenameModalOpen,
-                  })
-                }
-                isDisabled={isGenerating || !title}
-                title="Rename Script"
-              />
-              <IconButton
-                aria-label="Update Script Icon"
-                icon={<AddPhotoAlternateIcon />}
-                colorScheme="yellow"
-                onClick={onIconModalOpen}
-                isDisabled={isGenerating || !title}
-                title="Update Script Icon"
-              />
-              <IconButton
-                aria-label="Delete script"
-                colorScheme="red"
-                icon={<DeleteIcon />}
-                onClick={() => {
-                  onDeleteModalOpen();
-                  onClose();
-                }}
-                isDisabled={isGenerating || !title}
-                title="Delete Script"
-              />
-              <IconButton
-                aria-label="Restore previous versions"
-                colorScheme="pink"
-                icon={<HistoryIcon />}
-                onClick={async () => {
-                  await handleShowVersionsModal({
-                    title,
-                    setScriptVersions,
-                    onVersionsModalOpen,
-                  });
-                  onClose();
-                }}
-                isDisabled={isGenerating || !title}
-                title="Restore Previous Versions"
-              />
+
               <IconButton
                 aria-label="Share Script"
                 colorScheme="pink"
