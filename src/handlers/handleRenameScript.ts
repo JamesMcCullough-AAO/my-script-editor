@@ -6,34 +6,26 @@ import { scriptToFileName } from "../utils/database/scriptToFileName";
 type handleRenameScriptInput = {
   newScriptTitle: string;
   oldScriptTitle: string;
-  setOldScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
-  onRenameModalClose: () => void;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const handleRenameScript = async ({
   newScriptTitle,
   oldScriptTitle,
-  setOldScriptTitle,
-  setNewScriptTitle,
-  onRenameModalClose,
   setTitle,
-}: handleRenameScriptInput) => {
+}: handleRenameScriptInput): Promise<boolean> => {
   if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
     const oldTitle = scriptToFileName(oldScriptTitle);
     const newTitle = scriptToFileName(newScriptTitle);
 
     if (await ifItemExists(newTitle)) {
       alert("This title already exists!");
-      return;
+      return false;
     }
 
     await renameItem(oldTitle, newTitle);
 
     setTitle(newScriptTitle);
   }
-  setOldScriptTitle("");
-  setNewScriptTitle("");
-  onRenameModalClose();
+  return true;
 };

@@ -95,6 +95,8 @@ import { LinkIcon } from "./icons/linkIcon";
 import { ShareSuccessModal } from "./modals/ShareSuccessModal";
 import { scriptSpacingTypes } from "./styling";
 import { DeleteScriptModal } from "./modals/DeleteScriptModal";
+import { RenameScriptModal } from "./modals/RenameScriptModal";
+import { NameNewScriptModal } from "./modals/NameNewScriptModal";
 
 type AppProps = {
   scriptId?: string;
@@ -108,9 +110,7 @@ function App({ scriptId, isReadOnly }: AppProps) {
   const [title, setTitle] = useState("");
   const [scriptUUID, setScriptUUID] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [newScriptTitle, setNewScriptTitle] = useState("");
   const [scriptSpacing, setScriptSpacing] = useState(scriptSpacingTypes.SPACED);
-  const [oldScriptTitle, setOldScriptTitle] = useState("");
   const [iconImage, setIconImage] = useState("");
   const [uploadedIconImage, setUploadedIconImage] = useState("");
   const [notes, setNotes] = useState("");
@@ -774,7 +774,6 @@ function App({ scriptId, isReadOnly }: AppProps) {
         onClose={onMenuClose}
         notes={notes}
         setNotes={setNotes}
-        setNewScriptTitle={setNewScriptTitle}
         onNameModalOpen={onNameModalOpen}
         isGenerating={isGenerating}
         onUploadModalOpen={onUploadModalOpen}
@@ -784,7 +783,6 @@ function App({ scriptId, isReadOnly }: AppProps) {
         contentRef={contentRef}
         characterNotes={characterNotes}
         onRenameModalOpen={onRenameModalOpen}
-        setOldScriptTitle={setOldScriptTitle}
         onIconModalOpen={onIconModalOpen}
         onDeleteModalOpen={onDeleteModalOpen}
         setScriptVersions={setScriptVersions}
@@ -810,81 +808,22 @@ function App({ scriptId, isReadOnly }: AppProps) {
         contentRef={contentRef}
         setTitle={setTitle}
       />
-      <Modal isOpen={isRenameModalOpen} onClose={onRenameModalClose}>
-        <ModalOverlay />
-        <ModalContent
-          backgroundColor={designColors.backgroundgray}
-          color="white"
-        >
-          <ModalHeader>Rename Script</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Input
-              value={newScriptTitle}
-              onChange={(e) => setNewScriptTitle(e.target.value)}
-              placeholder="New Script Title"
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={() => {
-                handleRenameScript({
-                  oldScriptTitle,
-                  newScriptTitle,
-                  onRenameModalClose,
-                  setOldScriptTitle,
-                  setNewScriptTitle,
-                  setTitle,
-                });
-              }}
-            >
-              Rename
-            </Button>
-            <Button onClick={onRenameModalClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <Modal isOpen={isNameModalOpen} onClose={onNameModalClose}>
-        <ModalOverlay />
-        <ModalContent
-          backgroundColor={designColors.backgroundgray}
-          color="white"
-        >
-          <ModalHeader>Name New Script</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Input
-              value={newScriptTitle}
-              onChange={(e) => setNewScriptTitle(e.target.value)}
-              placeholder="New Script Title"
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={() => {
-                newScript({
-                  newScriptTitle,
-                  contentRef,
-                  setTitle,
-                  onMenuClose,
-                  onNameModalClose,
-                  setNotes,
-                  setIconImage,
-                  setIconColor,
-                  setScriptUUID,
-                });
-              }}
-            >
-              Create
-            </Button>
-            <Button onClick={onRenameModalClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <RenameScriptModal
+        isOpen={isRenameModalOpen}
+        onClose={onRenameModalClose}
+        setTitle={setTitle}
+        title={title}
+      />
+      <NameNewScriptModal
+        isOpen={isNameModalOpen}
+        onClose={onNameModalClose}
+        setTitle={setTitle}
+        contentRef={contentRef}
+        setNotes={setNotes}
+        setIconImage={setIconImage}
+        setIconColor={setIconColor}
+        setScriptUUID={setScriptUUID}
+      />
       <Modal isOpen={isInfoModalOpen} onClose={onInfoModalClose}>
         <ModalOverlay />
         <ModalContent

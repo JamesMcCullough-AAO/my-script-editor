@@ -39,7 +39,6 @@ type MenuModalProps = {
   onClose: () => void;
   notes: string;
   setNotes: React.Dispatch<React.SetStateAction<string>>;
-  setNewScriptTitle: React.Dispatch<React.SetStateAction<string>>;
   onNameModalOpen: () => void;
   isGenerating: boolean;
   onUploadModalOpen: () => void;
@@ -49,7 +48,6 @@ type MenuModalProps = {
   contentRef: React.MutableRefObject<HTMLDivElement | null>;
   characterNotes: characterNote[];
   onRenameModalOpen: () => void;
-  setOldScriptTitle: React.Dispatch<React.SetStateAction<string>>;
   onIconModalOpen: () => void;
   onDeleteModalOpen: () => void;
   setScriptVersions: React.Dispatch<React.SetStateAction<ScriptVersion[]>>;
@@ -74,7 +72,6 @@ export const MenuModal = ({
   onClose,
   notes,
   setNotes,
-  setNewScriptTitle,
   onNameModalOpen,
   isGenerating,
   onUploadModalOpen,
@@ -84,7 +81,6 @@ export const MenuModal = ({
   contentRef,
   characterNotes,
   onRenameModalOpen,
-  setOldScriptTitle,
   onIconModalOpen,
   onDeleteModalOpen,
   setScriptVersions,
@@ -117,9 +113,9 @@ export const MenuModal = ({
                 icon={<NoteAddIcon />}
                 onClick={() => {
                   handleNewScript({
-                    setNewScriptTitle,
                     onNameModalOpen,
                   });
+                  onClose();
                 }}
                 colorScheme="green"
                 isDisabled={isGenerating}
@@ -155,11 +151,8 @@ export const MenuModal = ({
                 colorScheme="yellow"
                 onClick={() =>
                   handleOpenRenameModal({
-                    scriptTitle: title,
                     onMenuClose: onClose,
                     onRenameModalOpen,
-                    setNewScriptTitle,
-                    setOldScriptTitle,
                   })
                 }
                 isDisabled={isGenerating || !title}

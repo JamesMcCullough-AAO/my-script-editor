@@ -7,8 +7,6 @@ type newScriptInput = {
   newScriptTitle: string;
   contentRef: React.RefObject<HTMLDivElement>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
-  onMenuClose: () => void;
-  onNameModalClose: () => void;
   setNotes: React.Dispatch<React.SetStateAction<string>>;
   setIconImage?: React.Dispatch<React.SetStateAction<string>>;
   setIconColor?: React.Dispatch<React.SetStateAction<string>>;
@@ -18,17 +16,15 @@ export const newScript = async ({
   newScriptTitle,
   contentRef,
   setTitle,
-  onMenuClose,
-  onNameModalClose,
   setNotes,
   setIconImage,
   setIconColor,
   setScriptUUID,
-}: newScriptInput) => {
+}: newScriptInput): Promise<boolean> => {
   if (newScriptTitle) {
     if (await ifItemExists(scriptToFileName(newScriptTitle))) {
       alert("This title already exists!");
-      return;
+      return false;
     }
     if (contentRef.current) {
       contentRef.current.innerHTML = "";
@@ -42,7 +38,7 @@ export const newScript = async ({
     if (setIconColor) {
       setIconColor(baseIconColor);
     }
-    onNameModalClose();
-    onMenuClose();
+    return true;
   }
+  return false;
 };
