@@ -42,11 +42,11 @@ export const saveScript = async ({
       characterNotes,
     };
 
-    const existingScripts = (await getItem(`script_${scriptToFileName(title)}`))
+    const existingScripts = (await getItem(scriptToFileName(title)))
       ?.existingScripts;
 
     if (!existingScripts) {
-      await setItem(`script_${scriptToFileName(title)}`, {
+      await setItem(scriptToFileName(title), {
         existingScripts: [payload],
         scriptUUID,
         iconImage,
@@ -69,7 +69,7 @@ export const saveScript = async ({
       existingScripts[existingScripts.length - 1] = payload;
     }
 
-    const id = `script_${scriptToFileName(title)}`;
+    const id = scriptToFileName(title);
 
     await setItem(id, { existingScripts, iconImage, iconColor, scriptUUID });
     lastSavedTimestamp = currentTime;

@@ -94,6 +94,7 @@ import { getSharedScript } from "./utils/supabase/supabaseConnect";
 import { LinkIcon } from "./icons/linkIcon";
 import { ShareSuccessModal } from "./modals/ShareSuccessModal";
 import { scriptSpacingTypes } from "./styling";
+import { DeleteScriptModal } from "./modals/DeleteScriptModal";
 
 type AppProps = {
   scriptId?: string;
@@ -802,37 +803,19 @@ function App({ scriptId, isReadOnly }: AppProps) {
         setScriptShareLink={setScriptShareLink}
         scriptSpacing={scriptSpacing}
       />
-      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+      <DeleteScriptModal
+        isOpen={isDeleteModalOpen}
+        onClose={onDeleteModalClose}
+        title={title}
+        contentRef={contentRef}
+        setTitle={setTitle}
+      />
+      <Modal isOpen={isRenameModalOpen} onClose={onRenameModalClose}>
         <ModalOverlay />
         <ModalContent
           backgroundColor={designColors.backgroundgray}
           color="white"
         >
-          <ModalHeader>Confirm Deletion</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>Are you sure you want to delete this script?</ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="red"
-              mr={3}
-              onClick={() => {
-                deleteScript({
-                  title,
-                  onDeleteModalClose,
-                  contentRef,
-                  setTitle,
-                });
-              }}
-            >
-              Delete
-            </Button>
-            <Button onClick={onDeleteModalClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <Modal isOpen={isRenameModalOpen} onClose={onRenameModalClose}>
-        <ModalOverlay />
-        <ModalContent>
           <ModalHeader>Rename Script</ModalHeader>
           <ModalCloseButton />
           <ModalBody>

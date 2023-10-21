@@ -26,7 +26,7 @@ export const newScript = async ({
   setScriptUUID,
 }: newScriptInput) => {
   if (newScriptTitle) {
-    if (await ifItemExists("script_" + scriptToFileName(newScriptTitle))) {
+    if (await ifItemExists(scriptToFileName(newScriptTitle))) {
       alert("This title already exists!");
       return;
     }

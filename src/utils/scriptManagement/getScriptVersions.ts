@@ -10,7 +10,7 @@ export type ScriptVersion = {
 export const getScriptVersions = async (
   scriptTitle: string
 ): Promise<ScriptVersion[] | null> => {
-  const id = `script_${scriptToFileName(scriptTitle)}`;
+  const id = scriptToFileName(scriptTitle);
   const scriptFile = await getItem(id);
   const savedScripts = scriptFile.existingScripts;
 

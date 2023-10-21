@@ -1,3 +1,5 @@
+export type fileNameString = `script_${string}`;
+
 const openDB = () => {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open("MyDatabase", 1);
@@ -17,7 +19,7 @@ const openDB = () => {
   });
 };
 
-export const setItem = async (id: string, value: any) => {
+export const setItem = async (id: fileNameString, value: any) => {
   const db = await openDB();
   const transaction = db.transaction("scripts", "readwrite");
   const store = transaction.objectStore("scripts");
@@ -29,7 +31,7 @@ export const setItem = async (id: string, value: any) => {
   });
 };
 
-export const getItem = async (id: string) => {
+export const getItem = async (id: fileNameString) => {
   const db = await openDB();
   const transaction = db.transaction("scripts");
   const store = transaction.objectStore("scripts");
@@ -41,7 +43,7 @@ export const getItem = async (id: string) => {
   });
 };
 
-export const deleteItem = async (id: string) => {
+export const deleteItem = async (id: fileNameString) => {
   const db = await openDB();
   const transaction = db.transaction("scripts", "readwrite");
   const store = transaction.objectStore("scripts");
@@ -65,7 +67,7 @@ export const getAllItems = async () => {
   });
 };
 
-export const ifItemExists = async (id: string) => {
+export const ifItemExists = async (id: fileNameString) => {
   const db = await openDB();
   const transaction = db.transaction("scripts");
   const store = transaction.objectStore("scripts");
@@ -77,7 +79,7 @@ export const ifItemExists = async (id: string) => {
   });
 };
 
-export const renameItem = async (id: string, newID: string) => {
+export const renameItem = async (id: fileNameString, newID: fileNameString) => {
   const db = await openDB();
   const transaction = db.transaction("scripts", "readwrite");
   const store = transaction.objectStore("scripts");
@@ -107,7 +109,7 @@ export const deleteAllItems = async () => {
   });
 };
 
-export const getScriptIconColor = async (id: string) => {
+export const getScriptIconColor = async (id: fileNameString) => {
   const db = await openDB();
   const transaction = db.transaction("scripts");
   const store = transaction.objectStore("scripts");

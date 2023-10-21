@@ -21,8 +21,8 @@ export const handleRenameScript = async ({
   setTitle,
 }: handleRenameScriptInput) => {
   if (newScriptTitle && oldScriptTitle && oldScriptTitle !== newScriptTitle) {
-    const oldTitle = "script_" + scriptToFileName(oldScriptTitle);
-    const newTitle = "script_" + scriptToFileName(newScriptTitle);
+    const oldTitle = scriptToFileName(oldScriptTitle);
+    const newTitle = scriptToFileName(newScriptTitle);
 
     if (await ifItemExists(newTitle)) {
       alert("This title already exists!");

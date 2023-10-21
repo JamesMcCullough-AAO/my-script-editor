@@ -85,14 +85,14 @@ export const applyScriptLinkSpanStyles = async (
 };
 
 const getScriptIconColor = async (scriptName: string) => {
-  const id = "script_" + scriptToFileName(scriptName);
+  const id = scriptToFileName(scriptName);
   const scriptData = await getItem(id);
 
   return scriptData?.iconColor || "#00FFB6";
 };
 
 const referenceScriptExists = async (scriptName: string) => {
-  const id = "script_" + scriptToFileName(scriptName);
+  const id = scriptToFileName(scriptName);
   const scriptData = await getItem(id);
 
   return scriptData !== undefined;

@@ -67,7 +67,8 @@ export const loadScript = async ({
     characterNotes,
   });
 
-  const id = `script_${scriptToFileName(loadTitle)}`;
+  const id = scriptToFileName(loadTitle);
+  console.log("id", id);
   const databaseLoad = await getItem(id);
   const savedScripts = databaseLoad.existingScripts;
   const {
