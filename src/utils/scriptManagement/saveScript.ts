@@ -10,6 +10,7 @@ type saveScriptInput = {
   notes?: string;
   iconColor: string;
   characterNotes: characterNote[];
+  scriptTags: string[];
 };
 // You might want to define this outside your React component to avoid re-initializing it.
 let lastSavedTimestamp: number = 0;
@@ -22,6 +23,7 @@ export const saveScript = async ({
   notes,
   iconColor,
   characterNotes,
+  scriptTags,
 }: saveScriptInput) => {
   if (
     title &&
@@ -51,6 +53,7 @@ export const saveScript = async ({
         scriptUUID,
         iconImage,
         iconColor,
+        scriptTags,
       });
       return;
     }
@@ -71,7 +74,13 @@ export const saveScript = async ({
 
     const id = scriptToFileName(title);
 
-    await setItem(id, { existingScripts, iconImage, iconColor, scriptUUID });
+    await setItem(id, {
+      existingScripts,
+      iconImage,
+      iconColor,
+      scriptUUID,
+      scriptTags,
+    });
     lastSavedTimestamp = currentTime;
   }
 };

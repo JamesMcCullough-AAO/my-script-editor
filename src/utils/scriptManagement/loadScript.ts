@@ -26,6 +26,8 @@ type loadScriptInput = {
   setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
   setScriptLinkHistory: React.Dispatch<React.SetStateAction<string[]>>;
   scriptSpacing: scriptSpacingTypes;
+  setScriptTags: React.Dispatch<React.SetStateAction<string[]>>;
+  scriptTags: string[];
 };
 export const loadScript = async ({
   loadTitle,
@@ -46,6 +48,8 @@ export const loadScript = async ({
   setCharacterNotes,
   setScriptLinkHistory,
   scriptSpacing,
+  setScriptTags,
+  scriptTags,
 }: loadScriptInput & { versionIndex?: number }) => {
   setIsLoading(true);
   console.log("loadTitle", loadTitle);
@@ -65,6 +69,7 @@ export const loadScript = async ({
     notes,
     iconColor,
     characterNotes,
+    scriptTags,
   });
 
   const id = scriptToFileName(loadTitle);
@@ -75,8 +80,10 @@ export const loadScript = async ({
     iconImage: loadIconImage,
     iconColor: loadIconColor,
     scriptUUID: loadScriptUUID,
+    scriptTags: loadScriptTags,
   } = databaseLoad;
 
+  console.log("databaseLoad", databaseLoad);
   console.log("savedScripts", savedScripts);
 
   // if the loadScriptUUID is "" or undefined, generate a new one, otherwise use the one from the database
@@ -128,6 +135,12 @@ export const loadScript = async ({
         setCharacterNotes(characterNotes);
       } else {
         setCharacterNotes([]);
+      }
+
+      if (loadScriptTags) {
+        setScriptTags(loadScriptTags);
+      } else {
+        setScriptTags([]);
       }
     }
   }

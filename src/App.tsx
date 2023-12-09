@@ -27,6 +27,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import InfoIcon from "@mui/icons-material/Info";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import HistoryIcon from "@mui/icons-material/History";
@@ -97,6 +98,7 @@ import { scriptSpacingTypes } from "./styling";
 import { DeleteScriptModal } from "./modals/DeleteScriptModal";
 import { RenameScriptModal } from "./modals/RenameScriptModal";
 import { NameNewScriptModal } from "./modals/NameNewScriptModal";
+import { TagMenu } from "./modals/TagMenu";
 
 type AppProps = {
   scriptId?: string;
@@ -124,6 +126,7 @@ function App({ scriptId, isReadOnly }: AppProps) {
   const [scriptLinkHistory, setScriptLinkHistory] = useState<string[]>([]);
   const [isLoadingScript, setIsLoadingScript] = useState(false);
   const [scriptShareLink, setScriptShareLink] = useState("");
+  const [scriptTags, setScriptTags] = useState<string[]>([]);
   const [currentInfoNoteText, setCurrentInfoNoteText] = useState<string | null>(
     null
   );
@@ -222,6 +225,12 @@ function App({ scriptId, isReadOnly }: AppProps) {
     onClose: onNotesModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isTagMenuOpen,
+    onOpen: onTagMenuOpen,
+    onClose: onTagMenuClose,
+  } = useDisclosure();
+
   // if a script is passed in, load it
   useEffect(() => {
     if (scriptId) {
@@ -286,6 +295,8 @@ function App({ scriptId, isReadOnly }: AppProps) {
           versionIndex: -1,
           setScriptLinkHistory,
           scriptSpacing,
+          setScriptTags,
+          scriptTags,
         }).then(() => {
           setIsLoadingScript(false);
         });
@@ -319,6 +330,7 @@ function App({ scriptId, isReadOnly }: AppProps) {
         notes,
         iconColor,
         characterNotes,
+        scriptTags,
       });
     }
   }, [
@@ -328,6 +340,7 @@ function App({ scriptId, isReadOnly }: AppProps) {
     notes,
     iconColor,
     characterNotes,
+    scriptTags,
   ]);
 
   const updateWordCount = throttle(() => {
@@ -361,6 +374,7 @@ function App({ scriptId, isReadOnly }: AppProps) {
           notes,
           iconColor,
           characterNotes,
+          scriptTags,
         });
       });
 
@@ -399,6 +413,8 @@ function App({ scriptId, isReadOnly }: AppProps) {
             setCharacterNotes,
             setScriptLinkHistory,
             scriptSpacing,
+            setScriptTags,
+            scriptTags,
           }).then(() => {
             setIsLoadingScript(false); // Step 4: Reset flag after loading
             currentlyLoadingScript = false;
@@ -578,6 +594,17 @@ function App({ scriptId, isReadOnly }: AppProps) {
           colorScheme="blue"
           isDisabled={isGenerating}
           title="Toggle Spacing"
+        />
+        <IconButton
+          aria-label="Edit tags"
+          icon={<LocalOfferIcon />}
+          onClick={() => {
+            onTagMenuOpen();
+          }}
+          colorScheme="blue"
+          isDisabled={isGenerating || !title}
+          visibility={title ? "visible" : "hidden"}
+          title="Edit Tags"
         />
 
         {editorSettings.novelAiApiKey && (
@@ -800,6 +827,8 @@ function App({ scriptId, isReadOnly }: AppProps) {
         setCharacterNotes={setCharacterNotes}
         setScriptShareLink={setScriptShareLink}
         scriptSpacing={scriptSpacing}
+        setScriptTags={setScriptTags}
+        scriptTags={scriptTags}
       />
       <DeleteScriptModal
         isOpen={isDeleteModalOpen}
@@ -1121,6 +1150,8 @@ function App({ scriptId, isReadOnly }: AppProps) {
                       setCharacterNotes,
                       setScriptLinkHistory,
                       scriptSpacing,
+                      setScriptTags,
+                      scriptTags,
                     });
                     setSelectedVersion(null); // Close the confirmation modal
                     onVersionsModalClose(); // Close the versions modal
@@ -1304,6 +1335,12 @@ function App({ scriptId, isReadOnly }: AppProps) {
       <ShareSuccessModal
         scriptShareLink={scriptShareLink}
         setScriptShareLink={setScriptShareLink}
+      />
+      <TagMenu
+        isOpen={isTagMenuOpen}
+        onClose={onTagMenuClose}
+        scriptTags={scriptTags}
+        setScriptTags={setScriptTags}
       />
     </Stack>
   );

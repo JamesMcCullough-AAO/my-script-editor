@@ -4,9 +4,11 @@ import { fileNameToScript } from "../database/scriptToFileName";
 export const searchSavedTitles = async ({
   title,
   searchTerm,
+  selectedTags,
 }: {
   title: string;
   searchTerm: string;
+  selectedTags: string[];
 }) => {
   const allItems = await getAllItems();
   const savedTitles: Array<{
@@ -14,6 +16,7 @@ export const searchSavedTitles = async ({
     timestamp: number;
     iconImage?: string;
     iconColor: string;
+    scriptTags?: string[];
   }> = [];
 
   allItems.forEach((item) => {
@@ -26,6 +29,7 @@ export const searchSavedTitles = async ({
           timestamp: mostRecentData.timestamp,
           iconImage: item.iconImage,
           iconColor: item.iconColor,
+          scriptTags: item.scriptTags,
         });
       }
     }
@@ -41,7 +45,11 @@ export const searchSavedTitles = async ({
   // Sort by most recently edited and filter based on search term
   return savedTitles
     .sort((a, b) => b.timestamp - a.timestamp)
-    .filter(({ title }) =>
-      title.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      ({ title, scriptTags }) =>
+        title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedTags.length === 0 ||
+          // must contain all selected tags
+          selectedTags.every((tag) => scriptTags?.includes(tag)))
     );
 };

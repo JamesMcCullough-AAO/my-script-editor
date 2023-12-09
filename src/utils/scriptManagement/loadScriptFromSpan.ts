@@ -20,6 +20,8 @@ type loadScriptFromSpanProps = {
   setCharacterNotes: React.Dispatch<React.SetStateAction<characterNote[]>>;
   setScriptLinkHistory: React.Dispatch<React.SetStateAction<string[]>>;
   scriptSpacing: scriptSpacingTypes;
+  setScriptTags: React.Dispatch<React.SetStateAction<string[]>>;
+  scriptTags: string[];
 };
 
 export const loadScriptFromSpan = async ({
@@ -40,6 +42,8 @@ export const loadScriptFromSpan = async ({
   setCharacterNotes,
   setScriptLinkHistory,
   scriptSpacing,
+  setScriptTags,
+  scriptTags,
 }: loadScriptFromSpanProps) => {
   const scriptTitle = span.dataset.scriptTitle;
   if (!scriptTitle) return;
@@ -64,5 +68,7 @@ export const loadScriptFromSpan = async ({
     setCharacterNotes,
     setScriptLinkHistory,
     scriptSpacing,
+    setScriptTags,
+    scriptTags,
   });
 };

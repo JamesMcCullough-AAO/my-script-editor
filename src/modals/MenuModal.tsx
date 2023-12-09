@@ -68,6 +68,8 @@ type MenuModalProps = {
   setCharacterNotes: React.Dispatch<SetStateAction<characterNote[]>>;
   setScriptShareLink: React.Dispatch<SetStateAction<string>>;
   scriptSpacing: scriptSpacingTypes;
+  setScriptTags: React.Dispatch<SetStateAction<string[]>>;
+  scriptTags: string[];
 };
 
 export const MenuModal = ({
@@ -101,6 +103,8 @@ export const MenuModal = ({
   setCharacterNotes,
   setScriptShareLink,
   scriptSpacing,
+  setScriptTags,
+  scriptTags,
 }: MenuModalProps) => {
   const [isEditPopupOpen, setIsEditPopupOpen] = React.useState(false);
 
@@ -298,6 +302,8 @@ export const MenuModal = ({
                 versionIndex: -1,
                 setScriptLinkHistory,
                 scriptSpacing,
+                setScriptTags,
+                scriptTags,
               }).then(() => {
                 setIsLoadingScript(false);
               });
