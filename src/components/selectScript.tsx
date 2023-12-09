@@ -95,7 +95,17 @@ export const SelectScript = ({
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const tags = await getAllTags();
+        const tags = (await getAllTags()) as ScriptTag[];
+        // Put tags with images at the start
+        tags.sort((a, b) => {
+          if (a.image && !b.image) {
+            return -1;
+          } else if (!a.image && b.image) {
+            return 1;
+          } else {
+            return a.name.localeCompare(b.name);
+          }
+        });
         setAllTags(tags);
       } catch (error) {
         console.error("Error fetching tags:", error);

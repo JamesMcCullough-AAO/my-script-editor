@@ -94,6 +94,17 @@ export const TagMenu = ({
     const loadTags = async () => {
       try {
         const loadedTags = await getAllTags();
+        // Sort by image first, then name
+        loadedTags.sort((a, b) => {
+          if (a.image && !b.image) {
+            return -1;
+          } else if (!a.image && b.image) {
+            return 1;
+          } else {
+            return a.name.localeCompare(b.name);
+          }
+        });
+
         setGlobalScriptTags(loadedTags);
       } catch (error) {
         console.error("Failed to load tags from database:", error);
