@@ -54,8 +54,21 @@ export const beginCharacterName = ({
 
   const span = document.createElement("span");
   applySpanStyles({ span, scriptSpacing });
-  range?.insertNode(span);
-  range?.setStart(span, 0);
+
+  // Set the span to be contentEditable
+  span.contentEditable = "true";
+
+  // Insert a zero-width space inside the span to ensure there's a text node inside
+  span.innerHTML = "\u200B"; // This character is invisible but ensures the span is considered 'textual'
+
+  range.insertNode(span);
+  range.setStart(span, 0);
+  range.collapse(true);
+
+  // Attempt to place the cursor inside the span
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
 };
 
 export const endCharacterNameBracket = ({
