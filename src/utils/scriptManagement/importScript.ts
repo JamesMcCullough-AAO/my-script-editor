@@ -25,7 +25,7 @@ export const importScript = ({
       if (tabIndex !== -1) {
         const character = line.slice(tabIndex + 2, line.indexOf("]"));
         const span = document.createElement("span");
-        span.textContent = character;
+        span.textContent = character + "\u200B";
         applySpanStyles({ span });
 
         contentDiv.appendChild(span);
