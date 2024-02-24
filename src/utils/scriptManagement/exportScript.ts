@@ -42,7 +42,12 @@ export const exportScript = ({
       const element = node as HTMLElement;
 
       if (element.tagName === "SPAN") {
-        scriptText += `\t[${element.textContent}] `;
+        if (element.className === "character-name") {
+          scriptText += `\n\n[${element.textContent}]`;
+        } else {
+          // Check for sub elements
+          Array.from(element.childNodes).forEach(traverseNode);
+        }
       } else if (element.tagName === "DIV") {
         // Recurse into the div to check its children
         Array.from(element.childNodes).forEach(traverseNode);
