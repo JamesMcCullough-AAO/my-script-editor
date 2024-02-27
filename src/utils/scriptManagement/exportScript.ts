@@ -43,7 +43,7 @@ export const exportScript = ({
 
       if (element.tagName === "SPAN") {
         if (element.className === "character-name") {
-          scriptText += `\n\n[${element.textContent}]`;
+          scriptText += `\n\t[${element.textContent}]`;
         } else {
           // Check for sub elements
           Array.from(element.childNodes).forEach(traverseNode);
