@@ -41,7 +41,9 @@ export const exportScript = ({
       // HTML element
       const element = node as HTMLElement;
 
-      if (element.tagName === "SPAN") {
+      if (element.tagName === "p") {
+        Array.from(element.childNodes).forEach(traverseNode);
+      } else if (element.tagName === "SPAN") {
         if (element.className === "character-name") {
           scriptText += `\n\t[${element.textContent}]`;
         } else {
