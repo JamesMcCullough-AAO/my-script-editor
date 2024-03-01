@@ -41,7 +41,8 @@ export const exportScript = ({
       // HTML element
       const element = node as HTMLElement;
 
-      if (element.tagName === "p") {
+      // If it's inside a p tag, traverse the children
+      if (element.tagName === "P") {
         Array.from(element.childNodes).forEach(traverseNode);
       } else if (element.tagName === "SPAN") {
         if (element.className === "character-name") {
