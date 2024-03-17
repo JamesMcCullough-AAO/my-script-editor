@@ -20,8 +20,9 @@ export const extractCharacterNames = ({
   const characterNameSpans = contentRef.current.querySelectorAll(
     "span.character-name"
   );
+  // Trim and remove zero-width spaces from character names
   const characterNames = Array.from(characterNameSpans).map(
-    (span) => span.textContent?.trim() ?? ""
+    (span) => span.textContent?.trim().replace(/\u200B/g, "") || ""
   );
 
   const uniqueCharacterNames = Array.from(new Set(characterNames));
@@ -65,7 +66,7 @@ export const updateCharacterNameStyling = ({
   );
   characterSpans.forEach((span) => {
     applySpanStyles({ span: span as HTMLSpanElement, scriptSpacing });
-    const name = span.textContent;
+    const name = span.textContent?.trim().replace(/\u200B/g, "") || "";
     if (name && nameToColorMapping[name]) {
       (span as HTMLSpanElement).style.backgroundColor =
         nameToColorMapping[name];
